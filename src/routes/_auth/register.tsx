@@ -3,7 +3,7 @@ import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { apiClient } from '@/lib/api'
+import { authApi } from '@/lib/api'
 import type { RegisterRequest } from '@glebremniov/budget-buddy-contracts'
 
 export const Route = createFileRoute('/_auth/register')({
@@ -17,7 +17,7 @@ function RegisterPage() {
 
   const register = useMutation({
     mutationFn: async (body: RegisterRequest) => {
-      await apiClient.post('/v1/auth/register', body)
+      await authApi.registerUser({ registerRequest: body })
     },
     onSuccess: () => {
       navigate({ to: '/login' })

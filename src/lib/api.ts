@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { AuthApi, CategoriesApi, Configuration, TransactionsApi } from '@glebremniov/budget-buddy-contracts'
 import { useAuthStore } from '@/stores/auth.store'
 import type { AuthToken } from '@glebremniov/budget-buddy-contracts'
 
@@ -79,3 +80,8 @@ apiClient.interceptors.response.use(
     }
   },
 )
+
+const config = new Configuration({ basePath: BASE_URL })
+export const authApi = new AuthApi(config, BASE_URL, apiClient)
+export const categoriesApi = new CategoriesApi(config, BASE_URL, apiClient)
+export const transactionsApi = new TransactionsApi(config, BASE_URL, apiClient)
