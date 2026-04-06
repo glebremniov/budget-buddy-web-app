@@ -98,11 +98,12 @@ src/
     ui/             # shadcn/ui primitives (Button, Input, Card, Badge, Separator, Select, Skeleton)
     layout/         # AppShell, Header, MobileNav + SidebarNav
   hooks/
-    useTransactions.ts   # TanStack Query hooks for /v1/transactions
-    useCategories.ts     # TanStack Query hooks for /v1/categories
-    useLogout.ts         # Logout mutation: calls authApi.logoutUser(), clears auth + query cache, redirects
+    useTransactions.ts        # TanStack Query hooks for /v1/transactions
+    useCategories.ts          # TanStack Query hooks for /v1/categories
+    useLogout.ts              # Logout mutation: calls authApi.logoutUser(), clears auth + query cache, redirects
+    useWindowFocusRefresh.ts  # Proactively refreshes auth token on window focus if token is ≥6 days old
   stores/
-    auth.store.ts   # Zustand: accessToken (memory) + refreshToken (localStorage)
+    auth.store.ts   # Zustand: accessToken (memory) + refreshToken + refreshTokenObtainedAt (localStorage)
     theme.store.ts  # Zustand: light/dark/system preference (localStorage)
   lib/
     api.ts          # Axios instance + authApi / categoriesApi / transactionsApi instances

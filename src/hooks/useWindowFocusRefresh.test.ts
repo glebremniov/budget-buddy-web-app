@@ -1,0 +1,130 @@
+import { renderHook } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+const mockSetAuth = vi.fn()
+const mockPost = vi.fn()
+
+vi.mock('@/lib/api', () => ({
+  apiClient: { post: mockPost },
+}))
+
+let mockStoreState = {
+  refreshToken: null as string | null,
+  refreshTokenObtainedAt: null as number | null,
+  setAuth: mockSetAuth,
+}
+
+vi.mock('@/stores/auth.store', () => ({
+  useAuthStore: {
+    getState: () => mockStoreState,
+  },
+}))
+
+const { useWindowFocusRefresh } = await import('./useWindowFocusRefresh')
+
+const SIX_DAYS_MS = 6 * 24 * 60 * 60 * 1000
+const STALE_TIMESTAMP = Date.now() - SIX_DAYS_MS - 1000
+const FRESH_TIMESTAMP = Date.now() - 1000
+
+describe('useWindowFocusRefresh', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockStoreState = {
+      refreshToken: null,
+      refreshTokenObtainedAt: null,
+      setAuth: mockSetAuth,
+    }
+  })
+
+  it('does nothing if there is no refresh token', async () => {
+    mockStoreState.refreshToken = null
+    mockStoreState.refreshTokenObtainedAt = STALE_TIMESTAMP
+
+    renderHook(() => useWindowFocusRefresh())
+    window.dispatchEvent(new Event('focus'))
+
+    await Promise.resolve()
+    expect(mockPost).not.toHaveBeenCalled()
+  })
+
+  it('does nothing if refreshTokenObtainedAt is null', async () => {
+    mockStoreState.refreshToken = 'rt_token'
+    mockStoreState.refreshTokenObtainedAt = null
+
+    renderHook(() => useWindowFocusRefresh())
+    window.dispatchEvent(new Event('focus'))
+
+    await Promise.resolve()
+    expect(mockPost).not.toHaveBeenCalled()
+  })
+
+  it('does not refresh when token is fresh (< 6 days old)', async () => {
+    mockStoreState.refreshToken = 'rt_token'
+    mockStoreState.refreshTokenObtainedAt = FRESH_TIMESTAMP
+
+    renderHook(() => useWindowFocusRefresh())
+    window.dispatchEvent(new Event('focus'))
+
+    await Promise.resolve()
+    expect(mockPost).not.toHaveBeenCalled()
+  })
+
+  it('refreshes and updates auth when token is stale (≥ 6 days old)', async () => {
+    mockStoreState.refreshToken = 'rt_old'
+    mockStoreState.refreshTokenObtainedAt = STALE_TIMESTAMP
+
+    mockPost.mockResolvedValue({
+      data: { access_token: 'at_new', refresh_token: 'rt_new' },
+    })
+
+    renderHook(() => useWindowFocusRefresh())
+    window.dispatchEvent(new Event('focus'))
+
+    await vi.waitFor(() => expect(mockPost).toHaveBeenCalledOnce())
+    expect(mockPost).toHaveBeenCalledWith('/v1/auth/refresh', { refresh_token: 'rt_old' })
+    expect(mockSetAuth).toHaveBeenCalledWith('at_new', 'rt_new')
+  })
+
+  it('silently catches refresh errors', async () => {
+    mockStoreState.refreshToken = 'rt_old'
+    mockStoreState.refreshTokenObtainedAt = STALE_TIMESTAMP
+
+    mockPost.mockRejectedValue(new Error('network error'))
+
+    renderHook(() => useWindowFocusRefresh())
+    window.dispatchEvent(new Event('focus'))
+
+    // Should not throw
+    await vi.waitFor(() => expect(mockPost).toHaveBeenCalledOnce())
+    expect(mockSetAuth).not.toHaveBeenCalled()
+  })
+
+  it('does not double-refresh on rapid focus events', async () => {
+    mockStoreState.refreshToken = 'rt_old'
+    mockStoreState.refreshTokenObtainedAt = STALE_TIMESTAMP
+
+    let resolveRefresh!: () => void
+    mockPost.mockReturnValue(
+      new Promise<{ data: { access_token: string; refresh_token: string } }>((resolve) => {
+        resolveRefresh = () => resolve({ data: { access_token: 'at_new', refresh_token: 'rt_new' } })
+      }),
+    )
+
+    renderHook(() => useWindowFocusRefresh())
+    window.dispatchEvent(new Event('focus'))
+    window.dispatchEvent(new Event('focus'))
+    window.dispatchEvent(new Event('focus'))
+
+    resolveRefresh()
+    await vi.waitFor(() => expect(mockPost).toHaveBeenCalledTimes(1))
+  })
+
+  it('removes the focus listener on unmount', () => {
+    const removeSpy = vi.spyOn(window, 'removeEventListener')
+
+    const { unmount } = renderHook(() => useWindowFocusRefresh())
+    unmount()
+
+    expect(removeSpy).toHaveBeenCalledWith('focus', expect.any(Function))
+  })
+})
