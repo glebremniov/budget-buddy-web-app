@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react'
+import { Button } from '@/components/ui/button'
 import { logError } from '@/lib/error-logger'
 
 interface Props {
@@ -45,9 +46,9 @@ function DefaultErrorFallback({ error, reset }: { error: Error; reset: () => voi
     <div className="flex min-h-[200px] flex-col items-center justify-center gap-4 p-6 text-center">
       <h2 className="text-base font-semibold">Something went wrong</h2>
       <p className="max-w-sm text-sm text-muted-foreground">{error.message}</p>
-      <button type="button" className="text-sm underline" onClick={reset}>
+      <Button variant="link" size="sm" onClick={reset}>
         Try again
-      </button>
+      </Button>
     </div>
   )
 }

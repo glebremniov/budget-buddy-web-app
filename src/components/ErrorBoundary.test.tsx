@@ -1,4 +1,4 @@
-import { render, screen, act } from '@testing-library/react'
+import { render, screen, act, fireEvent } from '@testing-library/react'
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { ErrorBoundary } from './ErrorBoundary'
 
@@ -30,7 +30,7 @@ describe('ErrorBoundary', () => {
   })
 
   it('renders default fallback and logs the error when a child throws', () => {
-    render(
+    const { rerender } = render(
       <ErrorBoundary>
         <Bomb shouldThrow={true} />
       </ErrorBoundary>,
@@ -41,6 +41,19 @@ describe('ErrorBoundary', () => {
       expect.any(Error),
       expect.objectContaining({ source: 'ErrorBoundary' }),
     )
+
+    // "Try again" button exists and resets the boundary
+    const btn = screen.getByRole('button', { name: /try again/i })
+    expect(btn).toBeInTheDocument()
+
+    rerender(
+      <ErrorBoundary>
+        <Bomb shouldThrow={false} />
+      </ErrorBoundary>,
+    )
+    act(() => { fireEvent.click(btn) })
+
+    expect(screen.getByText('safe content')).toBeInTheDocument()
   })
 
   it('renders a custom fallback when provided', () => {
