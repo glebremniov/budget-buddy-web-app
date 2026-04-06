@@ -31,7 +31,10 @@ export function useWindowFocusRefresh() {
         })
         setAuth(data.access_token, data.refresh_token)
       } catch {
-        // Silently ignore — reactive 401 handling in api.ts will catch actual expiry
+        // Network/transient errors are silently ignored so the user is not interrupted.
+        // If the refresh token is expired (server returns 401), the response interceptor
+        // in api.ts takes over: it attempts another refresh, fails, calls clearAuth(),
+        // and redirects to /login — which is the correct UX for an expired session.
       } finally {
         isRefreshingRef.current = false
       }
