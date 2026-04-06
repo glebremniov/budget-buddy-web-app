@@ -12,7 +12,7 @@ const SIX_DAYS_MS = 6 * 24 * 60 * 60 * 1000
  *
  * Mount once inside the authenticated layout.
  */
-export function useWindowFocusRefresh() {
+export function useTabVisibilityRefresh() {
   const isRefreshingRef = useRef(false)
 
   useEffect(() => {

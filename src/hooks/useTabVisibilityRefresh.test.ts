@@ -20,7 +20,7 @@ vi.mock('@/stores/auth.store', () => ({
   },
 }))
 
-const { useWindowFocusRefresh } = await import('./useWindowFocusRefresh')
+const { useTabVisibilityRefresh } = await import('./useTabVisibilityRefresh')
 
 const SIX_DAYS_MS = 6 * 24 * 60 * 60 * 1000
 const STALE_TIMESTAMP = Date.now() - SIX_DAYS_MS - 1000
@@ -38,7 +38,7 @@ function fireVisibilityChange(state: 'visible' | 'hidden') {
   document.dispatchEvent(new Event('visibilitychange'))
 }
 
-describe('useWindowFocusRefresh', () => {
+describe('useTabVisibilityRefresh', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockStoreState = {
@@ -53,7 +53,7 @@ describe('useWindowFocusRefresh', () => {
     mockStoreState.refreshToken = null
     mockStoreState.refreshTokenObtainedAt = STALE_TIMESTAMP
 
-    renderHook(() => useWindowFocusRefresh())
+    renderHook(() => useTabVisibilityRefresh())
     fireVisibilityChange('visible')
 
     await Promise.resolve()
@@ -64,7 +64,7 @@ describe('useWindowFocusRefresh', () => {
     mockStoreState.refreshToken = 'rt_token'
     mockStoreState.refreshTokenObtainedAt = null
 
-    renderHook(() => useWindowFocusRefresh())
+    renderHook(() => useTabVisibilityRefresh())
     fireVisibilityChange('visible')
 
     await Promise.resolve()
@@ -75,7 +75,7 @@ describe('useWindowFocusRefresh', () => {
     mockStoreState.refreshToken = 'rt_token'
     mockStoreState.refreshTokenObtainedAt = FRESH_TIMESTAMP
 
-    renderHook(() => useWindowFocusRefresh())
+    renderHook(() => useTabVisibilityRefresh())
     fireVisibilityChange('visible')
 
     await Promise.resolve()
@@ -86,7 +86,7 @@ describe('useWindowFocusRefresh', () => {
     mockStoreState.refreshToken = 'rt_old'
     mockStoreState.refreshTokenObtainedAt = STALE_TIMESTAMP
 
-    renderHook(() => useWindowFocusRefresh())
+    renderHook(() => useTabVisibilityRefresh())
     fireVisibilityChange('hidden')
 
     await Promise.resolve()
@@ -101,7 +101,7 @@ describe('useWindowFocusRefresh', () => {
       data: { access_token: 'at_new', refresh_token: 'rt_new' },
     })
 
-    renderHook(() => useWindowFocusRefresh())
+    renderHook(() => useTabVisibilityRefresh())
     fireVisibilityChange('visible')
 
     await vi.waitFor(() => expect(mockPost).toHaveBeenCalledOnce())
@@ -115,7 +115,7 @@ describe('useWindowFocusRefresh', () => {
 
     mockPost.mockRejectedValue(new Error('network error'))
 
-    renderHook(() => useWindowFocusRefresh())
+    renderHook(() => useTabVisibilityRefresh())
     fireVisibilityChange('visible')
 
     // Should not throw
@@ -134,7 +134,7 @@ describe('useWindowFocusRefresh', () => {
       }),
     )
 
-    renderHook(() => useWindowFocusRefresh())
+    renderHook(() => useTabVisibilityRefresh())
     fireVisibilityChange('visible')
     fireVisibilityChange('visible')
     fireVisibilityChange('visible')
@@ -143,10 +143,34 @@ describe('useWindowFocusRefresh', () => {
     await vi.waitFor(() => expect(mockPost).toHaveBeenCalledTimes(1))
   })
 
+  it('does not re-refresh on sequential visibility event after token was just refreshed', async () => {
+    mockStoreState.refreshToken = 'rt_old'
+    mockStoreState.refreshTokenObtainedAt = STALE_TIMESTAMP
+
+    mockPost.mockResolvedValue({
+      data: { access_token: 'at_new', refresh_token: 'rt_new' },
+    })
+    // Simulate setAuth updating the store so the next staleness check sees a fresh token
+    mockSetAuth.mockImplementation(() => {
+      mockStoreState.refreshTokenObtainedAt = Date.now()
+    })
+
+    renderHook(() => useTabVisibilityRefresh())
+    fireVisibilityChange('visible')
+
+    await vi.waitFor(() => expect(mockPost).toHaveBeenCalledTimes(1))
+
+    // Second visibility event — token is now fresh, staleness check should block refresh
+    fireVisibilityChange('visible')
+    await Promise.resolve()
+
+    expect(mockPost).toHaveBeenCalledTimes(1)
+  })
+
   it('removes the visibilitychange listener on unmount', () => {
     const removeSpy = vi.spyOn(document, 'removeEventListener')
 
-    const { unmount } = renderHook(() => useWindowFocusRefresh())
+    const { unmount } = renderHook(() => useTabVisibilityRefresh())
     unmount()
 
     expect(removeSpy).toHaveBeenCalledWith('visibilitychange', expect.any(Function))
