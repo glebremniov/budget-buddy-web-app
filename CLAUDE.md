@@ -85,7 +85,7 @@ src/
     _app/transactions/index.tsx
     _app/categories/index.tsx
   components/
-    ui/             # shadcn/ui primitives (Button, Input, Card, Badge, Separator)
+    ui/             # shadcn/ui primitives (Button, Input, Card, Badge, Separator, Select, Skeleton)
     layout/         # AppShell, Header, MobileNav + SidebarNav
   hooks/
     useTransactions.ts   # TanStack Query hooks for /v1/transactions
@@ -98,6 +98,8 @@ src/
     query-client.ts # TanStack QueryClient singleton
     formatters.ts   # formatCurrency (minor units), formatDate, toMinorUnits, todayIso
     cn.ts           # clsx + tailwind-merge utility
+  test/
+    setup.ts        # Vitest setup: @testing-library/jest-dom + localStorage mock for Zustand persist
 ```
 
 ## Auth flow
