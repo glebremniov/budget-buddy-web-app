@@ -6,8 +6,9 @@ import { useAuthStore } from '@/stores/auth.store'
 const SIX_DAYS_MS = 6 * 24 * 60 * 60 * 1000
 
 /**
- * Proactively refreshes the auth token on window focus if the refresh token
- * is older than 6 days, catching token expiry before the next user action.
+ * Proactively refreshes the auth token when the tab becomes visible if the
+ * refresh token is older than 6 days, catching token expiry before the next
+ * user action. Covers both tab-switching and window-focus scenarios.
  *
  * Mount once inside the authenticated layout.
  */
@@ -15,7 +16,9 @@ export function useWindowFocusRefresh() {
   const isRefreshingRef = useRef(false)
 
   useEffect(() => {
-    async function handleFocus() {
+    async function handleVisibilityChange() {
+      if (document.visibilityState !== 'visible') return
+
       const { refreshToken, refreshTokenObtainedAt, setAuth } = useAuthStore.getState()
 
       if (!refreshToken || refreshTokenObtainedAt === null) return
@@ -40,7 +43,7 @@ export function useWindowFocusRefresh() {
       }
     }
 
-    window.addEventListener('focus', handleFocus)
-    return () => window.removeEventListener('focus', handleFocus)
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
   }, [])
 }
