@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { queryClient } from '@/lib/query-client'
-import { apiClient } from '@/lib/api'
+import { authApi } from '@/lib/api'
 import { useAuthStore } from '@/stores/auth.store'
 
 export function useLogout() {
@@ -9,7 +9,7 @@ export function useLogout() {
   const clearAuth = useAuthStore((s) => s.clearAuth)
 
   return useMutation({
-    mutationFn: () => apiClient.post('/v1/auth/logout'),
+    mutationFn: () => authApi.logoutUser(),
     onSettled: () => {
       clearAuth()
       queryClient.clear()

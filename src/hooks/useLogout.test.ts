@@ -9,8 +9,8 @@ vi.mock('@tanstack/react-router', () => ({
 }))
 
 vi.mock('@/lib/api', () => ({
-  apiClient: {
-    post: vi.fn(),
+  authApi: {
+    logoutUser: vi.fn(),
   },
 }))
 
@@ -27,7 +27,7 @@ vi.mock('@/stores/auth.store', () => ({
 
 const mockClearAuth = vi.fn()
 
-const { apiClient } = await import('@/lib/api')
+const { authApi } = await import('@/lib/api')
 const { queryClient } = await import('@/lib/query-client')
 const { useLogout } = await import('./useLogout')
 
@@ -43,7 +43,7 @@ describe('useLogout', () => {
   })
 
   it('calls the logout endpoint, clears auth, clears query cache, and navigates to /login on success', async () => {
-    vi.mocked(apiClient.post).mockResolvedValue({ data: undefined })
+    vi.mocked(authApi.logoutUser).mockResolvedValue({ data: undefined } as never)
 
     const { result } = renderHook(() => useLogout(), { wrapper: makeWrapper() })
 
@@ -51,14 +51,14 @@ describe('useLogout', () => {
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
 
-    expect(apiClient.post).toHaveBeenCalledWith('/v1/auth/logout')
+    expect(authApi.logoutUser).toHaveBeenCalledOnce()
     expect(mockClearAuth).toHaveBeenCalledOnce()
     expect(queryClient.clear).toHaveBeenCalledOnce()
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/login' })
   })
 
   it('still clears auth, query cache, and navigates even when the backend call fails', async () => {
-    vi.mocked(apiClient.post).mockRejectedValue(new Error('network error'))
+    vi.mocked(authApi.logoutUser).mockRejectedValue(new Error('network error'))
 
     const { result } = renderHook(() => useLogout(), { wrapper: makeWrapper() })
 
