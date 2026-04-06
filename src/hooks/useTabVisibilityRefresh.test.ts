@@ -20,13 +20,25 @@ vi.mock('@/stores/auth.store', () => ({
   },
 }))
 
-const { useWindowFocusRefresh } = await import('./useWindowFocusRefresh')
+const { useTabVisibilityRefresh } = await import('./useTabVisibilityRefresh')
 
 const SIX_DAYS_MS = 6 * 24 * 60 * 60 * 1000
 const STALE_TIMESTAMP = Date.now() - SIX_DAYS_MS - 1000
 const FRESH_TIMESTAMP = Date.now() - 1000
 
-describe('useWindowFocusRefresh', () => {
+function setVisibilityState(state: 'visible' | 'hidden') {
+  Object.defineProperty(document, 'visibilityState', {
+    configurable: true,
+    get: () => state,
+  })
+}
+
+function fireVisibilityChange(state: 'visible' | 'hidden') {
+  setVisibilityState(state)
+  document.dispatchEvent(new Event('visibilitychange'))
+}
+
+describe('useTabVisibilityRefresh', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockStoreState = {
@@ -34,14 +46,15 @@ describe('useWindowFocusRefresh', () => {
       refreshTokenObtainedAt: null,
       setAuth: mockSetAuth,
     }
+    setVisibilityState('visible')
   })
 
   it('does nothing if there is no refresh token', async () => {
     mockStoreState.refreshToken = null
     mockStoreState.refreshTokenObtainedAt = STALE_TIMESTAMP
 
-    renderHook(() => useWindowFocusRefresh())
-    window.dispatchEvent(new Event('focus'))
+    renderHook(() => useTabVisibilityRefresh())
+    fireVisibilityChange('visible')
 
     await Promise.resolve()
     expect(mockPost).not.toHaveBeenCalled()
@@ -51,8 +64,8 @@ describe('useWindowFocusRefresh', () => {
     mockStoreState.refreshToken = 'rt_token'
     mockStoreState.refreshTokenObtainedAt = null
 
-    renderHook(() => useWindowFocusRefresh())
-    window.dispatchEvent(new Event('focus'))
+    renderHook(() => useTabVisibilityRefresh())
+    fireVisibilityChange('visible')
 
     await Promise.resolve()
     expect(mockPost).not.toHaveBeenCalled()
@@ -62,14 +75,25 @@ describe('useWindowFocusRefresh', () => {
     mockStoreState.refreshToken = 'rt_token'
     mockStoreState.refreshTokenObtainedAt = FRESH_TIMESTAMP
 
-    renderHook(() => useWindowFocusRefresh())
-    window.dispatchEvent(new Event('focus'))
+    renderHook(() => useTabVisibilityRefresh())
+    fireVisibilityChange('visible')
 
     await Promise.resolve()
     expect(mockPost).not.toHaveBeenCalled()
   })
 
-  it('refreshes and updates auth when token is stale (≥ 6 days old)', async () => {
+  it('does not refresh when tab becomes hidden', async () => {
+    mockStoreState.refreshToken = 'rt_old'
+    mockStoreState.refreshTokenObtainedAt = STALE_TIMESTAMP
+
+    renderHook(() => useTabVisibilityRefresh())
+    fireVisibilityChange('hidden')
+
+    await Promise.resolve()
+    expect(mockPost).not.toHaveBeenCalled()
+  })
+
+  it('refreshes and updates auth when tab becomes visible and token is stale (≥ 6 days old)', async () => {
     mockStoreState.refreshToken = 'rt_old'
     mockStoreState.refreshTokenObtainedAt = STALE_TIMESTAMP
 
@@ -77,8 +101,8 @@ describe('useWindowFocusRefresh', () => {
       data: { access_token: 'at_new', refresh_token: 'rt_new' },
     })
 
-    renderHook(() => useWindowFocusRefresh())
-    window.dispatchEvent(new Event('focus'))
+    renderHook(() => useTabVisibilityRefresh())
+    fireVisibilityChange('visible')
 
     await vi.waitFor(() => expect(mockPost).toHaveBeenCalledOnce())
     expect(mockPost).toHaveBeenCalledWith('/v1/auth/refresh', { refresh_token: 'rt_old' })
@@ -91,15 +115,15 @@ describe('useWindowFocusRefresh', () => {
 
     mockPost.mockRejectedValue(new Error('network error'))
 
-    renderHook(() => useWindowFocusRefresh())
-    window.dispatchEvent(new Event('focus'))
+    renderHook(() => useTabVisibilityRefresh())
+    fireVisibilityChange('visible')
 
     // Should not throw
     await vi.waitFor(() => expect(mockPost).toHaveBeenCalledOnce())
     expect(mockSetAuth).not.toHaveBeenCalled()
   })
 
-  it('does not double-refresh on rapid focus events', async () => {
+  it('does not double-refresh on rapid visibility events', async () => {
     mockStoreState.refreshToken = 'rt_old'
     mockStoreState.refreshTokenObtainedAt = STALE_TIMESTAMP
 
@@ -110,21 +134,45 @@ describe('useWindowFocusRefresh', () => {
       }),
     )
 
-    renderHook(() => useWindowFocusRefresh())
-    window.dispatchEvent(new Event('focus'))
-    window.dispatchEvent(new Event('focus'))
-    window.dispatchEvent(new Event('focus'))
+    renderHook(() => useTabVisibilityRefresh())
+    fireVisibilityChange('visible')
+    fireVisibilityChange('visible')
+    fireVisibilityChange('visible')
 
     resolveRefresh()
     await vi.waitFor(() => expect(mockPost).toHaveBeenCalledTimes(1))
   })
 
-  it('removes the focus listener on unmount', () => {
-    const removeSpy = vi.spyOn(window, 'removeEventListener')
+  it('does not re-refresh on sequential visibility event after token was just refreshed', async () => {
+    mockStoreState.refreshToken = 'rt_old'
+    mockStoreState.refreshTokenObtainedAt = STALE_TIMESTAMP
 
-    const { unmount } = renderHook(() => useWindowFocusRefresh())
+    mockPost.mockResolvedValue({
+      data: { access_token: 'at_new', refresh_token: 'rt_new' },
+    })
+    // Simulate setAuth updating the store so the next staleness check sees a fresh token
+    mockSetAuth.mockImplementation(() => {
+      mockStoreState.refreshTokenObtainedAt = Date.now()
+    })
+
+    renderHook(() => useTabVisibilityRefresh())
+    fireVisibilityChange('visible')
+
+    await vi.waitFor(() => expect(mockPost).toHaveBeenCalledTimes(1))
+
+    // Second visibility event — token is now fresh, staleness check should block refresh
+    fireVisibilityChange('visible')
+    await Promise.resolve()
+
+    expect(mockPost).toHaveBeenCalledTimes(1)
+  })
+
+  it('removes the visibilitychange listener on unmount', () => {
+    const removeSpy = vi.spyOn(document, 'removeEventListener')
+
+    const { unmount } = renderHook(() => useTabVisibilityRefresh())
     unmount()
 
-    expect(removeSpy).toHaveBeenCalledWith('focus', expect.any(Function))
+    expect(removeSpy).toHaveBeenCalledWith('visibilitychange', expect.any(Function))
   })
 })

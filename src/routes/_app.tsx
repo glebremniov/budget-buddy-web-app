@@ -1,7 +1,7 @@
 import { Outlet, createFileRoute, redirect, useRouter } from '@tanstack/react-router'
 import { AppShell } from '@/components/layout/AppShell'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
-import { useWindowFocusRefresh } from '@/hooks/useWindowFocusRefresh'
+import { useTabVisibilityRefresh } from '@/hooks/useTabVisibilityRefresh'
 import { useAuthStore } from '@/stores/auth.store'
 
 export const Route = createFileRoute('/_app')({
@@ -15,7 +15,7 @@ export const Route = createFileRoute('/_app')({
 })
 
 function AppLayout() {
-  useWindowFocusRefresh()
+  useTabVisibilityRefresh()
   return (
     <AppShell>
       <ErrorBoundary>
