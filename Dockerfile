@@ -66,7 +66,7 @@ RUN pnpm build
 # ─────────────────────────────────────────────────────────────────────────────
 # Stage 3 — production: serve the static bundle with Nginx
 # ─────────────────────────────────────────────────────────────────────────────
-FROM nginx:1.27-alpine AS production
+FROM nginx:1.29-alpine AS production
 
 LABEL org.opencontainers.image.source="https://github.com/glebremniov/budget-buddy-web-app"
 
