@@ -174,6 +174,10 @@ GITHUB_TOKEN=$(gh auth token) VITE_API_URL=http://localhost:8080 docker compose 
 
 `VITE_API_URL` is baked into the bundle at build time (Vite limitation) — rebuild the image when the API URL changes.
 
+**CI publishing:** The `publish` job in `.github/workflows/ci.yml` automatically builds and pushes to `ghcr.io/glebremniov/budget-buddy-web-app` after every merge to `main` (`latest` + `sha-<sha>` tags) and every GitHub Release (`v<version>` tag). Multi-platform (`linux/amd64` + `linux/arm64`), with SBOM/provenance attestations and keyless Cosign signing.
+
+Prerequisite: set `VITE_API_URL` as a **repository variable** in GitHub Settings → Secrets and variables → Actions → Variables before the first publish run.
+
 ## API
 
 Proxied to `VITE_API_URL` (default: `http://localhost:8080`). Copy `.env.example` to `.env.local` to configure. The Budget Buddy API requires `spring.profiles.active=dev` to auto-start PostgreSQL.

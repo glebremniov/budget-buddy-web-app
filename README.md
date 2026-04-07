@@ -59,6 +59,8 @@ GITHUB_TOKEN=$(gh auth token) VITE_API_URL=http://localhost:8080 docker compose 
 
 `VITE_API_URL` is baked into the bundle at build time — rebuild the image when the API URL changes.
 
+Pre-built images are published to `ghcr.io/glebremniov/budget-buddy-web-app` on every merge to `main` and every GitHub Release.
+
 ## Deployment
 
 See [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) for production deployment instructions and environment setup.
