@@ -68,6 +68,8 @@ RUN pnpm build
 # ─────────────────────────────────────────────────────────────────────────────
 FROM nginx:1.27-alpine AS production
 
+LABEL org.opencontainers.image.source="https://github.com/glebremniov/budget-buddy-web-app"
+
 # Create the snippets directory and copy the shared security-headers snippet.
 # nginx's add_header is not inherited by child location blocks that define their
 # own add_header, so the snippet is included explicitly inside each location.
