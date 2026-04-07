@@ -66,9 +66,12 @@ RUN pnpm build
 # ─────────────────────────────────────────────────────────────────────────────
 # Stage 3 — production: serve the static bundle with Nginx
 # ─────────────────────────────────────────────────────────────────────────────
-FROM nginx:1.27-alpine AS production
+FROM nginx:1.29-alpine AS production
 
 LABEL org.opencontainers.image.source="https://github.com/glebremniov/budget-buddy-web-app"
+
+# Upgrade all packages to pick up security patches not yet in the base image tag.
+RUN apk upgrade --no-cache
 
 # Create the snippets directory and copy the shared security-headers snippet.
 # nginx's add_header is not inherited by child location blocks that define their
