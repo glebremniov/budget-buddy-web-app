@@ -38,7 +38,7 @@ client.interceptors.response.use(async (response: Response, _request: Request, o
     }).then(async (token) => {
       const newHeaders = new Headers(options.headers)
       newHeaders.set('Authorization', `Bearer ${token}`)
-      return client.request({ ...options, headers: newHeaders } as any)
+      return client.request({ ...options, headers: newHeaders } as any).then((r: any) => r.response)
     })
   }
 
@@ -68,7 +68,7 @@ client.interceptors.response.use(async (response: Response, _request: Request, o
 
     const newHeaders = new Headers(options.headers)
     newHeaders.set('Authorization', `Bearer ${data.access_token}`)
-    return client.request({ ...options, headers: newHeaders } as any)
+    return client.request({ ...options, headers: newHeaders } as any).then((r: any) => r.response)
   } catch (refreshError) {
     flushQueue(refreshError, null)
     useAuthStore.getState().clearAuth()
