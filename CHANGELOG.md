@@ -1,3 +1,9 @@
+## [1.1.2](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v1.1.1...v1.1.2) (2026-04-11)
+
+### Bug Fixes
+
+* permissions in ci ([d1b3352](https://github.com/budget-buddy-org/budget-buddy-web-app/commit/d1b3352d4b67f6f38eb9952eade083f91bba7a25))
+
 ## [1.1.1](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v1.1.0...v1.1.1) (2026-04-11)
 
 
