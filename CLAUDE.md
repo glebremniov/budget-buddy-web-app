@@ -83,7 +83,9 @@ Required format: `type(scope): subject` — scope is optional.
 |---|---|---|
 | `feat` | new user-facing feature | minor |
 | `fix` | bug fix | patch |
+| `perf` | performance improvement | patch |
+| `revert` | reverts a previous commit | patch |
 | `feat!` / `BREAKING CHANGE:` footer | breaking API change | major |
-| `chore`, `docs`, `test`, `refactor`, `style`, `perf`, `build`, `ci` | everything else | none |
+| `chore`, `docs`, `test`, `refactor`, `style`, `build`, `ci`, `ops` | everything else | none |
 
 **Releases are fully automated.** Merging to `main` triggers semantic-release in CI, which analyzes commits since the last release, bumps the version, writes `CHANGELOG.md`, and publishes a GitHub release. That release event then triggers the Docker image build and push to GHCR with proper semver tags.
