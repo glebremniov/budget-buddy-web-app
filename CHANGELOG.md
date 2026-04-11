@@ -1,3 +1,11 @@
+## [1.1.1](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v1.1.0...v1.1.1) (2026-04-11)
+
+
+### Bug Fixes
+
+* extract .response from client.request() in interceptor ([#38](https://github.com/budget-buddy-org/budget-buddy-web-app/issues/38)) ([286143e](https://github.com/budget-buddy-org/budget-buddy-web-app/commit/286143e61d055991382d8649463da0d9611ed0b4))
+* wire API client base URL and upgrade contracts to v2.1.0 ([#37](https://github.com/budget-buddy-org/budget-buddy-web-app/issues/37)) ([f8cf4c8](https://github.com/budget-buddy-org/budget-buddy-web-app/commit/f8cf4c88bbc99f19553bdf7e0c7b44667f02d125))
+
 # [1.1.0](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v1.0.0...v1.1.0) (2026-04-11)
 
 
