@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v1.0.0...v1.1.0) (2026-04-11)
+
+
+### Features
+
+* upgrade to @budget-buddy-org/budget-buddy-contracts v2.0.0 ([#36](https://github.com/budget-buddy-org/budget-buddy-web-app/issues/36)) ([7824b8a](https://github.com/budget-buddy-org/budget-buddy-web-app/commit/7824b8a4ae7253157cbe35a36f5f065bf96c9a92))
+
 # 1.0.0 (2026-04-10)
 
 
