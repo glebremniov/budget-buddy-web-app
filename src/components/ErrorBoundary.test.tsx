@@ -29,29 +29,42 @@ describe('ErrorBoundary', () => {
     expect(screen.getByText('safe content')).toBeInTheDocument()
   })
 
-  it('renders default fallback and logs the error when a child throws', () => {
+  it('renders default fallback with generic message and toggleable details', () => {
     const { rerender } = render(
       <ErrorBoundary>
         <Bomb shouldThrow={true} />
       </ErrorBoundary>,
     )
     expect(screen.getByText('Something went wrong')).toBeInTheDocument()
-    expect(screen.getByText('test explosion')).toBeInTheDocument()
+    expect(
+      screen.getByText('An unexpected error occurred. Please try again later.'),
+    ).toBeInTheDocument()
+    expect(screen.queryByText('test explosion')).not.toBeInTheDocument()
+
     expect(logError).toHaveBeenCalledWith(
       expect.any(Error),
       expect.objectContaining({ source: 'ErrorBoundary' }),
     )
 
-    // "Try again" button exists and resets the boundary
-    const btn = screen.getByRole('button', { name: /try again/i })
-    expect(btn).toBeInTheDocument()
+    // Show details toggle
+    const toggleBtn = screen.getByRole('button', { name: /show details/i })
+    act(() => {
+      fireEvent.click(toggleBtn)
+    })
 
+    expect(screen.getByText('test explosion')).toBeInTheDocument()
+    expect(screen.getByText(/hide details/i)).toBeInTheDocument()
+
+    // "Try again" button exists and resets the boundary
+    const tryAgainBtn = screen.getByRole('button', { name: /try again/i })
     rerender(
       <ErrorBoundary>
         <Bomb shouldThrow={false} />
       </ErrorBoundary>,
     )
-    act(() => { fireEvent.click(btn) })
+    act(() => {
+      fireEvent.click(tryAgainBtn)
+    })
 
     expect(screen.getByText('safe content')).toBeInTheDocument()
   })
