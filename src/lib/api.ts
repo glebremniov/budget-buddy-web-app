@@ -20,6 +20,35 @@ function flushQueue(error: unknown, token: string | null) {
   pendingQueue = []
 }
 
+export async function refreshAuth() {
+  const refreshTokenValue = useAuthStore.getState().refreshToken
+  if (!refreshTokenValue) {
+    useAuthStore.getState().clearAuth()
+    return null
+  }
+
+  isRefreshing = true
+  try {
+    const { data } = await refreshAction({
+      body: { refresh_token: refreshTokenValue },
+    })
+
+    if (!data) {
+      throw new Error('Refresh failed')
+    }
+
+    useAuthStore.getState().setAuth(data.access_token, data.refresh_token)
+    flushQueue(null, data.access_token)
+    return data.access_token
+  } catch (refreshError) {
+    flushQueue(refreshError, null)
+    useAuthStore.getState().clearAuth()
+    return null
+  } finally {
+    isRefreshing = false
+  }
+}
+
 // On 401: attempt refresh → retry; on refresh failure → clear auth + redirect to login
 client.interceptors.response.use(async (response: Response, _request: Request, options: any) => {
   if (response.status !== 401 || options._retry) {
@@ -36,41 +65,17 @@ client.interceptors.response.use(async (response: Response, _request: Request, o
     })
   }
 
-  const refreshTokenValue = useAuthStore.getState().refreshToken
-  if (!refreshTokenValue) {
-    useAuthStore.getState().clearAuth()
-    if (typeof window !== 'undefined') {
-      window.location.href = '/login'
-    }
-    return response
-  }
-
   options._retry = true
-  isRefreshing = true
+  const token = await refreshAuth()
 
-  try {
-    const { data } = await refreshAction({
-      body: { refresh_token: refreshTokenValue },
-    })
-
-    if (!data) {
-      throw new Error('Refresh failed')
-    }
-
-    useAuthStore.getState().setAuth(data.access_token, data.refresh_token)
-    flushQueue(null, data.access_token)
-
-    const newHeaders = new Headers(options.headers)
-    newHeaders.set('Authorization', `Bearer ${data.access_token}`)
-    return client.request({ ...options, headers: newHeaders } as any).then((r: any) => r.response)
-  } catch (refreshError) {
-    flushQueue(refreshError, null)
-    useAuthStore.getState().clearAuth()
+  if (!token) {
     if (typeof window !== 'undefined') {
       window.location.href = '/login'
     }
     return response
-  } finally {
-    isRefreshing = false
   }
+
+  const newHeaders = new Headers(options.headers)
+  newHeaders.set('Authorization', `Bearer ${token}`)
+  return client.request({ ...options, headers: newHeaders } as any).then((r: any) => r.response)
 })
