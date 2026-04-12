@@ -12,6 +12,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "test:a11y": "vitest run a11y",
     "type-check": "tsc --noEmit -p tsconfig.app.json",
     "prepare": "husky"
   },
@@ -39,6 +40,7 @@
     "zustand": "^5.0.12"
   },
   "devDependencies": {
+    "@axe-core/react": "^4.11.1",
     "@biomejs/biome": "^2.4.11",
     "@commitlint/cli": "^20.5.0",
     "@commitlint/config-conventional": "^20.5.0",
@@ -70,6 +72,7 @@
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.58.1",
     "vite": "8.0.5",
-    "vitest": "^4.1.4"
+    "vitest": "^4.1.4",
+    "vitest-axe": "^0.1.0"
   }
 }

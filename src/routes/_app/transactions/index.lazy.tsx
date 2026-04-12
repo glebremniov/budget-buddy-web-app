@@ -116,6 +116,7 @@ function TransactionsPage() {
             size="sm"
             variant={showFilters ? 'secondary' : 'outline'}
             onClick={() => setShowFilters((v) => !v)}
+            aria-label="Toggle filters"
           >
             <Filter className="h-4 w-4" />
             {hasActiveFilters && <span className="ml-1 h-1.5 w-1.5 rounded-full bg-primary" />}
@@ -337,6 +338,7 @@ function TransactionsPage() {
                       className="h-8 w-8 shrink-0 text-muted-foreground hover:text-destructive"
                       onClick={() => deleteTx.mutate(t.id)}
                       disabled={deleteTx.isPending}
+                      aria-label="Delete transaction"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>

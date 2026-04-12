@@ -28,6 +28,7 @@ pnpm vitest run src/hooks/useTransactions.test.ts
 Coverage report:
 ```bash
 pnpm test:coverage   # HTML report in coverage/
+pnpm test:a11y       # Run accessibility tests
 ```
 
 ## Architecture
@@ -81,6 +82,14 @@ shadcn/ui pattern: Radix UI primitives + Tailwind v4. Shared primitives live in 
 ### Data Conventions
 
 Currency amounts are stored and sent as **minor units** (integers). `1299` = €12.99. Use `src/lib/formatters.ts` for display formatting.
+
+### Accessibility Testing
+
+We use `vitest-axe` for automated accessibility checks.
+- Add `.a11y.test.tsx` for critical routes and complex components.
+- Run a11y tests specifically with `pnpm test:a11y`.
+- Ensure all icon-only buttons have an `aria-label`.
+- Maintain progressive heading levels (h1 -> h2 -> h3).
 
 ### Tests
 
