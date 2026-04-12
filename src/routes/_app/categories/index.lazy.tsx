@@ -7,6 +7,8 @@ import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useCategories, useCreateCategory, useDeleteCategory, useUpdateCategory } from '@/hooks/useCategories'
 import { cn } from '@/lib/cn'
+import { useToast } from '@/hooks/use-toast'
+import { ConfirmationDialog } from '@/components/ConfirmationDialog'
 
 export const Route = createLazyFileRoute('/_app/categories/')({
   component: CategoriesPage,
@@ -14,12 +16,14 @@ export const Route = createLazyFileRoute('/_app/categories/')({
 
 function CategoriesPage() {
   const { data, isLoading } = useCategories()
+  const { toast } = useToast()
   const createCategory = useCreateCategory()
   const deleteCategory = useDeleteCategory()
 
   const [newName, setNewName] = useState('')
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editName, setEditName] = useState('')
+  const [deleteId, setDeleteId] = useState<string | null>(null)
 
   const createFieldError = (createCategory.error as any)?.errors?.[0]?.message
 
@@ -28,8 +32,45 @@ function CategoriesPage() {
     if (!newName.trim()) return
     createCategory.mutate(
       { name: newName.trim() },
-      { onSuccess: () => setNewName('') },
+      {
+        onSuccess: () => {
+          setNewName('')
+          toast({
+            title: 'Category created',
+            description: 'Your new category has been added successfully.',
+          })
+        },
+        onError: (error: any) => {
+          if (!error.errors) {
+            toast({
+              title: 'Error',
+              description: 'Failed to create category. Please try again.',
+              variant: 'destructive',
+            })
+          }
+        },
+      },
     )
+  }
+
+  const handleDelete = () => {
+    if (!deleteId) return
+    deleteCategory.mutate(deleteId, {
+      onSuccess: () => {
+        setDeleteId(null)
+        toast({
+          title: 'Category deleted',
+          description: 'The category has been removed.',
+        })
+      },
+      onError: () => {
+        toast({
+          title: 'Error',
+          description: 'Failed to delete category.',
+          variant: 'destructive',
+        })
+      },
+    })
   }
 
   const categories = data?.items ?? []
@@ -82,14 +123,25 @@ function CategoriesPage() {
                   }}
                   onEditName={setEditName}
                   onCancelEdit={() => setEditingId(null)}
-                  onDelete={() => deleteCategory.mutate(c.id)}
-                  isDeleting={deleteCategory.isPending}
+                  onDelete={() => setDeleteId(c.id)}
+                  isDeleting={deleteCategory.isPending && deleteId === c.id}
                 />
               ))}
             </ul>
           )}
         </CardContent>
       </Card>
+
+      <ConfirmationDialog
+        isOpen={!!deleteId}
+        onOpenChange={(open) => !open && setDeleteId(null)}
+        onConfirm={handleDelete}
+        title="Delete Category"
+        description="Are you sure you want to delete this category? This action cannot be undone."
+        confirmText="Delete"
+        variant="destructive"
+        isLoading={deleteCategory.isPending}
+      />
     </div>
   )
 }
@@ -115,6 +167,7 @@ function CategoryRow({
   onDelete: () => void
   isDeleting: boolean
 }) {
+  const { toast } = useToast()
   const updateCategory = useUpdateCategory(id)
   const isEditing = editingId === id
   const updateFieldError = (updateCategory.error as any)?.errors?.[0]?.message
@@ -124,7 +177,24 @@ function CategoryRow({
     if (!editName.trim()) return
     updateCategory.mutate(
       { name: editName.trim() },
-      { onSuccess: onCancelEdit },
+      {
+        onSuccess: () => {
+          onCancelEdit()
+          toast({
+            title: 'Category updated',
+            description: 'The category name has been changed.',
+          })
+        },
+        onError: (error: any) => {
+          if (!error.errors) {
+            toast({
+              title: 'Error',
+              description: 'Failed to update category.',
+              variant: 'destructive',
+            })
+          }
+        },
+      },
     )
   }
 

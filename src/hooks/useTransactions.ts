@@ -19,6 +19,7 @@ export interface TransactionFilters {
   start?: string
   end?: string
   sort?: 'asc' | 'desc'
+  search?: string
 }
 
 const KEYS = {

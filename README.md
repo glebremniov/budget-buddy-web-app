@@ -1,6 +1,6 @@
 # Budget Buddy — Web App
 
-React 19 frontend for the Budget Buddy personal finance app. Tracks transactions and categories with a typed API client generated from the OpenAPI spec.
+React 19 frontend for the Budget Buddy personal finance app. Features includes transaction tracking with debounced search, category management, and real-time feedback with a global notification system.
 
 ## Prerequisites
 

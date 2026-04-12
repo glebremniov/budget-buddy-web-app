@@ -1,8 +1,9 @@
-import { createLazyFileRoute } from '@tanstack/react-router'
+import { Link, createLazyFileRoute } from '@tanstack/react-router'
 import type { ReactNode } from 'react'
-import { ArrowDownRight, ArrowUpRight, Wallet } from 'lucide-react'
+import { ArrowDownRight, ArrowUpRight, Wallet, PlusCircle } from 'lucide-react'
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useTransactions } from '@/hooks/useTransactions'
@@ -115,7 +116,20 @@ function DashboardPage() {
         </CardHeader>
         <CardContent className="p-0">
           {recent.length === 0 ? (
-            <p className="px-6 pb-6 text-sm text-muted-foreground">No transactions yet.</p>
+            <div className="flex flex-col items-center justify-center gap-4 py-12 px-6 text-center">
+              <div className="rounded-full bg-muted p-3">
+                <PlusCircle className="h-6 w-6 text-muted-foreground" />
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm font-medium">No transactions yet</p>
+                <p className="text-xs text-muted-foreground max-w-[200px]">
+                  Start tracking your budget by adding your first transaction.
+                </p>
+              </div>
+              <Button asChild size="sm">
+                <Link to="/transactions">Add transaction</Link>
+              </Button>
+            </div>
           ) : (
             <ul className="divide-y">
               {recent.map((t) => (

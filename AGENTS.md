@@ -31,3 +31,15 @@
 
 ### Versioning
 - App version: Injected at build time via Vite `define` as `__APP_VERSION__`. Display in the `Header` component.
+
+### Notification Conventions
+#### Success/Error Feedback
+- Hook: Use `useToast` hook from `@/hooks/use-toast` for actionable feedback.
+- Placement: The `Toaster` component is globally integrated in `src/routes/__root.tsx`.
+- Best Practice: Provide clear, concise messages for successful actions (e.g., "Category created") and helpful error messages for failures.
+
+### Destructive Action Conventions
+#### Confirmation
+- Component: Use `ConfirmationDialog` for all destructive actions like deleting data.
+- Styling: The confirm button should use `variant="destructive"` to provide visual warning.
+- Content: Always clearly state what is being deleted and that the action cannot be undone.

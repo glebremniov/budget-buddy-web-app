@@ -18,6 +18,20 @@ vi.mock('@/hooks/useCategories', () => ({
   useUpdateCategory: () => mockUpdateCategory,
 }))
 
+vi.mock('@/hooks/use-toast', () => ({
+  useToast: () => ({
+    toast: vi.fn(),
+  }),
+}))
+
+vi.mock('@/components/ConfirmationDialog', () => ({
+  ConfirmationDialog: ({ isOpen, onConfirm, onOpenChange }: any) =>
+    isOpen ? React.createElement('div', { 'data-testid': 'confirmation-dialog' }, [
+      React.createElement('button', { key: 'confirm', onClick: onConfirm }, 'Confirm Delete'),
+      React.createElement('button', { key: 'cancel', onClick: () => onOpenChange(false) }, 'Cancel'),
+    ]) : null,
+}))
+
 // Stub UI primitives
 vi.mock('@/components/ui/button', () => ({
   Button: ({ children, disabled, type, onClick, variant, size, className }: any) =>
@@ -171,7 +185,7 @@ describe('CategoriesPage', () => {
     expect(screen.getByRole('button', { name: 'Groceries' })).toBeInTheDocument()
   })
 
-  it('calls deleteCategory.mutate when the delete button is clicked', async () => {
+  it('calls deleteCategory.mutate when the delete button is clicked and confirmed', async () => {
     vi.mocked(useCategories).mockReturnValue({
       data: { items: [{ id: 'cat-1', name: 'Groceries' }], total: 1, size: 200, page: 0 },
       isLoading: false,
@@ -185,6 +199,13 @@ describe('CategoriesPage', () => {
     expect(deleteBtn).toBeDefined()
     await user.click(deleteBtn!)
 
-    expect(mockDeleteCategory.mutate).toHaveBeenCalledWith('cat-1')
+    // Mutation should not be called yet
+    expect(mockDeleteCategory.mutate).not.toHaveBeenCalled()
+
+    // Confirmation dialog should be visible
+    const confirmBtn = screen.getByText('Confirm Delete')
+    await user.click(confirmBtn)
+
+    expect(mockDeleteCategory.mutate).toHaveBeenCalledWith('cat-1', expect.any(Object))
   })
 })

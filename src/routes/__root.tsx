@@ -2,6 +2,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { Link, Outlet, createRootRoute, useRouter } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/router-devtools'
 import { useState } from 'react'
+import { Toaster } from '@/components/ui/toaster'
 
 export const Route = createRootRoute({
   component: RootComponent,
@@ -13,6 +14,7 @@ function RootComponent() {
   return (
     <>
       <Outlet />
+      <Toaster />
       {import.meta.env.DEV && (
         <>
           <TanStackRouterDevtools position="bottom-right" />
