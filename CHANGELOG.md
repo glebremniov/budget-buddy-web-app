@@ -1,3 +1,9 @@
+## [2.0.3](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v2.0.2...v2.0.3) (2026-04-12)
+
+### Bug Fixes
+
+* ignore test files in TanStack Router route scanning ([#48](https://github.com/budget-buddy-org/budget-buddy-web-app/issues/48)) ([a0b297b](https://github.com/budget-buddy-org/budget-buddy-web-app/commit/a0b297b48ab7445f9278568f17e2491cf619965e))
+
 ## [2.0.2](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v2.0.1...v2.0.2) (2026-04-12)
 
 ### Bug Fixes
