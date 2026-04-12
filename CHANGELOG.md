@@ -1,3 +1,9 @@
+## [2.6.0](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v2.5.1...v2.6.0) (2026-04-12)
+
+### Features
+
+* Implement proactive token refresh on application bootstrap ([#58](https://github.com/budget-buddy-org/budget-buddy-web-app/issues/58)) ([67cd61a](https://github.com/budget-buddy-org/budget-buddy-web-app/commit/67cd61ad13191b1f748bd4440a0c98a2be0dd0cc))
+
 ## [2.5.1](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v2.5.0...v2.5.1) (2026-04-12)
 
 ### Bug Fixes
