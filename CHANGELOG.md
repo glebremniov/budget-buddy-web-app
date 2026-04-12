@@ -1,3 +1,9 @@
+## [2.4.0](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v2.3.0...v2.4.0) (2026-04-12)
+
+### Features
+
+* UI Enhancements and Accessibility Improvements ([#56](https://github.com/budget-buddy-org/budget-buddy-web-app/issues/56)) ([81e3e60](https://github.com/budget-buddy-org/budget-buddy-web-app/commit/81e3e60ee3dc226a14a288f0c5f1eb81e065608f)), closes [#55](https://github.com/budget-buddy-org/budget-buddy-web-app/issues/55)
+
 ## [2.3.0](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v2.2.0...v2.3.0) (2026-04-12)
 
 ### Features
