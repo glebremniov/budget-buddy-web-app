@@ -1,3 +1,9 @@
+## [2.2.0](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v2.1.0...v2.2.0) (2026-04-12)
+
+### Features
+
+* **ui:** display field-level validation errors and improve accessibility ([#51](https://github.com/budget-buddy-org/budget-buddy-web-app/issues/51)) ([9e562a4](https://github.com/budget-buddy-org/budget-buddy-web-app/commit/9e562a4ed2221313ce1f020ee2a7816db0b8eee0))
+
 ## [2.1.0](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v2.0.4...v2.1.0) (2026-04-12)
 
 ### Features
