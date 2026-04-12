@@ -29,6 +29,7 @@ pnpm lint         # Biome lint
 pnpm format       # Biome auto-format
 pnpm test         # Vitest (run once)
 pnpm test:watch   # Vitest (watch mode)
+pnpm test:a11y    # Run accessibility tests
 pnpm type-check   # tsc --noEmit
 ```
 
