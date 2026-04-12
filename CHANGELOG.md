@@ -1,3 +1,9 @@
+## [2.1.0](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v2.0.4...v2.1.0) (2026-04-12)
+
+### Features
+
+* add automated accessibility testing with vitest-axe (closes [#10](https://github.com/budget-buddy-org/budget-buddy-web-app/issues/10)) ([#50](https://github.com/budget-buddy-org/budget-buddy-web-app/issues/50)) ([a2e12ea](https://github.com/budget-buddy-org/budget-buddy-web-app/commit/a2e12eada92598081d509765e95ec78164a27416))
+
 ## [2.0.4](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v2.0.3...v2.0.4) (2026-04-12)
 
 ### Bug Fixes
