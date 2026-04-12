@@ -115,7 +115,6 @@ function TransactionsPage() {
         <h1 className="text-xl font-semibold">Transactions</h1>
         <div className="flex items-center gap-2">
           <Button
-            size="sm"
             variant={showFilters ? 'secondary' : 'outline'}
             onClick={() => setShowFilters((v) => !v)}
             aria-label="Toggle filters"
@@ -123,7 +122,7 @@ function TransactionsPage() {
             <Filter className="h-4 w-4" />
             {hasActiveFilters && <span className="ml-1 h-1.5 w-1.5 rounded-full bg-primary" />}
           </Button>
-          <Button size="sm" onClick={() => setShowForm((v) => !v)}>
+          <Button onClick={() => setShowForm((v) => !v)}>
             <Plus className="h-4 w-4" />
             Add
           </Button>
@@ -307,13 +306,12 @@ function TransactionsPage() {
               )}
 
               <div className="flex gap-2">
-                <Button type="submit" size="sm" disabled={createTx.isPending}>
+                <Button type="submit" disabled={createTx.isPending}>
                   {createTx.isPending ? 'Saving…' : 'Save'}
                 </Button>
                 <Button
                   type="button"
                   variant="outline"
-                  size="sm"
                   onClick={() => setShowForm(false)}
                 >
                   Cancel
@@ -346,10 +344,13 @@ function TransactionsPage() {
                     onDone={() => setEditingId(null)}
                   />
                 ) : (
-                  <li key={t.id} className="flex items-center gap-3 px-4 py-3">
+                  <li
+                    key={t.id}
+                    className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-muted/30 cursor-pointer"
+                  >
                     <button
                       type="button"
-                      className="min-w-0 flex-1 text-left"
+                      className="min-w-0 flex-1 text-left focus-visible:outline-none cursor-pointer"
                       onClick={() => setEditingId(t.id)}
                     >
                       <p className="truncate text-sm font-medium">{t.description ?? '—'}</p>
@@ -436,7 +437,7 @@ function TransactionEditRow({
   }
 
   return (
-    <li className="px-4 py-3">
+    <li className="bg-muted/20 px-4 py-3 sm:rounded-md">
       <form onSubmit={handleSave} className="space-y-3">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div className="sm:col-span-2 space-y-1">
@@ -531,10 +532,10 @@ function TransactionEditRow({
         )}
 
         <div className="flex gap-2">
-          <Button type="submit" size="sm" disabled={update.isPending}>
+          <Button type="submit" disabled={update.isPending}>
             {update.isPending ? 'Saving…' : 'Save'}
           </Button>
-          <Button type="button" variant="outline" size="sm" onClick={onDone}>
+          <Button type="button" variant="outline" onClick={onDone}>
             Cancel
           </Button>
         </div>
