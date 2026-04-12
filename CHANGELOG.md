@@ -1,3 +1,9 @@
+## [2.5.1](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v2.5.0...v2.5.1) (2026-04-12)
+
+### Bug Fixes
+
+* optimize iOS UI and reorganize transaction components ([#57](https://github.com/budget-buddy-org/budget-buddy-web-app/issues/57)) ([b445540](https://github.com/budget-buddy-org/budget-buddy-web-app/commit/b4455405a95f98d623a037680a8b311230809140))
+
 ## [2.5.0](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v2.4.0...v2.5.0) (2026-04-12)
 
 ### Features
