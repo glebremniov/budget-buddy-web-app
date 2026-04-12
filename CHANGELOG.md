@@ -1,3 +1,9 @@
+## [2.0.2](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v2.0.1...v2.0.2) (2026-04-12)
+
+### Bug Fixes
+
+* reset isRefreshing when no refresh token is present on 401 ([#47](https://github.com/budget-buddy-org/budget-buddy-web-app/issues/47)) ([edc65c1](https://github.com/budget-buddy-org/budget-buddy-web-app/commit/edc65c1da8bc39bcf2aef89e7c24b318a096ebf2)), closes [#46](https://github.com/budget-buddy-org/budget-buddy-web-app/issues/46)
+
 ## [2.0.1](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v2.0.0...v2.0.1) (2026-04-12)
 
 ### Performance Improvements
