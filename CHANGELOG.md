@@ -1,3 +1,9 @@
+## [2.3.0](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v2.2.0...v2.3.0) (2026-04-12)
+
+### Features
+
+* **config:** implement runtime configuration injection ([#54](https://github.com/budget-buddy-org/budget-buddy-web-app/issues/54)) ([abe67e7](https://github.com/budget-buddy-org/budget-buddy-web-app/commit/abe67e7305c491b31b80c1e3bb0720b9f9f6142d)), closes [#53](https://github.com/budget-buddy-org/budget-buddy-web-app/issues/53)
+
 ## [2.2.0](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v2.1.0...v2.2.0) (2026-04-12)
 
 ### Features
