@@ -68,6 +68,12 @@ Two Zustand stores:
 
 `useTabVisibilityRefresh` (mounted in `_app.tsx`) proactively refreshes the auth token on tab focus when the refresh token is older than 6 days, preventing expiry mid-session.
 
+### Error Handling
+
+- **Error Boundaries:** Use `src/components/ErrorBoundary.tsx` to wrap UI components. The default fallback shows a generic message and a toggle for technical details (`error.message` and `error.stack`).
+- **Route Errors:** Use the `errorComponent` property in TanStack Router route definitions (e.g., `src/routes/_app.tsx`). Similar to the Error Boundary, it should provide a generic message with toggleable details.
+- **Logging:** All errors caught by boundaries or route components are logged via `src/lib/error-logger.ts`. Global Query/Mutation errors are handled in `src/lib/query-client.ts`.
+
 ### UI Components
 
 shadcn/ui pattern: Radix UI primitives + Tailwind v4. Shared primitives live in `src/components/ui/`. Layout components (`AppShell`, `Header`, `MobileNav`) are in `src/components/layout/`. Charts use `recharts`. The `@` alias maps to `src/`.
