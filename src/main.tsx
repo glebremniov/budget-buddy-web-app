@@ -1,41 +1,42 @@
-import { QueryClientProvider } from '@tanstack/react-query'
-import { RouterProvider, createRouter } from '@tanstack/react-router'
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import { routeTree } from './routeTree.gen'
-import { queryClient } from './lib/query-client'
-import { client } from '@budget-buddy-org/budget-buddy-contracts/client.gen'
-import { loadConfig } from './lib/config'
-import { refreshAuth } from './lib/api'
-import { useAuthStore } from './stores/auth.store'
-import './index.css'
+import { client } from '@budget-buddy-org/budget-buddy-contracts/client.gen';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { createRouter, RouterProvider } from '@tanstack/react-router';
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import { refreshAuth } from './lib/api';
+import { loadConfig } from './lib/config';
+import { queryClient } from './lib/query-client';
+import { routeTree } from './routeTree.gen';
+import { useAuthStore } from './stores/auth.store';
+import './index.css';
 
-const router = createRouter({ routeTree })
+const router = createRouter({ routeTree });
 
 declare module '@tanstack/react-router' {
   interface Register {
-    router: typeof router
+    router: typeof router;
   }
 }
 
-const rootEl = document.getElementById('root')
-if (!rootEl) throw new Error('Root element not found')
+const rootEl = document.getElementById('root');
+if (!rootEl) throw new Error('Root element not found');
 
 // Bootstrapping: Load runtime config, update the API client, then render the app.
 loadConfig()
   .then(async (config) => {
     client.setConfig({
       baseUrl: config.VITE_API_URL,
-    })
+      auth: () => useAuthStore.getState().accessToken ?? undefined,
+    });
 
     // Try to refresh the token on app load if we have a refresh token but no access token.
     // This avoids unnecessary redirects to the login page on page reload.
-    const { accessToken, refreshToken } = useAuthStore.getState()
+    const { accessToken, refreshToken } = useAuthStore.getState();
     if (!accessToken && refreshToken) {
       try {
-        await refreshAuth()
+        await refreshAuth();
       } catch (err) {
-        console.error('[BOOTSTRAP] Auth refresh failed:', err)
+        console.error('[BOOTSTRAP] Auth refresh failed:', err);
       }
     }
 
@@ -45,10 +46,10 @@ loadConfig()
           <RouterProvider router={router} />
         </QueryClientProvider>
       </StrictMode>,
-    )
+    );
   })
   .catch((err) => {
-    console.error('[BOOTSTRAP] Config loading failed:', err)
+    console.error('[BOOTSTRAP] Config loading failed:', err);
     createRoot(rootEl).render(
       <div className="flex min-h-screen items-center justify-center p-6 text-center">
         <div className="max-w-xs">
@@ -58,5 +59,5 @@ loadConfig()
           </p>
         </div>
       </div>,
-    )
-  })
+    );
+  });

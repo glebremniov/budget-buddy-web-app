@@ -1,3 +1,5 @@
+import { Check, Trash2, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -5,20 +7,18 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Check, Trash2, X } from 'lucide-react'
+} from '@/components/ui/dialog';
 
 interface ConfirmationDialogProps {
-  isOpen: boolean
-  onOpenChange: (open: boolean) => void
-  onConfirm: () => void
-  title: string
-  description: string
-  confirmText?: string
-  cancelText?: string
-  variant?: 'default' | 'destructive'
-  isLoading?: boolean
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  onConfirm: () => void;
+  title: string;
+  description: string;
+  confirmText?: string;
+  cancelText?: string;
+  variant?: 'default' | 'destructive';
+  isLoading?: boolean;
 }
 
 export function ConfirmationDialog({
@@ -57,11 +57,16 @@ export function ConfirmationDialog({
             onClick={onConfirm}
             loading={isLoading}
           >
-            {!isLoading && (variant === 'destructive' ? <Trash2 className="h-4 w-4 mr-2" /> : <Check className="h-4 w-4 mr-2" />)}
+            {!isLoading &&
+              (variant === 'destructive' ? (
+                <Trash2 className="h-4 w-4 mr-2" />
+              ) : (
+                <Check className="h-4 w-4 mr-2" />
+              ))}
             {confirmText}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

@@ -1,34 +1,38 @@
-import '@testing-library/jest-dom'
-import 'vitest-axe/extend-expect'
-import * as axeMatchers from 'vitest-axe/matchers'
-import { expect } from 'vitest'
+import '@testing-library/jest-dom';
+import 'vitest-axe/extend-expect';
+import { expect } from 'vitest';
+import * as axeMatchers from 'vitest-axe/matchers';
 
-expect.extend(axeMatchers)
+expect.extend(axeMatchers);
 
 declare module 'vitest' {
-  export interface Assertion<T = any> extends axeMatchers.AxeMatchers {}
-  export interface AsymmetricMatchersContaining extends axeMatchers.AxeMatchers {}
+  export interface Assertion<T> extends axeMatchers.AxeMatchers {
+    _branded?: T;
+  }
+  export interface AsymmetricMatchersContaining extends axeMatchers.AxeMatchers {
+    _branded?: boolean;
+  }
 }
 
 // Provide localStorage for Zustand persist middleware in jsdom
 const localStorageMock = (() => {
-  let store: Record<string, string> = {}
+  let store: Record<string, string> = {};
   return {
     getItem: (key: string) => store[key] ?? null,
     setItem: (key: string, value: string) => {
-      store[key] = value
+      store[key] = value;
     },
     removeItem: (key: string) => {
-      delete store[key]
+      delete store[key];
     },
     clear: () => {
-      store = {}
+      store = {};
     },
     get length() {
-      return Object.keys(store).length
+      return Object.keys(store).length;
     },
     key: (index: number) => Object.keys(store)[index] ?? null,
-  }
-})()
+  };
+})();
 
-Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+Object.defineProperty(window, 'localStorage', { value: localStorageMock });

@@ -1,3 +1,3 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router';
 
-export const Route = createFileRoute('/_app/settings')({})
+export const Route = createFileRoute('/_app/settings')({});

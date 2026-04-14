@@ -1,27 +1,29 @@
-import { render } from '@testing-library/react'
-import 'vitest-axe/extend-expect'
-import { axe } from 'vitest-axe'
-import { describe, expect, it, vi } from 'vitest'
-import { Route } from './index.lazy'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import type React from 'react'
+import { render } from '@testing-library/react';
+import 'vitest-axe/extend-expect';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import type React from 'react';
+import { describe, expect, it, vi } from 'vitest';
+import { axe } from 'vitest-axe';
+import { DashboardPage } from '@/components/dashboard/DashboardPage';
 
 vi.mock('@tanstack/react-router', () => ({
-  createLazyFileRoute: () => (options: any) => ({ options }),
+  createLazyFileRoute: () => (options: { component: React.ComponentType }) => ({ options }),
   useNavigate: () => vi.fn(),
-  Link: ({ children }: { children: React.ReactNode }) => <a>{children}</a>,
-}))
+  Link: ({ children }: { children: React.ReactNode }) => <a href="/">{children}</a>,
+}));
 
 // Mock recharts to avoid rendering issues in JSDOM
 vi.mock('recharts', () => ({
-  ResponsiveContainer: ({ children }: any) => <div style={{ width: '100%', height: '100%' }}>{children}</div>,
-  BarChart: ({ children }: any) => <div>{children}</div>,
+  ResponsiveContainer: ({ children }: { children: React.ReactNode }) => (
+    <div style={{ width: '100%', height: '100%' }}>{children}</div>
+  ),
+  BarChart: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   Bar: () => null,
   XAxis: () => null,
   YAxis: () => null,
   Tooltip: () => null,
   Cell: () => null,
-}))
+}));
 
 vi.mock('@/hooks/useTransactions', () => {
   const mockData = {
@@ -48,12 +50,12 @@ vi.mock('@/hooks/useTransactions', () => {
       ],
     },
     isLoading: false,
-  }
+  };
   return {
     useTransactions: () => mockData,
     useAllTransactions: () => mockData,
-  }
-})
+  };
+});
 
 describe('DashboardPage a11y', () => {
   it('should have no accessibility violations', async () => {
@@ -63,17 +65,15 @@ describe('DashboardPage a11y', () => {
           retry: false,
         },
       },
-    })
-    
-    const DashboardPage = (Route as any).options.component as React.ElementType
-    
+    });
+
     const { container } = render(
       <QueryClientProvider client={queryClient}>
         <DashboardPage />
-      </QueryClientProvider>
-    )
-    
-    const results = await axe(container)
-    expect(results).toHaveNoViolations()
-  })
-})
+      </QueryClientProvider>,
+    );
+
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+});

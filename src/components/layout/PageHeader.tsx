@@ -1,23 +1,23 @@
-import type { ReactNode } from 'react'
-import { Button } from '@/components/ui/button'
-import { Plus } from 'lucide-react'
-import { useScrollDirection } from '@/hooks/use-scroll-direction'
-import { cn } from '@/lib/cn'
+import { Plus } from 'lucide-react';
+import type { ReactNode } from 'react';
+import { Button } from '@/components/ui/button';
+import { useScrollDirection } from '@/hooks/use-scroll-direction';
+import { cn } from '@/lib/cn';
 
 interface PageHeaderProps {
-  title: string
-  subtitle?: ReactNode
+  title: string;
+  subtitle?: ReactNode;
   primaryAction?: {
-    label: string
-    onClick: () => void
-    icon?: ReactNode
-  }
-  children?: ReactNode // Extra elements/buttons
+    label: string;
+    onClick: () => void;
+    icon?: ReactNode;
+  };
+  children?: ReactNode; // Extra elements/buttons
 }
 
 export function PageHeader({ title, subtitle, primaryAction, children }: PageHeaderProps) {
-  const scrollDirection = useScrollDirection()
-  const isHidden = scrollDirection === 'down'
+  const scrollDirection = useScrollDirection();
+  const isHidden = scrollDirection === 'down';
 
   return (
     <div className="space-y-4">
@@ -36,7 +36,7 @@ export function PageHeader({ title, subtitle, primaryAction, children }: PageHea
           )}
         </div>
       </div>
-      
+
       {/* Mobile FAB */}
       {primaryAction && (
         <Button
@@ -45,7 +45,7 @@ export function PageHeader({ title, subtitle, primaryAction, children }: PageHea
           className={cn(
             'fixed right-4 z-40 h-14 w-14 rounded-full shadow-lg md:hidden transition-all duration-300 transform',
             'bottom-[calc(50px+env(safe-area-inset-bottom)+1.5rem)]',
-            isHidden ? 'translate-y-24 opacity-0' : 'translate-y-0 opacity-100'
+            isHidden ? 'translate-y-24 opacity-0' : 'translate-y-0 opacity-100',
           )}
           aria-label={primaryAction.label}
         >
@@ -53,5 +53,5 @@ export function PageHeader({ title, subtitle, primaryAction, children }: PageHea
         </Button>
       )}
     </div>
-  )
+  );
 }

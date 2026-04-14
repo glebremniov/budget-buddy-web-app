@@ -1,8 +1,8 @@
-import * as React from 'react'
-import { Input } from './input'
-import { cn } from '@/lib/cn'
+import * as React from 'react';
+import { cn } from '@/lib/cn';
+import { Input } from './input';
 
-export interface DatePickerProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {}
+export type DatePickerProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'>;
 
 const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
   ({ className, ...props }, ref) => {
@@ -20,9 +20,9 @@ const DatePicker = React.forwardRef<HTMLInputElement, DatePickerProps>(
         ref={ref}
         {...props}
       />
-    )
+    );
   },
-)
-DatePicker.displayName = 'DatePicker'
+);
+DatePicker.displayName = 'DatePicker';
 
-export { DatePicker }
+export { DatePicker };

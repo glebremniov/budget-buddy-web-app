@@ -1,8 +1,8 @@
-import { useEffect } from 'react'
-import { refreshAuth } from '@/lib/api'
-import { useAuthStore } from '@/stores/auth.store'
+import { useEffect } from 'react';
+import { refreshAuth } from '@/lib/api';
+import { useAuthStore } from '@/stores/auth.store';
 
-const SIX_DAYS_MS = 6 * 24 * 60 * 60 * 1000
+const SIX_DAYS_MS = 6 * 24 * 60 * 60 * 1000;
 
 /**
  * Proactively refreshes the auth token when the tab becomes visible if the
@@ -14,17 +14,19 @@ const SIX_DAYS_MS = 6 * 24 * 60 * 60 * 1000
 export function useTabVisibilityRefresh() {
   useEffect(() => {
     async function handleVisibilityChange() {
-      if (document.visibilityState !== 'visible') return
+      if (document.visibilityState !== 'visible') return;
 
-      const { refreshToken, refreshTokenObtainedAt } = useAuthStore.getState()
+      const { refreshToken, refreshTokenObtainedAt, accessTokenExpiresAt } =
+        useAuthStore.getState();
 
-      if (!refreshToken || refreshTokenObtainedAt === null) return
+      if (!refreshToken || refreshTokenObtainedAt === null) return;
 
-      const ageMs = Date.now() - refreshTokenObtainedAt
-      if (ageMs < SIX_DAYS_MS) return
+      const ageMs = Date.now() - refreshTokenObtainedAt;
+      const isAccessTokenExpired = accessTokenExpiresAt && Date.now() > accessTokenExpiresAt;
+      if (ageMs < SIX_DAYS_MS && !isAccessTokenExpired) return;
 
       try {
-        await refreshAuth()
+        await refreshAuth();
       } catch {
         // Network/transient errors are silently ignored so the user is not interrupted.
         // If the refresh token is expired (server returns 401), the response interceptor
@@ -33,7 +35,7 @@ export function useTabVisibilityRefresh() {
       }
     }
 
-    document.addEventListener('visibilitychange', handleVisibilityChange)
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
-  }, [])
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
 }

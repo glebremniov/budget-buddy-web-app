@@ -43,12 +43,12 @@ Two layout routes act as auth guards:
 
 Child routes are nested under these layouts by naming convention (`_app/`, `_auth/`).
 
-**Code splitting:** Page components live in `.lazy.tsx` siblings (e.g. `_app/index.lazy.tsx`) using `createLazyFileRoute`. The plain `.tsx` file keeps only the `createFileRoute` stub (for loaders/beforeLoad). The Vite plugin handles the dynamic import automatically. Add new pages with the same split — never put a component in the route definition file.
+**Code splitting:** Page components live in `.lazy.tsx` siblings (e.g. `_app/index.lazy.tsx`) using `createLazyFileRoute`. The plain `.tsx` file keeps only the `createFileRoute` stub (for loaders/beforeLoad). Actual page implementations are moved to `src/components/{page}/` to resolve React Fast Refresh warnings and keep route files clean. The Vite plugin handles the dynamic import automatically. Add new pages with the same split — never put a component in the route definition file.
 
 ### API Client
 
 `src/lib/api.ts` configures the OpenAPI Fetch-based client from `@budget-buddy-org/budget-buddy-contracts`. It:
-- Uses `client.setConfig` only in `src/main.tsx` after the configuration is loaded. The `src/lib/api.ts` module only registers interceptors.
+- Uses `client.setConfig` only in `src/main.tsx` after the configuration is loaded. The `src/lib/api.ts` module only registers interceptors to ensure the global client is correctly configured before first use.
 - Attaches the access token from Zustand to every request via interceptors
 - On 401: queues concurrent requests, attempts a token refresh via `refreshToken()`, then replays queued requests; on refresh failure, clears auth and redirects to `/login`
 
@@ -58,6 +58,8 @@ The application uses standalone functional API calls (e.g. `listTransactions`, `
 
 TanStack Query v5. All query/mutation logic lives in hooks under `src/hooks/`. Each domain hook file (e.g. `useTransactions.ts`, `useCategories.ts`) exports a `KEYS` object for consistent cache key management, plus hooks for list, detail, create, update, and delete. Delete mutations use optimistic updates with rollback via `onMutate`/`onError`.
 
+- **Client-Side Search:** Since the current API version does not support filtering by search term, search functionality for transactions and categories is implemented on the client side. The `useTransactions` and `useCategories` hooks fetch larger datasets and filter them locally based on the search state.
+
 Global error logging is wired into `QueryCache` and `MutationCache` in `src/lib/query-client.ts` — don't add duplicate error reporting inside individual hooks.
 
 Default query `staleTime` is 1 minute; `retry` is 1.
@@ -65,7 +67,7 @@ Default query `staleTime` is 1 minute; `retry` is 1.
 ### Auth State
 
 Two Zustand stores:
-- `src/stores/auth.store.ts` — persists `refreshToken` + `refreshTokenObtainedAt` to `localStorage` (`budget-buddy-auth`). `accessToken` is memory-only; re-obtained via refresh on page load.
+- `src/stores/auth.store.ts` — persists `refreshToken` + `refreshTokenObtainedAt` to `localStorage` (`budget-buddy-auth`). `accessToken` and `accessTokenExpiresAt` are memory-only. The store tracks expiration via the `expires_in` field from the API.
 - `src/stores/theme.store.ts` — persists `theme` (`light`|`dark`|`system`), `primaryHue` (0-360), and `fontSize` (12-24) to `localStorage` (`budget-buddy-theme`). Applies CSS variables to `:root` on rehydration.
 
 `useTabVisibilityRefresh` (mounted in `_app.tsx`) proactively refreshes the auth token on tab focus when the refresh token is older than 6 days, preventing expiry mid-session.
@@ -114,7 +116,7 @@ Vitest + Testing Library, jsdom environment. Setup file at `src/test/setup.ts` p
 
 ### Linting / Formatting
 
-Biome handles both lint and format (single quotes, 2-space indent, 100 char line width). ESLint is also present for React-specific rules. Run `pnpm lint` before committing.
+Biome handles both lint and format (single quotes, 2-space indent, 100 char line width). ESLint is used for React-specific rules (purity, hooks, Fast Refresh). The `pnpm lint` command runs both tools. Run it before committing.
 
 ### Commits and Releases
 

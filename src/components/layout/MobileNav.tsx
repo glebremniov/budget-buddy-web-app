@@ -1,26 +1,25 @@
-import { Link } from '@tanstack/react-router'
-import { LayoutDashboard, Tag, ArrowLeftRight, Settings } from 'lucide-react'
-import { cn } from '@/lib/cn'
-import { useState } from 'react'
+import { Link } from '@tanstack/react-router';
+import { ArrowLeftRight, LayoutDashboard, Settings, Tag } from 'lucide-react';
+import { useCallback, useRef } from 'react';
+import { cn } from '@/lib/cn';
 
 const NAV_ITEMS = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/transactions', label: 'Transactions', icon: ArrowLeftRight },
   { to: '/categories', label: 'Categories', icon: Tag },
   { to: '/settings', label: 'Settings', icon: Settings },
-] as const
+] as const;
 
 export function MobileNav() {
-  const [lastTap, setLastTap] = useState<{ [key: string]: number }>({})
+  const lastTapRef = useRef<{ [key: string]: number }>({});
 
-  const handleTap = (to: string) => {
-    const now = Date.now()
-    const last = lastTap[to] || 0
-    if (now - last < 300) {
-      window.scrollTo({ top: 0, behavior: 'smooth' })
+  const handleTap = useCallback((to: string, timeStamp: number) => {
+    const last = lastTapRef.current[to] || 0;
+    if (timeStamp - last < 300) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-    setLastTap((prev) => ({ ...prev, [to]: now }))
-  }
+    lastTapRef.current[to] = timeStamp;
+  }, []);
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background pb-[env(safe-area-inset-bottom)] md:hidden">
@@ -32,15 +31,15 @@ export function MobileNav() {
             className="flex flex-1 flex-col items-center gap-0.5 py-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
             activeProps={{ className: 'text-primary font-semibold' }}
             activeOptions={{ exact: to === '/' }}
-            onClick={() => handleTap(to)}
+            onClick={(e) => handleTap(to, e.timeStamp)}
           >
             <Icon className="h-5 w-5" />
-            <span className="text-[0.625rem]">{label}</span>
+            <span className="text-xs">{label}</span>
           </Link>
         ))}
       </div>
     </nav>
-  )
+  );
 }
 
 export function SidebarNav({ className }: { className?: string }) {
@@ -59,5 +58,5 @@ export function SidebarNav({ className }: { className?: string }) {
         </Link>
       ))}
     </nav>
-  )
+  );
 }

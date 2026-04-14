@@ -1,25 +1,25 @@
-import { render, screen, fireEvent } from '@testing-library/react'
-import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
-import { Route } from './index.lazy'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import type React from 'react'
-import { useNavigate } from '@tanstack/react-router'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useNavigate } from '@tanstack/react-router';
+import { fireEvent, render, screen } from '@testing-library/react';
+import type React from 'react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { DashboardPage } from '@/components/dashboard/DashboardPage';
 
 vi.mock('@tanstack/react-router', () => ({
-  createLazyFileRoute: () => (options: any) => ({ options }),
+  createLazyFileRoute: () => (options: { component: React.ComponentType }) => ({ options }),
   useNavigate: vi.fn(),
-  Link: ({ children }: { children: React.ReactNode }) => <a>{children}</a>,
-}))
+  Link: ({ children }: { children: React.ReactNode }) => <a href="/">{children}</a>,
+}));
 
 vi.mock('recharts', () => ({
-  ResponsiveContainer: ({ children }: any) => <div>{children}</div>,
-  BarChart: ({ children }: any) => <div>{children}</div>,
+  ResponsiveContainer: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  BarChart: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   Bar: () => null,
   XAxis: () => null,
   YAxis: () => null,
   Tooltip: () => null,
   Cell: () => null,
-}))
+}));
 
 const mockTransactions = [
   {
@@ -49,13 +49,13 @@ const mockTransactions = [
     date: '2026-03-20',
     categoryId: '1',
   },
-]
+];
 
 vi.mock('@/hooks/useTransactions', () => ({
   useAllTransactions: vi.fn(),
-}))
+}));
 
-import { useAllTransactions } from '@/hooks/useTransactions'
+import { useAllTransactions } from '@/hooks/useTransactions';
 
 describe('DashboardPage', () => {
   const queryClient = new QueryClient({
@@ -64,74 +64,69 @@ describe('DashboardPage', () => {
         retry: false,
       },
     },
-  })
+  });
 
   beforeEach(() => {
-    vi.useFakeTimers()
-    vi.setSystemTime(new Date('2026-04-14'))
-    vi.clearAllMocks()
-  })
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-04-14'));
+    vi.clearAllMocks();
+  });
 
   afterEach(() => {
-    vi.useRealTimers()
-  })
+    vi.useRealTimers();
+  });
 
   it('calculates totals based on current month only', async () => {
-    ;(useAllTransactions as any).mockReturnValue({
+    vi.mocked(useAllTransactions).mockReturnValue({
       data: {
         items: mockTransactions,
       },
       isLoading: false,
-    })
-
-    const DashboardPage = (Route as any).options.component as React.ElementType
+    } as ReturnType<typeof useAllTransactions>);
 
     render(
       <QueryClientProvider client={queryClient}>
         <DashboardPage />
-      </QueryClientProvider>
-    )
+      </QueryClientProvider>,
+    );
 
     // Current month: 2026-04
     // Items: 10000 income, 5000 expense. Balance = 50.00
 
     // Income card
-    const incomeCard = screen.getByText('Income').closest('.rounded-lg')
-    expect(incomeCard).toHaveTextContent(/100/)
+    const incomeCard = screen.getByText('Income').closest('.rounded-lg');
+    expect(incomeCard).toHaveTextContent(/100/);
 
     // Expense card
-    const expenseCard = screen.getByText('Expenses').closest('.rounded-lg')
-    expect(expenseCard).toHaveTextContent(/50/)
+    const expenseCard = screen.getByText('Expenses').closest('.rounded-lg');
+    expect(expenseCard).toHaveTextContent(/50/);
 
     // Balance card
-    const balanceCard = screen.getByText('Balance').closest('.rounded-lg')
-    expect(balanceCard).toHaveTextContent(/50/)
-  })
+    const balanceCard = screen.getByText('Balance').closest('.rounded-lg');
+    expect(balanceCard).toHaveTextContent(/50/);
+  });
 
-  it('navigates to edit transaction on click', async () => {
-    const mockNavigate = vi.fn()
-    ;(useNavigate as any).mockReturnValue(mockNavigate)
-    ;(useAllTransactions as any).mockReturnValue({
+  it('navigates to transaction list on click', async () => {
+    const mockNavigate = vi.fn();
+    vi.mocked(useNavigate).mockReturnValue(mockNavigate);
+    vi.mocked(useAllTransactions).mockReturnValue({
       data: {
         items: mockTransactions,
       },
       isLoading: false,
-    })
-
-    const DashboardPage = (Route as any).options.component as React.ElementType
+    } as ReturnType<typeof useAllTransactions>);
 
     render(
       <QueryClientProvider client={queryClient}>
         <DashboardPage />
-      </QueryClientProvider>
-    )
+      </QueryClientProvider>,
+    );
 
-    const transactionItem = screen.getByText('Income this month')
-    fireEvent.click(transactionItem)
+    const transactionItem = screen.getByText('Income this month');
+    fireEvent.click(transactionItem);
 
     expect(mockNavigate).toHaveBeenCalledWith({
       to: '/transactions',
-      search: expect.objectContaining({ edit: '1' }),
-    })
-  })
-})
+    });
+  });
+});

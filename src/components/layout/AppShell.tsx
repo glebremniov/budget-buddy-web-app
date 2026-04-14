@@ -1,6 +1,6 @@
-import type * as React from 'react'
-import { Header } from './Header'
-import { MobileNav, SidebarNav } from './MobileNav'
+import type * as React from 'react';
+import { Header } from './Header';
+import { MobileNav, SidebarNav } from './MobileNav';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
@@ -14,12 +14,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         {/* Main content */}
         <main className="flex-1 pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:pb-0">
-          <div className="mx-auto max-w-2xl px-4 py-6 animate-fade-in md:max-w-4xl md:px-6">{children}</div>
+          <div className="mx-auto max-w-2xl px-4 py-6 animate-fade-in md:max-w-4xl md:px-6">
+            {children}
+          </div>
         </main>
       </div>
 
       {/* Bottom nav — visible on mobile */}
       <MobileNav />
     </div>
-  )
+  );
 }
