@@ -1,3 +1,9 @@
+## [2.9.1](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v2.9.0...v2.9.1) (2026-04-14)
+
+### Bug Fixes
+
+* **auth:** fix infinite loop on 401 from refresh endpoint ([#66](https://github.com/budget-buddy-org/budget-buddy-web-app/issues/66)) ([fca77fd](https://github.com/budget-buddy-org/budget-buddy-web-app/commit/fca77fd5f797f41fbb630f32b564fc9094a7b3a6))
+
 ## [2.9.0](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v2.8.0...v2.9.0) (2026-04-14)
 
 ### Features
