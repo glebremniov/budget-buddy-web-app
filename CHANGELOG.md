@@ -1,3 +1,9 @@
+## [2.8.0](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v2.7.0...v2.8.0) (2026-04-14)
+
+### Features
+
+* add initial loader and optimize mobile SPA experience ([#64](https://github.com/budget-buddy-org/budget-buddy-web-app/issues/64)) ([44add56](https://github.com/budget-buddy-org/budget-buddy-web-app/commit/44add56f04e8a9ddb6d55311331229ccc94a2a18))
+
 ## [2.7.0](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v2.6.0...v2.7.0) (2026-04-13)
 
 ### Features
