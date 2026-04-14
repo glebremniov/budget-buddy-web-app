@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import 'vitest-axe/extend-expect'
 import { axe } from 'vitest-axe'
 import { describe, expect, it, vi } from 'vitest'
@@ -54,15 +54,15 @@ vi.mock('@/hooks/useTransactions', () => ({
 }))
 
 describe('TransactionsPage a11y', () => {
-  it('should have no accessibility violations', async () => {
-    const queryClient = new QueryClient({
-      defaultOptions: {
-        queries: {
-          retry: false,
-        },
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
       },
-    })
-    
+    },
+  })
+
+  it('should have no accessibility violations', async () => {
     const TransactionsPage = (Route as any).options.component as React.ElementType
     
     const { container } = render(
@@ -72,6 +72,24 @@ describe('TransactionsPage a11y', () => {
     )
     
     const results = await axe(container)
+    expect(results).toHaveNoViolations()
+  })
+
+  it('should have no accessibility violations when filters dialog is open', async () => {
+    const TransactionsPage = (Route as any).options.component as React.ElementType
+    
+    render(
+      <QueryClientProvider client={queryClient}>
+        <TransactionsPage />
+      </QueryClientProvider>
+    )
+    
+    // Open filters dialog
+    const filterButton = screen.getByLabelText(/toggle filters/i)
+    fireEvent.click(filterButton)
+    
+    // Dialog teleports to body, so we check document.body
+    const results = await axe(document.body)
     expect(results).toHaveNoViolations()
   })
 })

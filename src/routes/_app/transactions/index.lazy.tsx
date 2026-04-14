@@ -2,7 +2,7 @@ import { createLazyFileRoute, useNavigate, useSearch } from '@tanstack/react-rou
 import { Filter } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { useCategories } from '@/hooks/useCategories'
 import { useTransactions } from '@/hooks/useTransactions'
 import { PageHeader } from '@/components/layout/PageHeader'
@@ -65,15 +65,18 @@ function TransactionsPage() {
   }
 
   const { data, isLoading } = useTransactions(queryFilters)
-  const transactions = data?.items ?? []
+  const allTransactions = data?.items ?? []
   const total = data?.meta?.total ?? 0
 
+  const isFiltered = !!(filters.categoryId || filters.start || filters.end || filters.search)
+  const transactions = filters.search
+    ? allTransactions.filter((t) =>
+        t.description?.toLowerCase().includes(filters.search.toLowerCase())
+      )
+    : allTransactions
+
   const hasActiveFilters =
-    filters.categoryId ||
-    filters.start ||
-    filters.end ||
-    filters.sort !== 'desc' ||
-    filters.search
+    isFiltered || filters.sort !== 'desc'
 
   const resetFilters = () => {
     setFilters({
@@ -110,19 +113,31 @@ function TransactionsPage() {
         </Button>
       </PageHeader>
 
-      {showFilters && (
-        <TransactionFilters
-          categories={categories}
-          filters={filters}
-          onFilterChange={handleFilterChange}
-          onReset={resetFilters}
-        />
-      )}
+      <Dialog open={showFilters} onOpenChange={setShowFilters}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Filter Transactions</DialogTitle>
+            <DialogDescription>
+              Apply filters to your transaction history.
+            </DialogDescription>
+          </DialogHeader>
+          <TransactionFilters
+            categories={categories}
+            filters={filters}
+            onFilterChange={handleFilterChange}
+            onReset={resetFilters}
+            onClose={() => setShowFilters(false)}
+          />
+        </DialogContent>
+      </Dialog>
       
       <Dialog open={showForm} onOpenChange={setShowForm}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Add Transaction</DialogTitle>
+            <DialogDescription>
+              Record a new expense or income to track your budget.
+            </DialogDescription>
           </DialogHeader>
           <TransactionForm
             categories={categories}
@@ -136,6 +151,8 @@ function TransactionsPage() {
         transactions={transactions}
         categories={categories}
         isLoading={isLoading}
+        isFiltering={isFiltered}
+        onResetFilters={resetFilters}
       />
 
       {!isLoading && transactions.length > 0 && (

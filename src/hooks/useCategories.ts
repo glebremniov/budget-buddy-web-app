@@ -22,9 +22,10 @@ export function useCategories(size = 200, page = 0) {
   return useQuery({
     queryKey: KEYS.list(size, page),
     queryFn: async () => {
-      const { data } = await listCategories({
+      const { data, error } = await listCategories({
         query: { size, page },
       })
+      if (error) throw error
       return data
     },
   })
@@ -34,9 +35,10 @@ export function useCategory(id: string) {
   return useQuery({
     queryKey: KEYS.detail(id),
     queryFn: async () => {
-      const { data } = await getCategory({
+      const { data, error } = await getCategory({
         path: { categoryId: id },
       })
+      if (error) throw error
       return data
     },
     enabled: Boolean(id),
@@ -79,9 +81,10 @@ export function useDeleteCategory() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async (id: string) => {
-      await deleteCategory({
+      const { error } = await deleteCategory({
         path: { categoryId: id },
       })
+      if (error) throw error
       return id
     },
     onMutate: async (id) => {

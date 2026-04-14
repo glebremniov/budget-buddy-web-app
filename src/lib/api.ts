@@ -12,7 +12,7 @@ client.interceptors.request.use((request: Request) => {
 })
 
 // Queue of requests waiting for a token refresh to complete
-let isRefreshing = false
+let refreshPromise: Promise<string | null> | null = null
 let pendingQueue: Array<{ resolve: (token: string) => void; reject: (err: unknown) => void }> = []
 
 function flushQueue(error: unknown, token: string | null) {
@@ -20,43 +20,56 @@ function flushQueue(error: unknown, token: string | null) {
   pendingQueue = []
 }
 
-export async function refreshAuth() {
+export function refreshAuth() {
+  if (refreshPromise) {
+    return refreshPromise
+  }
+
   const refreshTokenValue = useAuthStore.getState().refreshToken
   if (!refreshTokenValue) {
     useAuthStore.getState().clearAuth()
-    return null
+    return Promise.resolve(null)
   }
 
-  isRefreshing = true
-  try {
-    const { data } = await refreshAction({
-      body: { refresh_token: refreshTokenValue },
-      _isRefresh: true,
-    } as any)
+  refreshPromise = (async () => {
+    try {
+      const { data } = await refreshAction({
+        body: { refresh_token: refreshTokenValue },
+        _isRefresh: true,
+      } as any)
 
-    if (!data) {
-      throw new Error('Refresh failed')
+      if (!data) {
+        throw new Error('Refresh failed')
+      }
+
+      useAuthStore.getState().setAuth(data.access_token, data.refresh_token)
+      flushQueue(null, data.access_token)
+      return data.access_token
+    } catch (refreshError) {
+      flushQueue(refreshError, null)
+      useAuthStore.getState().clearAuth()
+      return null
+    } finally {
+      refreshPromise = null
     }
+  })()
 
-    useAuthStore.getState().setAuth(data.access_token, data.refresh_token)
-    flushQueue(null, data.access_token)
-    return data.access_token
-  } catch (refreshError) {
-    flushQueue(refreshError, null)
-    useAuthStore.getState().clearAuth()
-    return null
-  } finally {
-    isRefreshing = false
-  }
+  return refreshPromise
 }
 
 // On 401: attempt refresh → retry; on refresh failure → clear auth + redirect to login
 client.interceptors.response.use(async (response: Response, _request: Request, options: any) => {
-  if (response.status !== 401 || options._retry || options._isRefresh) {
+  if (
+    response.status !== 401 ||
+    options._retry ||
+    options._isRefresh ||
+    options.url?.includes('/auth/login') ||
+    options.url?.includes('/auth/register')
+  ) {
     return response
   }
 
-  if (isRefreshing) {
+  if (refreshPromise) {
     return new Promise<string>((resolve, reject) => {
       pendingQueue.push({ resolve, reject })
     }).then(async (token) => {
@@ -70,7 +83,11 @@ client.interceptors.response.use(async (response: Response, _request: Request, o
   const token = await refreshAuth()
 
   if (!token) {
-    if (typeof window !== 'undefined') {
+    if (
+      typeof window !== 'undefined' &&
+      !window.location.pathname.includes('/login') &&
+      !window.location.pathname.includes('/register')
+    ) {
       window.location.href = '/login'
     }
     return response

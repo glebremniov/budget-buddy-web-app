@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react'
-import { refreshToken as refreshAction } from '@budget-buddy-org/budget-buddy-contracts'
+import { useEffect } from 'react'
+import { refreshAuth } from '@/lib/api'
 import { useAuthStore } from '@/stores/auth.store'
 
 const SIX_DAYS_MS = 6 * 24 * 60 * 60 * 1000
@@ -12,35 +12,24 @@ const SIX_DAYS_MS = 6 * 24 * 60 * 60 * 1000
  * Mount once inside the authenticated layout.
  */
 export function useTabVisibilityRefresh() {
-  const isRefreshingRef = useRef(false)
-
   useEffect(() => {
     async function handleVisibilityChange() {
       if (document.visibilityState !== 'visible') return
 
-      const { refreshToken, refreshTokenObtainedAt, setAuth } = useAuthStore.getState()
+      const { refreshToken, refreshTokenObtainedAt } = useAuthStore.getState()
 
       if (!refreshToken || refreshTokenObtainedAt === null) return
-      if (isRefreshingRef.current) return
 
       const ageMs = Date.now() - refreshTokenObtainedAt
       if (ageMs < SIX_DAYS_MS) return
 
-      isRefreshingRef.current = true
       try {
-        const { data } = await refreshAction({
-          body: { refresh_token: refreshToken },
-        })
-        if (data) {
-          setAuth(data.access_token, data.refresh_token)
-        }
+        await refreshAuth()
       } catch {
         // Network/transient errors are silently ignored so the user is not interrupted.
         // If the refresh token is expired (server returns 401), the response interceptor
         // in api.ts takes over: it attempts another refresh, fails, calls clearAuth(),
         // and redirects to /login — which is the correct UX for an expired session.
-      } finally {
-        isRefreshingRef.current = false
       }
     }
 

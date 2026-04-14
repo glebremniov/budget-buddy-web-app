@@ -1,6 +1,6 @@
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { Link, Outlet, createRootRoute, useRouter } from '@tanstack/react-router'
-import { TanStackRouterDevtools } from '@tanstack/router-devtools'
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import { useState } from 'react'
 import { Toaster } from '@/components/ui/toaster'
 import { VersionCheck } from '@/components/VersionCheck'
