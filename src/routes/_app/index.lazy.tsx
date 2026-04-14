@@ -96,7 +96,7 @@ function DashboardPage() {
       {chartData.length > 0 && (
         <Card className="hidden md:block">
           <CardHeader>
-            <CardTitle className="text-sm font-medium" as="h2">Monthly overview</CardTitle>
+            <CardTitle className="text-lg font-semibold" as="h2">Monthly overview</CardTitle>
           </CardHeader>
           <CardContent className="pl-2">
             <ResponsiveContainer width="100%" height={180}>
@@ -118,7 +118,7 @@ function DashboardPage() {
       {/* Recent transactions */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-sm font-medium" as="h2">Recent transactions</CardTitle>
+          <CardTitle className="text-lg font-semibold" as="h2">Recent transactions</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           {recent.length === 0 ? (

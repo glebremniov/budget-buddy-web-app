@@ -29,7 +29,7 @@ function SettingsPage() {
             <h2 className="text-lg font-semibold">Theme</h2>
           </div>
           <Card className="p-4">
-            <div className="flex flex-wrap gap-2">
+            <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap">
               {[
                 { value: 'light', icon: Sun, label: 'Light' },
                 { value: 'dark', icon: Moon, label: 'Dark' },
@@ -39,7 +39,7 @@ function SettingsPage() {
                   key={t.value}
                   variant={theme === t.value ? 'default' : 'outline'}
                   size="sm"
-                  className="gap-2 cursor-pointer"
+                  className="gap-2 cursor-pointer w-full sm:w-auto"
                   onClick={() => setTheme(t.value as any)}
                 >
                   <t.icon className="h-4 w-4" />

@@ -32,13 +32,14 @@ export function useTransactions(filters: TransactionFilters = {}) {
   return useQuery({
     queryKey: KEYS.list(filters),
     queryFn: async () => {
-      const { data } = await listTransactions({
+      const { data, error } = await listTransactions({
         query: {
           size: 20,
           sort: 'desc',
           ...filters,
         },
       })
+      if (error) throw error
       return data
     },
   })
@@ -48,9 +49,10 @@ export function useTransaction(id: string) {
   return useQuery({
     queryKey: KEYS.detail(id),
     queryFn: async () => {
-      const { data } = await getTransaction({
+      const { data, error } = await getTransaction({
         path: { transactionId: id },
       })
+      if (error) throw error
       return data
     },
     enabled: Boolean(id),
@@ -93,9 +95,10 @@ export function useDeleteTransaction() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async (id: string) => {
-      await deleteTransaction({
+      const { error } = await deleteTransaction({
         path: { transactionId: id },
       })
+      if (error) throw error
       return id
     },
     onMutate: async (id) => {

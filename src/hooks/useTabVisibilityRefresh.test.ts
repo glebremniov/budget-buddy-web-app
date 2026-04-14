@@ -71,7 +71,10 @@ describe('useTabVisibilityRefresh', () => {
     fireVisibilityChange('visible')
 
     await vi.waitFor(() => expect(refreshAction).toHaveBeenCalledOnce())
-    expect(refreshAction).toHaveBeenCalledWith({ body: { refresh_token: 'rt_old' } })
+    expect(refreshAction).toHaveBeenCalledWith({
+      body: { refresh_token: 'rt_old' },
+      _isRefresh: true,
+    })
     expect(mockSetAuth).toHaveBeenCalledWith('at_new', 'rt_new')
   })
 })

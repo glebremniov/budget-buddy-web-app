@@ -5,10 +5,11 @@ import { DatePicker } from '@/components/ui/date-picker'
 import { Select } from '@/components/ui/select'
 import { TransactionTypeToggle } from '@/components/ui/transaction-type-toggle'
 import { useCreateTransaction, useUpdateTransaction } from '@/hooks/useTransactions'
+import { useCreateCategory } from '@/hooks/useCategories'
 import { useToast } from '@/hooks/use-toast'
 import { toMinorUnits, todayIso } from '@/lib/formatters'
 import type { Transaction, TransactionWrite } from '@budget-buddy-org/budget-buddy-contracts'
-import { Check, X } from 'lucide-react'
+import { Check, X, Plus, RotateCcw } from 'lucide-react'
 import { useState } from 'react'
 
 const CURRENCIES = ['EUR', 'USD', 'GBP']
@@ -29,6 +30,7 @@ export function TransactionForm({
   const { toast } = useToast()
   const createTx = useCreateTransaction()
   const updateTx = useUpdateTransaction(transaction?.id ?? '')
+  const createCategory = useCreateCategory()
 
   const [form, setForm] = useState({
     description: transaction?.description ?? '',
@@ -39,6 +41,9 @@ export function TransactionForm({
     categoryId: transaction?.categoryId ?? '',
   })
 
+  const [isAddingCategory, setIsAddingCategory] = useState(false)
+  const [newCategoryName, setNewCategoryName] = useState('')
+
   const isEditing = !!transaction
   const currentMutation = isEditing ? updateTx : createTx
 
@@ -48,7 +53,8 @@ export function TransactionForm({
     form.type !== ((transaction?.type as 'EXPENSE' | 'INCOME') ?? 'EXPENSE') ||
     form.currency !== (transaction?.currency ?? 'EUR') ||
     form.date !== (transaction?.date ?? todayIso()) ||
-    form.categoryId !== (transaction?.categoryId ?? '')
+    form.categoryId !== (transaction?.categoryId ?? '') ||
+    (isAddingCategory && !!newCategoryName)
 
   const fieldErrors = (currentMutation.error as any)?.errors as Array<{
     field: string
@@ -57,15 +63,32 @@ export function TransactionForm({
   const getFieldError = (field: string) =>
     fieldErrors?.find((e) => e.field === field)?.message
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    let categoryId = form.categoryId
+
+    if (isAddingCategory && newCategoryName) {
+      try {
+        const newCat = await createCategory.mutateAsync({ name: newCategoryName })
+        categoryId = newCat.id
+      } catch (error: any) {
+        toast({
+          title: 'Error',
+          description: error.message || 'Failed to create new category.',
+          variant: 'destructive',
+        })
+        return
+      }
+    }
+
     const body: TransactionWrite = {
       description: form.description || undefined,
       amount: toMinorUnits(Number(form.amount)),
       type: form.type,
       currency: form.currency,
       date: form.date,
-      categoryId: form.categoryId,
+      categoryId,
     }
 
     currentMutation.mutate(body, {
@@ -75,6 +98,7 @@ export function TransactionForm({
           description: isEditing
             ? 'Your changes have been saved.'
             : 'The transaction has been recorded successfully.',
+          variant: 'success',
         })
         onSuccess()
       },
@@ -96,9 +120,10 @@ export function TransactionForm({
     !!form.date &&
     !!form.amount &&
     Number.parseFloat(form.amount) !== 0 &&
-    (categories.length === 0 || !!form.categoryId)
+    (isAddingCategory ? !!newCategoryName : !!form.categoryId)
 
   const isFormDisabled = !isFormValid || (isEditing && !hasChanges)
+  const isPending = currentMutation.isPending || createCategory.isPending
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -184,36 +209,89 @@ export function TransactionForm({
               )}
             </div>
 
-            {categories.length > 0 && (
-              <div className="sm:col-span-2 space-y-1">
+            <div className="sm:col-span-2 space-y-1">
+              <div className="flex items-center justify-between">
                 <label className="text-xs font-medium text-muted-foreground">
                   Category <span className="text-destructive">*</span>
                 </label>
-                <Select
-                  value={form.categoryId}
-                  onChange={(e) => setForm((f) => ({ ...f, categoryId: e.target.value }))}
-                  className={getFieldError('categoryId') ? 'border-destructive ring-destructive focus-visible:ring-destructive' : ''}
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 px-2 text-[0.625rem] font-medium"
+                  onClick={() => setIsAddingCategory((v) => !v)}
+                  disabled={isPending}
                 >
-                  <option value="">No category</option>
-                  {categories.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </Select>
-                {getFieldError('categoryId') && (
-                  <p className="text-[0.625rem] font-medium text-destructive">{getFieldError('categoryId')}</p>
-                )}
+                  {isAddingCategory ? (
+                    <>
+                      <RotateCcw className="h-3 w-3 mr-1" />
+                      Choose existing
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="h-3 w-3 mr-1" />
+                      Add new
+                    </>
+                  )}
+                </Button>
               </div>
-            )}
+
+              {isAddingCategory ? (
+                <div className="space-y-1">
+                  <Input
+                    placeholder="New category name…"
+                    value={newCategoryName}
+                    onChange={(e) => setNewCategoryName(e.target.value)}
+                    disabled={isPending}
+                    autoComplete="off"
+                    className={
+                      createCategory.error
+                        ? 'border-destructive ring-destructive focus-visible:ring-destructive'
+                        : ''
+                    }
+                    autoFocus
+                  />
+                  {(createCategory.error as any)?.message && (
+                    <p className="text-[0.625rem] font-medium text-destructive">
+                      {(createCategory.error as any).message}
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <>
+                  <Select
+                    value={form.categoryId}
+                    onChange={(e) => setForm((f) => ({ ...f, categoryId: e.target.value }))}
+                    disabled={isPending}
+                    className={
+                      getFieldError('categoryId')
+                        ? 'border-destructive ring-destructive focus-visible:ring-destructive'
+                        : ''
+                    }
+                  >
+                    <option value="">No category</option>
+                    {categories.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </Select>
+                  {getFieldError('categoryId') && (
+                    <p className="text-[0.625rem] font-medium text-destructive">
+                      {getFieldError('categoryId')}
+                    </p>
+                  )}
+                </>
+              )}
+            </div>
           </div>
 
           <div className="flex gap-2 pt-2">
-            <Button type="submit" className="flex-1" loading={currentMutation.isPending} disabled={isFormDisabled}>
+            <Button type="submit" className="flex-1" loading={isPending} disabled={isFormDisabled}>
               <Check className="h-4 w-4 mr-2" />
               Save
             </Button>
-            <Button type="button" variant="outline" className="flex-1" onClick={onCancel} disabled={currentMutation.isPending}>
+            <Button type="button" variant="outline" className="flex-1" onClick={onCancel} disabled={isPending}>
               <X className="h-4 w-4 mr-2" />
               Cancel
             </Button>

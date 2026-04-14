@@ -2,7 +2,7 @@ import { createLazyFileRoute } from '@tanstack/react-router'
 import { Check, Trash2, X } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -50,6 +50,7 @@ function CategoriesPage() {
           toast({
             title: 'Category created',
             description: 'Your new category has been added successfully.',
+            variant: 'success',
           })
         },
         onError: (error: any) => {
@@ -77,6 +78,7 @@ function CategoriesPage() {
           toast({
             title: 'Category updated',
             description: 'The category name has been changed.',
+            variant: 'success',
           })
         },
         onError: (error: any) => {
@@ -100,6 +102,7 @@ function CategoriesPage() {
         toast({
           title: 'Category deleted',
           description: 'The category has been removed.',
+          variant: 'success',
         })
       },
       onError: () => {
@@ -128,6 +131,9 @@ function CategoriesPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Add Category</DialogTitle>
+            <DialogDescription>
+              Create a new category to group your transactions.
+            </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleCreate} className="space-y-4">
             <div className="space-y-1">
@@ -140,6 +146,7 @@ function CategoriesPage() {
                 onChange={(e) => setNewName(e.target.value)}
                 maxLength={255}
                 autoFocus
+                autoComplete="off"
                 className={createFieldError ? 'border-destructive ring-destructive focus-visible:ring-destructive' : ''}
               />
               {createFieldError && (
@@ -164,6 +171,9 @@ function CategoriesPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Category</DialogTitle>
+            <DialogDescription>
+              Modify the name of your category.
+            </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleUpdate} className="space-y-4">
             <div className="space-y-1">
@@ -176,6 +186,7 @@ function CategoriesPage() {
                 onChange={(e) => setEditName(e.target.value)}
                 maxLength={255}
                 autoFocus
+                autoComplete="off"
                 className={updateFieldError ? 'border-destructive ring-destructive focus-visible:ring-destructive' : ''}
               />
               {updateFieldError && (

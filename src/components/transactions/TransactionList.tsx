@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ConfirmationDialog } from '@/components/ConfirmationDialog'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { TransactionForm } from './TransactionForm'
 import { useDeleteTransaction } from '@/hooks/useTransactions'
 import { useToast } from '@/hooks/use-toast'
@@ -16,12 +16,16 @@ interface TransactionListProps {
   transactions: Transaction[]
   categories: { id: string; name: string }[]
   isLoading: boolean
+  isFiltering?: boolean
+  onResetFilters?: () => void
 }
 
 export function TransactionList({
   transactions,
   categories,
   isLoading,
+  isFiltering = false,
+  onResetFilters,
 }: TransactionListProps) {
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
   const [deleteId, setDeleteId] = useState<string | null>(null)
@@ -38,6 +42,7 @@ export function TransactionList({
         toast({
           title: 'Transaction deleted',
           description: 'The transaction has been removed.',
+          variant: 'success',
         })
       },
       onError: () => {
@@ -69,7 +74,16 @@ export function TransactionList({
       <Card>
         <CardContent className="p-0">
           {transactions.length === 0 ? (
-            <p className="px-6 py-4 text-sm text-muted-foreground">No transactions yet.</p>
+            <div className="flex flex-col items-center justify-center gap-2 px-6 py-8 text-center">
+              <p className="text-sm text-muted-foreground">
+                {isFiltering ? 'No transactions match your filters.' : 'No transactions yet.'}
+              </p>
+              {isFiltering && onResetFilters && (
+                <Button variant="link" onClick={onResetFilters} className="h-auto p-0 text-primary">
+                  Reset filters
+                </Button>
+              )}
+            </div>
           ) : (
             <ul className="divide-y">
               {transactions.map((t) => (
@@ -124,6 +138,9 @@ export function TransactionList({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Transaction</DialogTitle>
+            <DialogDescription>
+              Update your transaction details including amount, date, and category.
+            </DialogDescription>
           </DialogHeader>
           {editingTransaction && (
             <TransactionForm

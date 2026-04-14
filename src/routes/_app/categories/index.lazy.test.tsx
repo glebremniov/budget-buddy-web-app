@@ -53,6 +53,7 @@ vi.mock('@/components/ui/dialog', () => ({
   DialogContent: ({ children }: any) => React.createElement('div', { 'data-testid': 'dialog-content' }, children),
   DialogHeader: ({ children }: any) => React.createElement('div', { 'data-testid': 'dialog-header' }, children),
   DialogTitle: ({ children }: any) => React.createElement('h2', { 'data-testid': 'dialog-title' }, children),
+  DialogDescription: ({ children }: any) => React.createElement('p', { 'data-testid': 'dialog-description' }, children),
 }))
 vi.mock('lucide-react', () => ({
   Plus: () => React.createElement('span', null, '+'),

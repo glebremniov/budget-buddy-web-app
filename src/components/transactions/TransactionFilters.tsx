@@ -1,8 +1,8 @@
-import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Select } from '@/components/ui/select'
-import { Search } from 'lucide-react'
+import { Search, RotateCcw } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useDebounce } from '@/hooks/use-debounce'
 
@@ -17,6 +17,7 @@ interface TransactionFiltersProps {
   }
   onFilterChange: (filters: any) => void
   onReset: () => void
+  onClose: () => void
 }
 
 export function TransactionFilters({
@@ -24,84 +25,109 @@ export function TransactionFilters({
   filters,
   onFilterChange,
   onReset,
+  onClose,
 }: TransactionFiltersProps) {
   const [searchTerm, setSearchTerm] = useState(filters.search)
   const debouncedSearch = useDebounce(searchTerm)
 
   useEffect(() => {
+    setSearchTerm(filters.search)
+  }, [filters.search])
+
+  useEffect(() => {
     onFilterChange({ ...filters, search: debouncedSearch })
   }, [debouncedSearch])
 
+  const hasActiveFilters =
+    filters.categoryId ||
+    filters.start ||
+    filters.end ||
+    filters.sort !== 'desc' ||
+    filters.search
+
   return (
-    <Card>
-      <CardContent className="pt-4">
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-5">
-          <div className="sm:col-span-2 md:col-span-1 space-y-1">
-            <label className="text-xs font-medium text-muted-foreground">Search</label>
-            <div className="relative">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search transactions…"
-                className="pl-8"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-          </div>
-          <div className="space-y-1">
-            <label className="text-xs font-medium text-muted-foreground">Category</label>
-            <Select
-              value={filters.categoryId}
-              onChange={(e) => onFilterChange({ ...filters, categoryId: e.target.value })}
-            >
-              <option value="">All categories</option>
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </Select>
-          </div>
-          <div className="space-y-1">
-            <label className="text-xs font-medium text-muted-foreground">From</label>
-            <DatePicker
-              value={filters.start}
-              onChange={(e) => onFilterChange({ ...filters, start: e.target.value })}
-            />
-          </div>
-          <div className="space-y-1">
-            <label className="text-xs font-medium text-muted-foreground">To</label>
-            <DatePicker
-              value={filters.end}
-              onChange={(e) => onFilterChange({ ...filters, end: e.target.value })}
-            />
-          </div>
-          <div className="space-y-1">
-            <label className="text-xs font-medium text-muted-foreground">Sort</label>
-            <Select
-              value={filters.sort}
-              onChange={(e) =>
-                onFilterChange({ ...filters, sort: e.target.value as 'asc' | 'desc' })
-              }
-            >
-              <option value="desc">Newest first</option>
-              <option value="asc">Oldest first</option>
-            </Select>
-          </div>
+    <div className="space-y-4 pt-2">
+      <div className="space-y-2">
+        <label htmlFor="search-filter" className="text-sm font-medium">Search</label>
+        <div className="relative">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            id="search-filter"
+            placeholder="Search transactions…"
+            className="pl-9"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
-        {(filters.categoryId || filters.start || filters.end || filters.sort !== 'desc' || filters.search) && (
-          <button
-            type="button"
-            className="mt-3 text-xs text-muted-foreground underline cursor-pointer"
-            onClick={() => {
-              setSearchTerm('')
-              onReset()
-            }}
-          >
-            Clear filters
-          </button>
-        )}
-      </CardContent>
-    </Card>
+      </div>
+
+      <div className="space-y-2">
+        <label htmlFor="category-filter" className="text-sm font-medium">Category</label>
+        <Select
+          id="category-filter"
+          value={filters.categoryId}
+          onChange={(e) => onFilterChange({ ...filters, categoryId: e.target.value })}
+        >
+          <option value="">All categories</option>
+          {categories.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name}
+            </option>
+          ))}
+        </Select>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <label htmlFor="start-date-filter" className="text-sm font-medium">From</label>
+          <DatePicker
+            id="start-date-filter"
+            value={filters.start}
+            onChange={(e) => onFilterChange({ ...filters, start: e.target.value })}
+          />
+        </div>
+        <div className="space-y-2">
+          <label htmlFor="end-date-filter" className="text-sm font-medium">To</label>
+          <DatePicker
+            id="end-date-filter"
+            value={filters.end}
+            onChange={(e) => onFilterChange({ ...filters, end: e.target.value })}
+          />
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <label htmlFor="sort-filter" className="text-sm font-medium">Sort</label>
+        <Select
+          id="sort-filter"
+          value={filters.sort}
+          onChange={(e) =>
+            onFilterChange({ ...filters, sort: e.target.value as 'asc' | 'desc' })
+          }
+        >
+          <option value="desc">Newest first</option>
+          <option value="asc">Oldest first</option>
+        </Select>
+      </div>
+
+      <div className="pt-4 flex items-center justify-between gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            setSearchTerm('')
+            onReset()
+          }}
+          disabled={!hasActiveFilters}
+          className="flex-1"
+        >
+          <RotateCcw className="mr-2 h-4 w-4" />
+          Reset
+        </Button>
+        <Button onClick={onClose} className="flex-1">
+          Done
+        </Button>
+      </div>
+    </div>
   )
 }
