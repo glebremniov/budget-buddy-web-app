@@ -130,9 +130,10 @@ function CategoriesPage() {
     : allCategories
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6 animate-fade-in">
       <PageHeader
         title="Categories"
+        subtitle="Manage categories to organize your transactions."
         primaryAction={{
           label: 'Add',
           onClick: () => setShowForm((v) => !v),

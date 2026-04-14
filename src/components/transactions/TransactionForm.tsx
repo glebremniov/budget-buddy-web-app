@@ -4,13 +4,20 @@ import { AmountInput } from '@/components/ui/amount-input'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Select } from '@/components/ui/select'
 import { TransactionTypeToggle } from '@/components/ui/transaction-type-toggle'
-import { useCreateTransaction, useUpdateTransaction } from '@/hooks/useTransactions'
+import { useCreateTransaction, useUpdateTransaction, useDeleteTransaction } from '@/hooks/useTransactions'
 import { useCreateCategory } from '@/hooks/useCategories'
 import { useToast } from '@/hooks/use-toast'
 import { toMinorUnits, todayIso } from '@/lib/formatters'
 import type { Transaction, TransactionWrite } from '@budget-buddy-org/budget-buddy-contracts'
-import { Check, X, Plus, RotateCcw } from 'lucide-react'
+import { Check, X, Plus, RotateCcw, MoreVertical, Trash2 } from 'lucide-react'
 import { useState } from 'react'
+import { ConfirmationDialog } from '@/components/ConfirmationDialog'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 
 const CURRENCIES = ['EUR', 'GBP', 'USD']
 
@@ -30,8 +37,10 @@ export function TransactionForm({
   const { toast } = useToast()
   const createTx = useCreateTransaction()
   const updateTx = useUpdateTransaction(transaction?.id ?? '')
+  const deleteTx = useDeleteTransaction()
   const createCategory = useCreateCategory()
 
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [form, setForm] = useState({
     description: transaction?.description ?? '',
     amount: transaction ? (transaction.amount / 100).toFixed(2) : '',
@@ -114,6 +123,27 @@ export function TransactionForm({
     })
   }
 
+  const handleDelete = () => {
+    if (!transaction?.id) return
+    deleteTx.mutate(transaction.id, {
+      onSuccess: () => {
+        toast({
+          title: 'Transaction deleted',
+          description: 'The transaction has been removed.',
+          variant: 'success',
+        })
+        onSuccess()
+      },
+      onError: () => {
+        toast({
+          title: 'Error',
+          description: 'Failed to delete transaction.',
+          variant: 'destructive',
+        })
+      },
+    })
+  }
+
   const isFormValid =
     !!form.type &&
     !!form.currency &&
@@ -126,8 +156,37 @@ export function TransactionForm({
   const isPending = currentMutation.isPending || createCategory.isPending
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {isEditing && (
+          <div className="absolute top-4 right-4">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                >
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="text-destructive focus:text-destructive cursor-pointer"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Remove
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={onCancel} className="cursor-pointer">
+                  <X className="h-4 w-4 mr-2" />
+                  Cancel
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        )}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="sm:col-span-2 space-y-1">
               <label className="text-xs font-medium text-muted-foreground">
                 Type <span className="text-destructive">*</span>
@@ -297,5 +356,17 @@ export function TransactionForm({
             </Button>
           </div>
     </form>
+
+      <ConfirmationDialog
+        isOpen={showDeleteConfirm}
+        onOpenChange={setShowDeleteConfirm}
+        onConfirm={handleDelete}
+        title="Delete Transaction"
+        description="Are you sure you want to delete this transaction? This action cannot be undone."
+        confirmText="Delete"
+        variant="destructive"
+        isLoading={deleteTx.isPending}
+      />
+    </>
   )
 }

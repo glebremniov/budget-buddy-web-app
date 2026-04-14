@@ -12,9 +12,11 @@ vi.mock('@/hooks/use-toast', () => ({
 
 const mockCreateTx = { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false, error: null }
 const mockUpdateTx = { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false, error: null }
+const mockDeleteTx = { mutate: vi.fn(), isPending: false }
 vi.mock('@/hooks/useTransactions', () => ({
   useCreateTransaction: () => mockCreateTx,
   useUpdateTransaction: () => mockUpdateTx,
+  useDeleteTransaction: () => mockDeleteTx,
 }))
 
 const mockCreateCategory = { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false, error: null }
@@ -49,6 +51,21 @@ vi.mock('@/components/ui/transaction-type-toggle', () => ({
       React.createElement('button', { onClick: () => onChange('EXPENSE'), 'aria-pressed': value === 'EXPENSE' }, 'Expense'),
       React.createElement('button', { onClick: () => onChange('INCOME'), 'aria-pressed': value === 'INCOME' }, 'Income'),
     ),
+}))
+
+vi.mock('@/components/ui/dropdown-menu', () => ({
+  DropdownMenu: ({ children }: any) => React.createElement('div', {}, children),
+  DropdownMenuTrigger: ({ children }: any) => React.createElement('div', {}, children),
+  DropdownMenuContent: ({ children }: any) => React.createElement('div', {}, children),
+  DropdownMenuItem: ({ children, onClick }: any) => React.createElement('button', { onClick }, children),
+}))
+
+vi.mock('@/components/ConfirmationDialog', () => ({
+  ConfirmationDialog: ({ isOpen, onConfirm, title }: any) => 
+    isOpen ? React.createElement('div', {}, 
+      React.createElement('span', {}, title),
+      React.createElement('button', { onClick: onConfirm }, 'Confirm Delete')
+    ) : null,
 }))
 
 const categories = [
@@ -130,5 +147,23 @@ describe('TransactionForm', () => {
       }),
       expect.any(Object)
     ))
+  })
+
+  it('shows delete confirmation and deletes transaction', async () => {
+    const onSuccess = vi.fn()
+    const transaction = { id: 'tx-1', description: 'Old Coffee', amount: 500, currency: 'EUR', type: 'EXPENSE', date: '2024-01-01' }
+    renderForm({ onSuccess, transaction })
+    const user = userEvent.setup()
+
+    // Open dropdown and click Remove
+    await user.click(screen.getByText(/Remove/i))
+
+    // Check if confirmation dialog is shown
+    expect(screen.getByText(/Delete Transaction/i)).toBeInTheDocument()
+
+    // Confirm delete
+    await user.click(screen.getByText(/Confirm Delete/i))
+
+    expect(mockDeleteTx.mutate).toHaveBeenCalledWith('tx-1', expect.any(Object))
   })
 })
