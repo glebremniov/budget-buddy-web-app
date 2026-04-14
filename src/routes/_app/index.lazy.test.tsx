@@ -108,7 +108,7 @@ describe('DashboardPage', () => {
     expect(balanceCard).toHaveTextContent(/50/)
   })
 
-  it('navigates to edit transaction on click', async () => {
+  it('navigates to transaction list on click', async () => {
     const mockNavigate = vi.fn()
     ;(useNavigate as any).mockReturnValue(mockNavigate)
     ;(useAllTransactions as any).mockReturnValue({
@@ -131,7 +131,6 @@ describe('DashboardPage', () => {
 
     expect(mockNavigate).toHaveBeenCalledWith({
       to: '/transactions',
-      search: expect.objectContaining({ edit: '1' }),
     })
   })
 })

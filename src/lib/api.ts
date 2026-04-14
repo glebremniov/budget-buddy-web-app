@@ -2,15 +2,6 @@ import { refreshToken as refreshAction } from '@budget-buddy-org/budget-buddy-co
 import { client } from '@budget-buddy-org/budget-buddy-contracts/client.gen'
 import { useAuthStore } from '@/stores/auth.store'
 
-// Attach access token to every outgoing request
-client.interceptors.request.use((request: Request) => {
-  const token = useAuthStore.getState().accessToken
-  if (token) {
-    request.headers.set('Authorization', `Bearer ${token}`)
-  }
-  return request
-})
-
 // Queue of requests waiting for a token refresh to complete
 let refreshPromise: Promise<string | null> | null = null
 let pendingQueue: Array<{ resolve: (token: string) => void; reject: (err: unknown) => void }> = []
@@ -42,7 +33,7 @@ export function refreshAuth() {
         throw new Error('Refresh failed')
       }
 
-      useAuthStore.getState().setAuth(data.access_token, data.refresh_token)
+      useAuthStore.getState().setAuth(data.access_token, data.refresh_token, data.expires_in)
       flushQueue(null, data.access_token)
       return data.access_token
     } catch (refreshError) {

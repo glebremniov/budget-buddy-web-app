@@ -122,12 +122,7 @@ function CategoriesPage() {
     })
   }
 
-  const allCategories = data?.items ?? []
-  const categories = debouncedSearch
-    ? allCategories.filter((c) =>
-        c.name.toLowerCase().includes(debouncedSearch.toLowerCase())
-      )
-    : allCategories
+  const categories = data?.items ?? []
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -175,7 +170,7 @@ function CategoriesPage() {
                 className={createFieldError ? 'border-destructive ring-destructive focus-visible:ring-destructive' : ''}
               />
               {createFieldError && (
-                <p className="text-[0.625rem] font-medium text-destructive">{createFieldError}</p>
+                <p className="text-xs font-medium text-destructive">{createFieldError}</p>
               )}
             </div>
             <div className="flex gap-2 pt-2">
@@ -214,7 +209,7 @@ function CategoriesPage() {
                 className={updateFieldError ? 'border-destructive ring-destructive focus-visible:ring-destructive' : ''}
               />
               {updateFieldError && (
-                <p className="text-[0.625rem] font-medium text-destructive">{updateFieldError}</p>
+                <p className="text-xs font-medium text-destructive">{updateFieldError}</p>
               )}
             </div>
             <div className="flex gap-2 pt-2">

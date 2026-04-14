@@ -14,7 +14,7 @@ describe('useAuthStore', () => {
   })
 
   it('setAuth stores both tokens', () => {
-    useAuthStore.getState().setAuth('access-123', 'refresh-456')
+    useAuthStore.getState().setAuth('access-123', 'refresh-456', 3600)
     const { accessToken, refreshToken, isAuthenticated } = useAuthStore.getState()
     expect(accessToken).toBe('access-123')
     expect(refreshToken).toBe('refresh-456')
@@ -22,7 +22,7 @@ describe('useAuthStore', () => {
   })
 
   it('setAccessToken updates only the access token', () => {
-    useAuthStore.getState().setAuth('old-access', 'my-refresh')
+    useAuthStore.getState().setAuth('old-access', 'my-refresh', 3600)
     useAuthStore.getState().setAccessToken('new-access')
     const { accessToken, refreshToken } = useAuthStore.getState()
     expect(accessToken).toBe('new-access')
@@ -30,7 +30,7 @@ describe('useAuthStore', () => {
   })
 
   it('clearAuth resets both tokens to null', () => {
-    useAuthStore.getState().setAuth('access-123', 'refresh-456')
+    useAuthStore.getState().setAuth('access-123', 'refresh-456', 3600)
     useAuthStore.getState().clearAuth()
     const { accessToken, refreshToken, isAuthenticated } = useAuthStore.getState()
     expect(accessToken).toBeNull()

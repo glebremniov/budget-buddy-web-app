@@ -25,7 +25,7 @@ function LoginPage() {
       return data as AuthToken
     },
     onSuccess: (data) => {
-      setAuth(data.access_token, data.refresh_token)
+      setAuth(data.access_token, data.refresh_token, data.expires_in)
       navigate({ to: '/' })
     },
   })

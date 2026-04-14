@@ -11,6 +11,7 @@ const mockSetAuth = vi.fn()
 let mockStoreState = {
   refreshToken: null as string | null,
   refreshTokenObtainedAt: null as number | null,
+  accessTokenExpiresAt: null as number | null,
   setAuth: mockSetAuth,
 }
 
@@ -43,6 +44,7 @@ describe('useTabVisibilityRefresh', () => {
     mockStoreState = {
       refreshToken: null,
       refreshTokenObtainedAt: null,
+      accessTokenExpiresAt: null,
       setAuth: mockSetAuth,
     }
     setVisibilityState('visible')
@@ -64,7 +66,7 @@ describe('useTabVisibilityRefresh', () => {
     mockStoreState.refreshTokenObtainedAt = STALE_TIMESTAMP
 
     vi.mocked(refreshAction).mockResolvedValue({
-      data: { access_token: 'at_new', refresh_token: 'rt_new' },
+      data: { access_token: 'at_new', refresh_token: 'rt_new', expires_in: 3600 },
     } as any)
 
     renderHook(() => useTabVisibilityRefresh())
@@ -75,6 +77,6 @@ describe('useTabVisibilityRefresh', () => {
       body: { refresh_token: 'rt_old' },
       _isRefresh: true,
     })
-    expect(mockSetAuth).toHaveBeenCalledWith('at_new', 'rt_new')
+    expect(mockSetAuth).toHaveBeenCalledWith('at_new', 'rt_new', 3600)
   })
 })

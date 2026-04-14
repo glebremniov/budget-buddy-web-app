@@ -23,15 +23,24 @@ export function useCategories(size = 200, page = 0, search?: string) {
     queryKey: KEYS.list(size, page, search),
     queryFn: async () => {
       const { data, error } = await listCategories({
-        query: { size, page, search } as any,
+        query: { size, page, search: undefined } as any, // Clear search from API call
       })
       if (error) throw error
-      
+
+      // Client-side search if API doesn't support it
+      if (search && data?.items) {
+        const term = search.toLowerCase()
+        data.items = data.items.filter((item) =>
+          item.name.toLowerCase().includes(term),
+        )
+        data.meta.total = data.items.length
+      }
+
       // Sort categories by name ASC
       if (data?.items) {
         data.items.sort((a, b) => a.name.localeCompare(b.name))
       }
-      
+
       return data
     },
   })
@@ -96,15 +105,22 @@ export function useDeleteCategory() {
     onMutate: async (id) => {
       await qc.cancelQueries({ queryKey: KEYS.all })
       const previous = qc.getQueriesData<PaginatedCategories>({ queryKey: KEYS.all })
-      qc.setQueriesData<PaginatedCategories>({ queryKey: KEYS.all }, (old) =>
+
+      // Optimistically update all paginated lists
+      qc.setQueriesData<PaginatedCategories>({ queryKey: ['categories', 'list'] }, (old) =>
         old ? { ...old, items: old.items.filter((c) => c.id !== id) } : old,
       )
+
       return { previous }
     },
     onError: (_err, _id, ctx) => {
       if (ctx?.previous) {
         ctx.previous.forEach(([key, value]) => qc.setQueryData(key, value))
       }
+    },
+    onSuccess: (_data, id) => {
+      // Also remove the specific detail query if it exists
+      qc.removeQueries({ queryKey: KEYS.detail(id) })
     },
     onSettled: () => qc.invalidateQueries({ queryKey: KEYS.all }),
   })

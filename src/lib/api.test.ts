@@ -56,35 +56,6 @@ function makeRequest(url = 'http://localhost/test'): Request {
   return new Request(url)
 }
 
-describe('API request interceptor', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-    mockAuthState = {
-      accessToken: null,
-      refreshToken: null,
-      setAuth: vi.fn(),
-      clearAuth: vi.fn(),
-    }
-  })
-
-  it('attaches a Bearer token when the user is authenticated', () => {
-    mockAuthState.accessToken = 'my-access-token'
-
-    const req = makeRequest()
-    const result = requestInterceptor!(req)
-
-    expect(result.headers.get('Authorization')).toBe('Bearer my-access-token')
-  })
-
-  it('does not set Authorization header when no access token', () => {
-    mockAuthState.accessToken = null
-
-    const req = makeRequest()
-    const result = requestInterceptor!(req)
-
-    expect(result.headers.get('Authorization')).toBeNull()
-  })
-})
 
 describe('API response interceptor', () => {
   beforeEach(() => {
@@ -113,7 +84,7 @@ describe('API response interceptor', () => {
 
   it('attempts token refresh on 401 and retries the original request', async () => {
     vi.mocked(refreshToken).mockResolvedValue({
-      data: { access_token: 'at-new', refresh_token: 'rt-new' },
+      data: { access_token: 'at-new', refresh_token: 'rt-new', expires_in: 3600 },
     } as any)
     mockClientRequest.mockResolvedValue({ response: makeResponse(200) })
 
@@ -126,7 +97,7 @@ describe('API response interceptor', () => {
       body: { refresh_token: 'rt-current' },
       _isRefresh: true,
     })
-    expect(mockAuthState.setAuth).toHaveBeenCalledWith('at-new', 'rt-new')
+    expect(mockAuthState.setAuth).toHaveBeenCalledWith('at-new', 'rt-new', 3600)
     expect(mockClientRequest).toHaveBeenCalled()
   })
 
@@ -177,7 +148,7 @@ describe('API response interceptor', () => {
     const second = responseInterceptor!(makeResponse(401), makeRequest(), { headers: new Headers() })
 
     // Now let the refresh complete
-    resolveRefresh({ data: { access_token: 'at-new', refresh_token: 'rt-new' } })
+    resolveRefresh({ data: { access_token: 'at-new', refresh_token: 'rt-new', expires_in: 3600 } })
 
     await Promise.all([first, second])
 
@@ -213,7 +184,7 @@ describe('API response interceptor', () => {
     // Second 401 — now has a refresh token; must attempt refresh, not hang
     mockAuthState.refreshToken = 'rt-valid'
     vi.mocked(refreshToken).mockResolvedValue({
-      data: { access_token: 'at-new', refresh_token: 'rt-new' },
+      data: { access_token: 'at-new', refresh_token: 'rt-new', expires_in: 3600 },
     } as any)
     mockClientRequest.mockResolvedValue({ response: makeResponse(200) })
 

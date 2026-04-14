@@ -50,88 +50,19 @@ describe('useTransactions', () => {
     vi.clearAllMocks()
   })
 
-  it('returns fetched transactions and requests one more page', async () => {
-    vi.mocked(listTransactions)
-      .mockResolvedValueOnce({
-        data: {
-          items: [{ id: 'tx-1', date: '2024-01-10' }],
-          meta: { total: 100, size: 20, page: 0 }
-        }
-      } as any)
-      .mockResolvedValueOnce({
-        data: {
-          items: [{ id: 'tx-2', date: '2024-01-09' }],
-          meta: { total: 100, size: 20, page: 1 }
-        }
-      } as any)
-      .mockResolvedValueOnce({
-        data: {
-          items: [{ id: 'tx-3', date: '2024-01-08' }],
-          meta: { total: 100, size: 20, page: 2 }
-        }
-      } as any)
-
-    const { result } = renderHook(() => useTransactions(), { wrapper: makeWrapper() })
-
-    await waitFor(() => expect(result.current.isSuccess).toBe(true))
-    // It should have called listTransactions 3 times (page 0, page 1 (min 2 pages), page 2 (to check split))
-    // But only items from page 0 and 1 should be included as page 1 and 2 are not split.
-    expect(result.current.data?.items).toHaveLength(2)
-    expect(listTransactions).toHaveBeenCalledTimes(3)
-  })
-
-  it('continues fetching if day is split', async () => {
-    vi.mocked(listTransactions)
-      .mockResolvedValueOnce({
-        data: {
-          items: [{ id: '1', date: '2024-01-10' }],
-          meta: { total: 100, size: 1, page: 0 }
-        }
-      } as any)
-      .mockResolvedValueOnce({
-        data: {
-          items: [{ id: '2', date: '2024-01-10' }],
-          meta: { total: 100, size: 1, page: 1 }
-        }
-      } as any)
-      .mockResolvedValueOnce({
-        data: {
-          items: [{ id: '3', date: '2024-01-10' }], // Split with page 1
-          meta: { total: 100, size: 1, page: 2 }
-        }
-      } as any)
-      .mockResolvedValueOnce({
-        data: {
-          items: [{ id: '4', date: '2024-01-09' }], // Not split with page 2
-          meta: { total: 100, size: 1, page: 3 }
-        }
-      } as any)
-
-    const { result } = renderHook(() => useTransactions(), { wrapper: makeWrapper() })
-
-    await waitFor(() => expect(result.current.isSuccess).toBe(true))
-    // Calls:
-    // 1. Page 0 (Added, fetchCount=1)
-    // 2. Page 1 (Added, fetchCount=2)
-    // 3. Page 2 (Split with 1, Added, fetchCount=3)
-    // 4. Page 3 (Not split with 2, Broken)
-    expect(listTransactions).toHaveBeenCalledTimes(4)
-    expect(result.current.data?.items).toHaveLength(3)
-  })
-
-  it('stops at 10 page fetches', async () => {
+  it('returns fetched transactions', async () => {
     vi.mocked(listTransactions).mockResolvedValue({
       data: {
-        items: [{ id: 'x', date: '2024-01-10' }],
-        meta: { total: 100, size: 1, page: 0 }
+        items: [{ id: 'tx-1', date: '2024-01-10' }],
+        meta: { total: 1, size: 20, page: 0 }
       }
     } as any)
 
     const { result } = renderHook(() => useTransactions(), { wrapper: makeWrapper() })
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
-    expect(listTransactions).toHaveBeenCalledTimes(10)
-    expect(result.current.data?.items).toHaveLength(10)
+    expect(result.current.data?.items).toHaveLength(1)
+    expect(listTransactions).toHaveBeenCalledTimes(1)
   })
 
   it('passes filters to the API', async () => {
@@ -145,6 +76,43 @@ describe('useTransactions', () => {
     await waitFor(() => expect(listTransactions).toHaveBeenCalled())
     expect(listTransactions).toHaveBeenCalledWith(
       expect.objectContaining({ query: expect.objectContaining({ categoryId: 'cat-1', sort: 'asc', size: 10 }) }),
+    )
+  })
+
+  it('performs client-side search when search filter is present', async () => {
+    const items = [
+      { id: '1', description: 'Apple' },
+      { id: '2', description: 'Banana' },
+      { id: '3', description: 'Apricot' },
+    ]
+    vi.mocked(listTransactions).mockResolvedValue({
+      data: {
+        items,
+        meta: { total: 3, size: 20, page: 0 }
+      }
+    } as any)
+
+    const { result } = renderHook(
+      () => useTransactions({ search: 'ap' }),
+      { wrapper: makeWrapper() },
+    )
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+    
+    // Should find Apple and Apricot
+    expect(result.current.data?.items).toHaveLength(2)
+    expect(result.current.data?.items[0].description).toBe('Apple')
+    expect(result.current.data?.items[1].description).toBe('Apricot')
+    expect(result.current.data?.meta.total).toBe(2)
+    
+    // Should have called API with search: undefined and large size
+    expect(listTransactions).toHaveBeenCalledWith(
+      expect.objectContaining({ 
+        query: expect.objectContaining({ 
+          search: undefined,
+          size: 1000 
+        }) 
+      }),
     )
   })
 })

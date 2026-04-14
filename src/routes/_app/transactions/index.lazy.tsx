@@ -1,4 +1,4 @@
-import { createLazyFileRoute, useNavigate, useSearch } from '@tanstack/react-router'
+import { createLazyFileRoute, useNavigate } from '@tanstack/react-router'
 import { Filter } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
@@ -20,33 +20,17 @@ const PAGE_SIZE = 20
 
 function TransactionsPage() {
   const navigate = useNavigate()
-  const search = useSearch({ from: '/_app/transactions/' }) as any
   const { data: categoriesData } = useCategories()
   const categories = categoriesData?.items ?? []
 
   const [showForm, setShowForm] = useState(false)
   const [showFilters, setShowFilters] = useState(false)
-  const { data: editingTransaction, isLoading: isTransactionLoading } = useTransaction(search.edit!)
-
-  useEffect(() => {
-    if (search.add === 'true') {
-      setShowForm(true)
-      // Clear the param after opening
-      navigate({
-        search: { add: undefined } as any,
-        replace: true,
-      })
-    }
-  }, [search.add, navigate])
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const { data: editingTransaction, isLoading: isTransactionLoading } = useTransaction(editingId!)
 
   const closeForm = () => {
     setShowForm(false)
-    if (search.edit) {
-      navigate({
-        search: { edit: undefined } as any,
-        replace: true,
-      })
-    }
+    setEditingId(null)
   }
 
   const [filters, setFilters] = useState<{
@@ -77,15 +61,10 @@ function TransactionsPage() {
   }
 
   const { data, isLoading } = useTransactions(queryFilters)
-  const allTransactions = data?.items ?? []
+  const transactions = data?.items ?? []
   const total = data?.meta?.total ?? 0
 
   const isFiltered = !!(filters.categoryId || filters.start || filters.end || filters.search)
-  const transactions = filters.search
-    ? allTransactions.filter((t) =>
-        t.description?.toLowerCase().includes(filters.search.toLowerCase())
-      )
-    : allTransactions
 
   const hasActiveFilters =
     isFiltered || filters.sort !== 'desc'
@@ -144,28 +123,29 @@ function TransactionsPage() {
         </DialogContent>
       </Dialog>
       
-      <Dialog open={showForm || !!search.edit} onOpenChange={(open) => !open && closeForm()}>
-        <DialogContent hideClose={!!search.edit}>
+      <Dialog open={showForm || !!editingId} onOpenChange={(open) => !open && closeForm()}>
+        <DialogContent hideClose={!!editingId}>
           <DialogHeader>
-            <DialogTitle>{search.edit ? 'Edit Transaction' : 'Add Transaction'}</DialogTitle>
+            <DialogTitle>{editingId ? 'Edit Transaction' : 'Add Transaction'}</DialogTitle>
             <DialogDescription>
-              {search.edit
+              {editingId
                 ? 'Update your transaction details including amount, date, and category.'
                 : 'Record a new expense or income to track your budget.'}
             </DialogDescription>
           </DialogHeader>
-          {isTransactionLoading && search.edit ? (
+          {isTransactionLoading && editingId ? (
             <div className="space-y-4 py-4 animate-fade-in">
               <Skeleton className="h-10 w-full" />
               <Skeleton className="h-10 w-full" />
               <Skeleton className="h-10 w-full" />
             </div>
-          ) : (showForm || (search.edit && editingTransaction)) ? (
+          ) : (showForm || (editingId && editingTransaction)) ? (
             <TransactionForm
               categories={categories}
-              transaction={search.edit ? editingTransaction : undefined}
+              transaction={editingId ? editingTransaction : undefined}
               onSuccess={closeForm}
               onCancel={closeForm}
+              onDeleteSuccess={closeForm}
             />
           ) : null}
         </DialogContent>
@@ -177,7 +157,7 @@ function TransactionsPage() {
         isLoading={isLoading}
         isFiltering={isFiltered}
         onResetFilters={resetFilters}
-        onEdit={(id) => (navigate as any)({ search: (s: any) => ({ ...s, edit: id }) })}
+        onEdit={(id) => setEditingId(id)}
       />
 
       {!isLoading && transactions.length > 0 && (

@@ -16,12 +16,13 @@ export function useTabVisibilityRefresh() {
     async function handleVisibilityChange() {
       if (document.visibilityState !== 'visible') return
 
-      const { refreshToken, refreshTokenObtainedAt } = useAuthStore.getState()
+      const { refreshToken, refreshTokenObtainedAt, accessTokenExpiresAt } = useAuthStore.getState()
 
       if (!refreshToken || refreshTokenObtainedAt === null) return
 
       const ageMs = Date.now() - refreshTokenObtainedAt
-      if (ageMs < SIX_DAYS_MS) return
+      const isAccessTokenExpired = accessTokenExpiresAt && Date.now() > accessTokenExpiresAt
+      if (ageMs < SIX_DAYS_MS && !isAccessTokenExpired) return
 
       try {
         await refreshAuth()

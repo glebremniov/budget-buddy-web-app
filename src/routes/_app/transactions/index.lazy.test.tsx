@@ -1,16 +1,15 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { Route } from './index.lazy'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type React from 'react'
 
 const mockNavigate = vi.fn()
-const mockUseSearch = vi.fn()
 
 vi.mock('@tanstack/react-router', () => ({
   createLazyFileRoute: () => (options: any) => ({ options }),
   useNavigate: () => mockNavigate,
-  useSearch: () => mockUseSearch(),
+  useSearch: () => vi.fn(),
 }))
 
 vi.mock('@/hooks/useTransactions', () => ({
@@ -50,10 +49,16 @@ describe('TransactionsPage', () => {
     ;(useTransaction as any).mockReturnValue({ data: null, isLoading: false })
   })
 
-  it('opens edit dialog when edit search param is present', async () => {
-    mockUseSearch.mockReturnValue({ edit: '123' })
+  it('opens edit dialog when clicking a transaction in the list', async () => {
+    ;(useTransactions as any).mockReturnValue({ 
+      data: { 
+        items: [{ id: '123', description: 'Test Transaction', amount: 1000, date: '2024-01-01', type: 'EXPENSE', currency: 'EUR' }], 
+        meta: { total: 1 } 
+      }, 
+      isLoading: false 
+    })
     ;(useTransaction as any).mockReturnValue({ 
-      data: { id: '123', description: 'Test', amount: 1000, date: '2024-01-01' }, 
+      data: { id: '123', description: 'Test Transaction', amount: 1000, date: '2024-01-01', type: 'EXPENSE', currency: 'EUR' }, 
       isLoading: false 
     })
 
@@ -65,13 +70,14 @@ describe('TransactionsPage', () => {
       </QueryClientProvider>
     )
 
+    const transactionItem = screen.getByText('Test Transaction')
+    fireEvent.click(transactionItem)
+
     expect(screen.getByText('Edit Transaction')).toBeInTheDocument()
     expect(screen.getByTestId('transaction-form')).toHaveTextContent('Editing 123')
   })
 
-  it('opens add dialog when add search param is present', async () => {
-    mockUseSearch.mockReturnValue({ add: 'true' })
-    
+  it('opens add dialog when clicking Add button', async () => {
     const TransactionsPage = (Route as any).options.component as React.ElementType
 
     render(
@@ -79,6 +85,9 @@ describe('TransactionsPage', () => {
         <TransactionsPage />
       </QueryClientProvider>
     )
+
+    const addButtons = screen.getAllByRole('button', { name: /add/i })
+    fireEvent.click(addButtons[0])
 
     expect(screen.getByText('Add Transaction')).toBeInTheDocument()
     expect(screen.getByTestId('transaction-form')).toHaveTextContent('Adding')

@@ -61,7 +61,7 @@ describe('LoginPage', () => {
 
   it('calls loginUser with credentials and stores tokens on success', async () => {
     vi.mocked(loginUser).mockResolvedValue({
-      data: { access_token: 'at-abc', refresh_token: 'rt-xyz' },
+      data: { access_token: 'at-abc', refresh_token: 'rt-xyz', expires_in: 3600 },
     } as any)
 
     renderLogin()
@@ -74,7 +74,7 @@ describe('LoginPage', () => {
     await waitFor(() => expect(loginUser).toHaveBeenCalledWith({
       body: { username: 'alice', password: 'secret' },
     }))
-    await waitFor(() => expect(mockSetAuth).toHaveBeenCalledWith('at-abc', 'rt-xyz'))
+    await waitFor(() => expect(mockSetAuth).toHaveBeenCalledWith('at-abc', 'rt-xyz', 3600))
     await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith({ to: '/' }))
   })
 

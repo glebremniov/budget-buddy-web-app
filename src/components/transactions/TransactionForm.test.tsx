@@ -151,8 +151,9 @@ describe('TransactionForm', () => {
 
   it('shows delete confirmation and deletes transaction', async () => {
     const onSuccess = vi.fn()
+    const onDeleteSuccess = vi.fn()
     const transaction = { id: 'tx-1', description: 'Old Coffee', amount: 500, currency: 'EUR', type: 'EXPENSE', date: '2024-01-01' }
-    renderForm({ onSuccess, transaction })
+    renderForm({ onSuccess, onDeleteSuccess, transaction })
     const user = userEvent.setup()
 
     // Open dropdown and click Remove
@@ -161,13 +162,20 @@ describe('TransactionForm', () => {
     // Check if confirmation dialog is shown
     expect(screen.getByText(/Delete Transaction/i)).toBeInTheDocument()
 
+    // Mock delete success
+    mockDeleteTx.mutate.mockImplementationOnce((_id, options) => {
+      options.onSuccess()
+    })
+
     // Confirm delete
     await user.click(screen.getByText(/Confirm Delete/i))
 
     expect(mockDeleteTx.mutate).toHaveBeenCalledWith('tx-1', expect.any(Object))
+    expect(onDeleteSuccess).toHaveBeenCalled()
+    expect(onSuccess).not.toHaveBeenCalled()
   })
 
-  it('handles autoFocus based on mode', () => {
+  it('handles autoFocus always', () => {
     const { unmount } = renderForm()
     const createInput = screen.getByPlaceholderText(/Coffee/i)
     expect(createInput).toHaveAttribute('data-autofocus', 'true')
@@ -176,6 +184,6 @@ describe('TransactionForm', () => {
     const transaction = { id: 'tx-1', description: 'Old Coffee', amount: 500, currency: 'EUR', type: 'EXPENSE', date: '2024-01-01' }
     renderForm({ transaction })
     const editInput = screen.getByPlaceholderText(/Coffee/i)
-    expect(editInput).toHaveAttribute('data-autofocus', 'false')
+    expect(editInput).toHaveAttribute('data-autofocus', 'true')
   })
 })

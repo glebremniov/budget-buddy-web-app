@@ -92,7 +92,7 @@ input {
 input,
 select,
 textarea {
-  font-size: 16px !important;
+  font-size: max(16px, 1rem) !important;
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera globally */

@@ -35,7 +35,7 @@ export function MobileNav() {
             onClick={() => handleTap(to)}
           >
             <Icon className="h-5 w-5" />
-            <span className="text-[0.625rem]">{label}</span>
+            <span className="text-xs">{label}</span>
           </Link>
         ))}
       </div>

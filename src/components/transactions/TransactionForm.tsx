@@ -25,6 +25,7 @@ interface TransactionFormProps {
   categories: { id: string; name: string }[]
   onSuccess: () => void
   onCancel: () => void
+  onDeleteSuccess?: () => void
   transaction?: Transaction
 }
 
@@ -32,6 +33,7 @@ export function TransactionForm({
   categories,
   onSuccess,
   onCancel,
+  onDeleteSuccess,
   transaction,
 }: TransactionFormProps) {
   const { toast } = useToast()
@@ -132,7 +134,11 @@ export function TransactionForm({
           description: 'The transaction has been removed.',
           variant: 'success',
         })
-        onSuccess()
+        if (onDeleteSuccess) {
+          onDeleteSuccess()
+        } else {
+          onSuccess()
+        }
       },
       onError: () => {
         toast({
@@ -153,39 +159,11 @@ export function TransactionForm({
     (isAddingCategory ? !!newCategoryName : !!form.categoryId)
 
   const isFormDisabled = !isFormValid || (isEditing && !hasChanges)
-  const isPending = currentMutation.isPending || createCategory.isPending
+  const isPending = currentMutation.isPending || createCategory.isPending || deleteTx.isPending
 
   return (
     <>
       <form onSubmit={handleSubmit} className="space-y-4 animate-fade-in">
-        {isEditing && (
-          <div className="absolute top-4 right-4">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                >
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem
-                  onClick={() => setShowDeleteConfirm(true)}
-                  className="text-destructive focus:text-destructive cursor-pointer"
-                >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Remove
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={onCancel} className="cursor-pointer">
-                  <X className="h-4 w-4 mr-2" />
-                  Cancel
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        )}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="sm:col-span-2 space-y-1">
               <label className="text-xs font-medium text-muted-foreground">
@@ -197,7 +175,7 @@ export function TransactionForm({
                 error={!!getFieldError('type')}
               />
               {getFieldError('type') && (
-                <p className="text-[0.625rem] font-medium text-destructive">{getFieldError('type')}</p>
+                <p className="text-xs font-medium text-destructive">{getFieldError('type')}</p>
               )}
             </div>
 
@@ -208,10 +186,10 @@ export function TransactionForm({
                 value={form.description}
                 onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
                 className={getFieldError('description') ? 'border-destructive ring-destructive focus-visible:ring-destructive' : ''}
-                autoFocus={!isEditing}
+                autoFocus
               />
               {getFieldError('description') && (
-                <p className="text-[0.625rem] font-medium text-destructive">{getFieldError('description')}</p>
+                <p className="text-xs font-medium text-destructive">{getFieldError('description')}</p>
               )}
             </div>
 
@@ -228,7 +206,7 @@ export function TransactionForm({
                   className={getFieldError('amount') ? 'border-destructive ring-destructive focus-visible:ring-destructive' : ''}
                 />
                 {getFieldError('amount') && (
-                  <p className="text-[0.625rem] font-medium text-destructive">{getFieldError('amount')}</p>
+                  <p className="text-xs font-medium text-destructive">{getFieldError('amount')}</p>
                 )}
               </div>
 
@@ -248,7 +226,7 @@ export function TransactionForm({
                   ))}
                 </Select>
                 {getFieldError('currency') && (
-                  <p className="text-[0.625rem] font-medium text-destructive">{getFieldError('currency')}</p>
+                  <p className="text-xs font-medium text-destructive">{getFieldError('currency')}</p>
                 )}
               </div>
             </div>
@@ -264,7 +242,7 @@ export function TransactionForm({
                 className={getFieldError('date') ? 'border-destructive ring-destructive focus-visible:ring-destructive' : ''}
               />
               {getFieldError('date') && (
-                <p className="text-[0.625rem] font-medium text-destructive">{getFieldError('date')}</p>
+                <p className="text-xs font-medium text-destructive">{getFieldError('date')}</p>
               )}
             </div>
 
@@ -277,18 +255,18 @@ export function TransactionForm({
                   type="button"
                   variant="ghost"
                   size="sm"
-                  className="h-6 px-2 text-[0.625rem] font-medium"
+                  className="h-6 px-2 text-xs font-medium"
                   onClick={() => setIsAddingCategory((v) => !v)}
                   disabled={isPending}
                 >
                   {isAddingCategory ? (
                     <>
-                      <RotateCcw className="h-3 w-3 mr-1" />
+                      <RotateCcw className="h-3.5 w-3.5 mr-1" />
                       Choose existing
                     </>
                   ) : (
                     <>
-                      <Plus className="h-3 w-3 mr-1" />
+                      <Plus className="h-3.5 w-3.5 mr-1" />
                       Add new
                     </>
                   )}
@@ -311,7 +289,7 @@ export function TransactionForm({
                     autoFocus
                   />
                   {(createCategory.error as any)?.message && (
-                    <p className="text-[0.625rem] font-medium text-destructive">
+                    <p className="text-xs font-medium text-destructive">
                       {(createCategory.error as any).message}
                     </p>
                   )}
@@ -336,7 +314,7 @@ export function TransactionForm({
                     ))}
                   </Select>
                   {getFieldError('categoryId') && (
-                    <p className="text-[0.625rem] font-medium text-destructive">
+                    <p className="text-xs font-medium text-destructive">
                       {getFieldError('categoryId')}
                     </p>
                   )}
@@ -355,7 +333,36 @@ export function TransactionForm({
               Cancel
             </Button>
           </div>
-    </form>
+
+          {isEditing && (
+            <div className="absolute top-4 right-4">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  >
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    onClick={() => setShowDeleteConfirm(true)}
+                    className="text-destructive focus:text-destructive cursor-pointer"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Remove
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={onCancel} className="cursor-pointer">
+                    <X className="h-4 w-4 mr-2" />
+                    Cancel
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          )}
+        </form>
 
       <ConfirmationDialog
         isOpen={showDeleteConfirm}

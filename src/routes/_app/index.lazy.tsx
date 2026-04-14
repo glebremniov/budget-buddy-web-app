@@ -69,7 +69,7 @@ function DashboardPage() {
         subtitle="Current month summary"
         primaryAction={{
           label: 'Add',
-          onClick: () => navigate({ to: '/transactions', search: { add: 'true' } as any }),
+          onClick: () => navigate({ to: '/transactions' }),
         }}
       />
 
@@ -78,7 +78,7 @@ function DashboardPage() {
         <Card className="col-span-2 md:col-span-1">
           <CardHeader className="pb-2">
             <CardDescription className="flex items-center gap-1">
-              <Wallet className="h-3.5 w-3.5" />
+              <Wallet className="h-4 w-4" />
               Balance
             </CardDescription>
           </CardHeader>
@@ -92,13 +92,13 @@ function DashboardPage() {
         <SummaryCard
           label="Income"
           amount={totals.income}
-          icon={<ArrowUpRight className="h-3.5 w-3.5 text-income" />}
+          icon={<ArrowUpRight className="h-4 w-4 text-income" />}
           className="text-income"
         />
         <SummaryCard
           label="Expenses"
           amount={totals.expense}
-          icon={<ArrowDownRight className="h-3.5 w-3.5 text-expense" />}
+          icon={<ArrowDownRight className="h-4 w-4 text-expense" />}
           className="text-expense"
         />
       </div>
@@ -144,7 +144,7 @@ function DashboardPage() {
                 </p>
               </div>
               <Button asChild size="sm">
-                <Link to="/transactions" search={{ add: undefined, edit: undefined } as any}>Add transaction</Link>
+                <Link to="/transactions">Add transaction</Link>
               </Button>
             </div>
           ) : (
@@ -154,7 +154,7 @@ function DashboardPage() {
                   <button
                     type="button"
                     className="flex w-full items-center justify-between px-6 py-3 transition-colors hover:bg-muted/30 cursor-pointer text-left focus-visible:outline-none"
-                    onClick={() => navigate({ to: '/transactions', search: { edit: t.id } as any })}
+                    onClick={() => navigate({ to: '/transactions' })}
                   >
                     <div className="min-w-0">
                       <p className="truncate text-sm font-medium">{t.description ?? '—'}</p>

@@ -26,6 +26,7 @@ loadConfig()
   .then(async (config) => {
     client.setConfig({
       baseUrl: config.VITE_API_URL,
+      auth: () => useAuthStore.getState().accessToken,
     })
 
     // Try to refresh the token on app load if we have a refresh token but no access token.

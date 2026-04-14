@@ -22,11 +22,11 @@ function SettingsPage() {
       <div className="grid gap-6">
         <section className="space-y-3">
           <div className="flex items-center gap-2">
-            <Sun className="h-4 w-4 text-primary" />
+            <Sun className="h-5 w-5 text-primary" />
             <h2 className="text-lg font-semibold">Theme</h2>
           </div>
           <Card className="p-4">
-            <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap">
+            <div className="grid grid-cols-3 gap-2">
               {[
                 { value: 'light', icon: Sun, label: 'Light' },
                 { value: 'dark', icon: Moon, label: 'Dark' },
@@ -36,11 +36,11 @@ function SettingsPage() {
                   key={t.value}
                   variant={theme === t.value ? 'default' : 'outline'}
                   size="sm"
-                  className="gap-2 cursor-pointer w-full sm:w-auto"
+                  className="gap-2 cursor-pointer flex-col h-auto py-3 px-1 sm:flex-row sm:h-10 sm:py-0"
                   onClick={() => setTheme(t.value as any)}
                 >
-                  <t.icon className="h-4 w-4" />
-                  {t.label}
+                  <t.icon className="h-5 w-5" />
+                  <span className="text-xs sm:text-sm">{t.label}</span>
                 </Button>
               ))}
             </div>
@@ -49,7 +49,7 @@ function SettingsPage() {
 
         <section className="space-y-3">
           <div className="flex items-center gap-2">
-            <Palette className="h-4 w-4 text-primary" />
+            <Palette className="h-5 w-5 text-primary" />
             <h2 className="text-lg font-semibold">Primary Color</h2>
           </div>
           <Card className="p-4 space-y-4">
@@ -80,7 +80,7 @@ function SettingsPage() {
 
         <section className="space-y-3">
           <div className="flex items-center gap-2">
-            <Type className="h-4 w-4 text-primary" />
+            <Type className="h-5 w-5 text-primary" />
             <h2 className="text-lg font-semibold">Font Size</h2>
           </div>
           <Card className="p-4 space-y-4">
@@ -118,7 +118,7 @@ function SettingsPage() {
 
         <section className="space-y-3">
           <div className="flex items-center gap-2">
-            <RefreshCw className="h-4 w-4 text-primary" />
+            <RefreshCw className="h-5 w-5 text-primary" />
             <h2 className="text-lg font-semibold">Version & Updates</h2>
           </div>
           <Card className="p-4 space-y-4">

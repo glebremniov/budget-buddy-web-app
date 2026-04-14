@@ -8,8 +8,9 @@ interface AuthState {
   refreshToken: string | null
   /** Unix timestamp (ms) of when the refresh token was last obtained. Used for staleness checks. */
   refreshTokenObtainedAt: number | null
-  setAuth: (accessToken: string, refreshToken: string) => void
-  setAccessToken: (token: string) => void
+  accessTokenExpiresAt: number | null
+  setAuth: (accessToken: string, refreshToken: string, expiresIn: number) => void
+  setAccessToken: (token: string, expiresIn?: number) => void
   clearAuth: () => void
   isAuthenticated: () => boolean
 }
@@ -20,10 +21,25 @@ export const useAuthStore = create<AuthState>()(
       accessToken: null,
       refreshToken: null,
       refreshTokenObtainedAt: null,
-      setAuth: (accessToken, refreshToken) =>
-        set({ accessToken, refreshToken, refreshTokenObtainedAt: Date.now() }),
-      setAccessToken: (token) => set({ accessToken: token }),
-      clearAuth: () => set({ accessToken: null, refreshToken: null, refreshTokenObtainedAt: null }),
+      accessTokenExpiresAt: null,
+      setAuth: (accessToken, refreshToken, expiresIn) =>
+        set({ 
+          accessToken, 
+          refreshToken, 
+          refreshTokenObtainedAt: Date.now(),
+          accessTokenExpiresAt: Date.now() + (expiresIn * 1000)
+        }),
+      setAccessToken: (token, expiresIn) => 
+        set({ 
+          accessToken: token,
+          accessTokenExpiresAt: expiresIn ? Date.now() + (expiresIn * 1000) : null
+        }),
+      clearAuth: () => set({ 
+        accessToken: null, 
+        refreshToken: null, 
+        refreshTokenObtainedAt: null,
+        accessTokenExpiresAt: null
+      }),
       isAuthenticated: () => get().accessToken !== null,
     }),
     {

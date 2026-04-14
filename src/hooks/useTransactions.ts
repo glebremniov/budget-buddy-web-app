@@ -32,44 +32,46 @@ export function useTransactions(filters: TransactionFilters = {}) {
   return useQuery({
     queryKey: KEYS.list(filters),
     queryFn: async () => {
-      let allItems: any[] = []
-      const page = filters.page ?? 0
-      const size = filters.size ?? 20
-      let total = 0
-      let fetchCount = 0
-
-      while (fetchCount < 10) {
+      // API doesn't support search yet, so we implement it client-side
+      if (filters.search) {
+        // Fetch a larger set to perform local search — fetch up to 1000 items
         const { data, error } = await listTransactions({
           query: {
-            size,
-            sort: 'desc',
             ...filters,
-            page: page + fetchCount,
-          },
+            size: 1000,
+            page: 0,
+            search: undefined, // Clear from API call to avoid errors
+          } as any,
         })
         if (error) throw error
 
-        if (fetchCount === 0) {
-          total = data.meta.total
-        }
+        const term = filters.search.toLowerCase()
+        const filtered = data.items.filter((item) =>
+          item.description?.toLowerCase().includes(term),
+        )
 
-        const newItems = data.items
-        if (newItems.length === 0) break
+        // Local pagination of filtered results
+        const page = filters.page ?? 0
+        const size = filters.size ?? 20
+        const start = page * size
+        const items = filtered.slice(start, start + size)
 
-        // Always add the first two pages (initial requested + one more)
-        // OR if the day is split (last item of current batch has same date as first item of next page)
-        const isSplit = allItems.length > 0 && allItems[allItems.length - 1].date === newItems[0].date
-
-        if (fetchCount < 2 || isSplit) {
-          allItems = [...allItems, ...newItems]
-          fetchCount++
-          if (allItems.length >= total) break
-        } else {
-          break
+        return {
+          items,
+          meta: {
+            total: filtered.length,
+          },
         }
       }
 
-      return { items: allItems, meta: { total } }
+      const { data, error } = await listTransactions({
+        query: {
+          ...filters,
+          sort: filters.sort ?? 'desc',
+        } as any,
+      })
+      if (error) throw error
+      return data
     },
   })
 }
@@ -161,15 +163,22 @@ export function useDeleteTransaction() {
     onMutate: async (id) => {
       await qc.cancelQueries({ queryKey: KEYS.all })
       const previous = qc.getQueriesData<PaginatedTransactions>({ queryKey: KEYS.all })
-      qc.setQueriesData<PaginatedTransactions>({ queryKey: KEYS.all }, (old) =>
+
+      // Optimistically update all paginated lists
+      qc.setQueriesData<PaginatedTransactions>({ queryKey: ['transactions', 'list'] }, (old) =>
         old ? { ...old, items: old.items.filter((t) => t.id !== id) } : old,
       )
+
       return { previous }
     },
     onError: (_err, _id, ctx) => {
       if (ctx?.previous) {
         ctx.previous.forEach(([key, value]) => qc.setQueryData(key, value))
       }
+    },
+    onSuccess: (_data, id) => {
+      // Also remove the specific detail query if it exists
+      qc.removeQueries({ queryKey: KEYS.detail(id) })
     },
     onSettled: () => qc.invalidateQueries({ queryKey: KEYS.all }),
   })

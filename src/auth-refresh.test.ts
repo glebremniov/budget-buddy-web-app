@@ -27,7 +27,7 @@ describe('Auth rehydration on page reload', () => {
   it('should be authenticated after refreshAuth is called', async () => {
     const { refreshToken: refreshAction } = await import('@budget-buddy-org/budget-buddy-contracts')
     vi.mocked(refreshAction).mockResolvedValue({
-      data: { access_token: 'at-new', refresh_token: 'rt-new' },
+      data: { access_token: 'at-new', refresh_token: 'rt-new', expires_in: 3600 },
     } as any)
 
     useAuthStore.setState({
