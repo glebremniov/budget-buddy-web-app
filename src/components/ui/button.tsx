@@ -1,20 +1,20 @@
-import { Slot } from '@radix-ui/react-slot'
-import { type VariantProps } from 'class-variance-authority'
-import * as React from 'react'
-import { cn } from '@/lib/cn'
-import { Loader2 } from 'lucide-react'
-import { buttonVariants } from './button-variants'
+import { Slot } from '@radix-ui/react-slot';
+import type { VariantProps } from 'class-variance-authority';
+import { Loader2 } from 'lucide-react';
+import * as React from 'react';
+import { cn } from '@/lib/cn';
+import { buttonVariants } from './button-variants';
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
-  asChild?: boolean
-  loading?: boolean
+  asChild?: boolean;
+  loading?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, loading, children, disabled, ...props }, ref) => {
-    const Comp = asChild ? Slot : 'button'
+    const Comp = asChild ? Slot : 'button';
     return (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
@@ -22,16 +22,18 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={loading || disabled}
         {...props}
       >
-        {asChild ? children : (
+        {asChild ? (
+          children
+        ) : (
           <>
             {loading && <Loader2 className="h-4 w-4 animate-spin" />}
             {children}
           </>
         )}
       </Comp>
-    )
+    );
   },
-)
-Button.displayName = 'Button'
+);
+Button.displayName = 'Button';
 
-export { Button }
+export { Button };

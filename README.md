@@ -25,7 +25,7 @@ pnpm dev                      # http://localhost:5173
 ```bash
 pnpm dev          # Vite dev server
 pnpm build        # type-check + production build
-pnpm lint         # Biome lint
+pnpm lint         # ESLint + Biome lint
 pnpm format       # Biome auto-format
 pnpm test         # Vitest (run once)
 pnpm test:watch   # Vitest (watch mode)
@@ -40,7 +40,7 @@ pnpm type-check   # tsc --noEmit
 - **TanStack Query v5** — server state, caching, mutations
 - **Zustand v5** — auth tokens + theme preference
 - **shadcn/ui** (Radix UI + Tailwind v4)
-- **Biome** — lint + format
+- **ESLint** + **Biome** — lint + format
 - **Vitest** + **Testing Library** — unit tests
 
 ## Docker

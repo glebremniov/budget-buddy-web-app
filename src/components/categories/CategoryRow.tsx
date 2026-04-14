@@ -1,5 +1,5 @@
-import { Button } from '@/components/ui/button'
-import { Trash2 } from 'lucide-react'
+import { Trash2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export function CategoryRow({
   name,
@@ -7,11 +7,11 @@ export function CategoryRow({
   onDelete,
   isDeleting,
 }: {
-  id: string
-  name: string
-  onStartEdit: () => void
-  onDelete: () => void
-  isDeleting: boolean
+  id: string;
+  name: string;
+  onStartEdit: () => void;
+  onDelete: () => void;
+  isDeleting: boolean;
 }) {
   return (
     <li className="flex items-center justify-between px-4 py-3 transition-colors hover:bg-muted/30 cursor-pointer">
@@ -33,5 +33,5 @@ export function CategoryRow({
         <Trash2 className="h-4 w-4" />
       </Button>
     </li>
-  )
+  );
 }

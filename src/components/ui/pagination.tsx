@@ -1,25 +1,19 @@
-import { Button } from '@/components/ui/button'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { cn } from '@/lib/cn'
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/cn';
 
 interface PaginationProps {
-  page: number
-  total: number
-  size: number
-  onPageChange: (page: number) => void
-  className?: string
+  page: number;
+  total: number;
+  size: number;
+  onPageChange: (page: number) => void;
+  className?: string;
 }
 
-export function Pagination({
-  page,
-  total,
-  size,
-  onPageChange,
-  className,
-}: PaginationProps) {
-  const totalPages = Math.max(1, Math.ceil(total / size))
-  const canPrevious = page > 0
-  const canNext = (page + 1) * size < total
+export function Pagination({ page, total, size, onPageChange, className }: PaginationProps) {
+  const totalPages = Math.max(1, Math.ceil(total / size));
+  const canPrevious = page > 0;
+  const canNext = (page + 1) * size < total;
 
   return (
     <div className={cn('flex items-center justify-between px-2 pt-4 pb-20 md:pb-4', className)}>
@@ -50,5 +44,5 @@ export function Pagination({
         </Button>
       </div>
     </div>
-  )
+  );
 }

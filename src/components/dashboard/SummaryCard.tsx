@@ -1,13 +1,19 @@
-import type { ReactNode } from 'react'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { formatCurrency } from '@/lib/formatters'
+import type { ReactNode } from 'react';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { formatCurrency } from '@/lib/formatters';
 
-export function CardDescription({ className, children }: { className?: string; children: ReactNode }) {
+export function CardDescription({
+  className,
+  children,
+}: {
+  className?: string;
+  children: ReactNode;
+}) {
   return (
     <p className={`flex items-center gap-1 text-xs text-muted-foreground ${className ?? ''}`}>
       {children}
     </p>
-  )
+  );
 }
 
 export function SummaryCard({
@@ -16,10 +22,10 @@ export function SummaryCard({
   icon,
   className,
 }: {
-  label: string
-  amount: number
-  icon: ReactNode
-  className: string
+  label: string;
+  amount: number;
+  icon: ReactNode;
+  className: string;
 }) {
   return (
     <Card>
@@ -33,5 +39,5 @@ export function SummaryCard({
         <p className={`text-xl font-bold ${className}`}>{formatCurrency(amount)}</p>
       </CardContent>
     </Card>
-  )
+  );
 }

@@ -1,62 +1,62 @@
-import { Link, useNavigate } from '@tanstack/react-router'
-import { ArrowDownRight, ArrowUpRight, Wallet, PlusCircle } from 'lucide-react'
-import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { useAllTransactions } from '@/hooks/useTransactions'
-import { formatCurrency, formatDate } from '@/lib/formatters'
-import { PageHeader } from '@/components/layout/PageHeader'
-import { DashboardSkeleton } from '@/components/dashboard/DashboardSkeleton'
-import { SummaryCard, CardDescription } from '@/components/dashboard/SummaryCard'
+import { Link, useNavigate } from '@tanstack/react-router';
+import { ArrowDownRight, ArrowUpRight, PlusCircle, Wallet } from 'lucide-react';
+import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { DashboardSkeleton } from '@/components/dashboard/DashboardSkeleton';
+import { CardDescription, SummaryCard } from '@/components/dashboard/SummaryCard';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAllTransactions } from '@/hooks/useTransactions';
+import { formatCurrency, formatDate } from '@/lib/formatters';
 
 export function DashboardPage() {
-  const navigate = useNavigate()
-  
+  const navigate = useNavigate();
+
   // Calculate date range for the last 6 months to support the chart
-  const now = new Date()
-  const currentMonth = now.toISOString().slice(0, 7)
-  const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1)
-  const startDate = sixMonthsAgo.toISOString().split('T')[0]
+  const now = new Date();
+  const currentMonth = now.toISOString().slice(0, 7);
+  const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
+  const startDate = sixMonthsAgo.toISOString().split('T')[0];
 
-  const { data, isLoading } = useAllTransactions({ 
+  const { data, isLoading } = useAllTransactions({
     start: startDate,
-    sort: 'desc' 
-  })
+    sort: 'desc',
+  });
 
-  if (isLoading) return <DashboardSkeleton />
+  if (isLoading) return <DashboardSkeleton />;
 
-  const transactions = data?.items ?? []
+  const transactions = data?.items ?? [];
 
   // Current month summary
-  const currentMonthTransactions = transactions.filter((t) => t.date.startsWith(currentMonth))
-  
+  const currentMonthTransactions = transactions.filter((t) => t.date.startsWith(currentMonth));
+
   const totals = currentMonthTransactions.reduce(
     (acc, t) => {
-      if (t.type === 'INCOME') acc.income += t.amount
-      else acc.expense += t.amount
-      return acc
+      if (t.type === 'INCOME') acc.income += t.amount;
+      else acc.expense += t.amount;
+      return acc;
     },
     { income: 0, expense: 0 },
-  )
+  );
 
-  const balance = totals.income - totals.expense
+  const balance = totals.income - totals.expense;
 
   // Group transactions by month for chart
   const chartData = Object.entries(
     transactions.reduce<Record<string, { income: number; expense: number }>>((acc, t) => {
-      const month = t.date.slice(0, 7) // YYYY-MM
-      if (!acc[month]) acc[month] = { income: 0, expense: 0 }
-      if (t.type === 'INCOME') acc[month]!.income += t.amount / 100
-      else acc[month]!.expense += t.amount / 100
-      return acc
+      const month = t.date.slice(0, 7); // YYYY-MM
+      if (!acc[month]) acc[month] = { income: 0, expense: 0 };
+      if (t.type === 'INCOME') acc[month].income += t.amount / 100;
+      else acc[month].expense += t.amount / 100;
+      return acc;
     }, {}),
   )
     .sort(([a], [b]) => a.localeCompare(b))
     .slice(-6)
-    .map(([month, values]) => ({ month, ...values }))
+    .map(([month, values]) => ({ month, ...values }));
 
-  const recent = transactions.slice(0, 8)
+  const recent = transactions.slice(0, 8);
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -103,7 +103,9 @@ export function DashboardPage() {
       {chartData.length > 0 && (
         <Card className="hidden md:block">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold" as="h2">Monthly overview</CardTitle>
+            <CardTitle className="text-lg font-semibold" as="h2">
+              Monthly overview
+            </CardTitle>
           </CardHeader>
           <CardContent className="pl-2">
             <ResponsiveContainer width="100%" height={180}>
@@ -115,7 +117,12 @@ export function DashboardPage() {
                   contentStyle={{ fontSize: 12 }}
                 />
                 <Bar dataKey="income" name="Income" fill="hsl(142 71% 45%)" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="expense" name="Expenses" fill="hsl(0 84% 60%)" radius={[4, 4, 0, 0]} />
+                <Bar
+                  dataKey="expense"
+                  name="Expenses"
+                  fill="hsl(0 84% 60%)"
+                  radius={[4, 4, 0, 0]}
+                />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -125,7 +132,9 @@ export function DashboardPage() {
       {/* Recent transactions */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg font-semibold" as="h2">Recent transactions</CardTitle>
+          <CardTitle className="text-lg font-semibold" as="h2">
+            Recent transactions
+          </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           {recent.length === 0 ? (
@@ -170,5 +179,5 @@ export function DashboardPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

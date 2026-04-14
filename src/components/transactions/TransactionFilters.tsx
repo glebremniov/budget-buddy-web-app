@@ -1,23 +1,23 @@
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { DatePicker } from '@/components/ui/date-picker'
-import { Select } from '@/components/ui/select'
-import { Search, RotateCcw } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { useDebounce } from '@/hooks/use-debounce'
+import { RotateCcw, Search } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { DatePicker } from '@/components/ui/date-picker';
+import { Input } from '@/components/ui/input';
+import { Select } from '@/components/ui/select';
+import { useDebounce } from '@/hooks/use-debounce';
 
 interface TransactionFiltersProps {
-  categories: { id: string; name: string }[]
+  categories: { id: string; name: string }[];
   filters: {
-    categoryId: string
-    start: string
-    end: string
-    sort: 'asc' | 'desc'
-    search: string
-  }
-  onFilterChange: (filters: TransactionFiltersProps['filters']) => void
-  onReset: () => void
-  onClose: () => void
+    categoryId: string;
+    start: string;
+    end: string;
+    sort: 'asc' | 'desc';
+    search: string;
+  };
+  onFilterChange: (filters: TransactionFiltersProps['filters']) => void;
+  onReset: () => void;
+  onClose: () => void;
 }
 
 export function TransactionFilters({
@@ -27,32 +27,30 @@ export function TransactionFilters({
   onReset,
   onClose,
 }: TransactionFiltersProps) {
-  const [searchTerm, setSearchTerm] = useState(filters.search)
-  const [prevSearch, setPrevSearch] = useState(filters.search)
-  const debouncedSearch = useDebounce(searchTerm)
+  const [searchTerm, setSearchTerm] = useState(filters.search);
+  const [prevSearch, setPrevSearch] = useState(filters.search);
+  const debouncedSearch = useDebounce(searchTerm);
 
   if (filters.search !== prevSearch) {
-    setSearchTerm(filters.search)
-    setPrevSearch(filters.search)
+    setSearchTerm(filters.search);
+    setPrevSearch(filters.search);
   }
 
   useEffect(() => {
     if (debouncedSearch !== filters.search) {
-      onFilterChange({ ...filters, search: debouncedSearch })
+      onFilterChange({ ...filters, search: debouncedSearch });
     }
-  }, [debouncedSearch, filters, onFilterChange])
+  }, [debouncedSearch, filters, onFilterChange]);
 
   const hasActiveFilters =
-    filters.categoryId ||
-    filters.start ||
-    filters.end ||
-    filters.sort !== 'desc' ||
-    filters.search
+    filters.categoryId || filters.start || filters.end || filters.sort !== 'desc' || filters.search;
 
   return (
     <div className="space-y-4 pt-2">
       <div className="space-y-2">
-        <label htmlFor="search-filter" className="text-sm font-medium">Search</label>
+        <label htmlFor="search-filter" className="text-sm font-medium">
+          Search
+        </label>
         <div className="relative">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
@@ -66,7 +64,9 @@ export function TransactionFilters({
       </div>
 
       <div className="space-y-2">
-        <label htmlFor="category-filter" className="text-sm font-medium">Category</label>
+        <label htmlFor="category-filter" className="text-sm font-medium">
+          Category
+        </label>
         <Select
           id="category-filter"
           value={filters.categoryId}
@@ -83,7 +83,9 @@ export function TransactionFilters({
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <label htmlFor="start-date-filter" className="text-sm font-medium">From</label>
+          <label htmlFor="start-date-filter" className="text-sm font-medium">
+            From
+          </label>
           <DatePicker
             id="start-date-filter"
             value={filters.start}
@@ -91,7 +93,9 @@ export function TransactionFilters({
           />
         </div>
         <div className="space-y-2">
-          <label htmlFor="end-date-filter" className="text-sm font-medium">To</label>
+          <label htmlFor="end-date-filter" className="text-sm font-medium">
+            To
+          </label>
           <DatePicker
             id="end-date-filter"
             value={filters.end}
@@ -101,13 +105,13 @@ export function TransactionFilters({
       </div>
 
       <div className="space-y-2">
-        <label htmlFor="sort-filter" className="text-sm font-medium">Sort</label>
+        <label htmlFor="sort-filter" className="text-sm font-medium">
+          Sort
+        </label>
         <Select
           id="sort-filter"
           value={filters.sort}
-          onChange={(e) =>
-            onFilterChange({ ...filters, sort: e.target.value as 'asc' | 'desc' })
-          }
+          onChange={(e) => onFilterChange({ ...filters, sort: e.target.value as 'asc' | 'desc' })}
         >
           <option value="desc">Newest first</option>
           <option value="asc">Oldest first</option>
@@ -119,8 +123,8 @@ export function TransactionFilters({
           variant="outline"
           size="sm"
           onClick={() => {
-            setSearchTerm('')
-            onReset()
+            setSearchTerm('');
+            onReset();
           }}
           disabled={!hasActiveFilters}
           className="flex-1"
@@ -133,5 +137,5 @@ export function TransactionFilters({
         </Button>
       </div>
     </div>
-  )
+  );
 }

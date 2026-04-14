@@ -1,5 +1,5 @@
-import { MutationCache, QueryCache, QueryClient } from '@tanstack/react-query'
-import { logError } from './error-logger'
+import { MutationCache, QueryCache, QueryClient } from '@tanstack/react-query';
+import { logError } from './error-logger';
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -16,4 +16,4 @@ export const queryClient = new QueryClient({
   mutationCache: new MutationCache({
     onError: (error) => logError(error, { source: 'MutationCache' }),
   }),
-})
+});

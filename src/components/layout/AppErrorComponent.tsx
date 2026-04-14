@@ -1,9 +1,9 @@
-import { useState } from 'react'
-import { useRouter } from '@tanstack/react-router'
+import { useRouter } from '@tanstack/react-router';
+import { useState } from 'react';
 
 export function AppErrorComponent({ error }: { error: Error }) {
-  const router = useRouter()
-  const [showDetails, setShowDetails] = useState(false)
+  const router = useRouter();
+  const [showDetails, setShowDetails] = useState(false);
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-4 p-6 text-center">
@@ -14,7 +14,11 @@ export function AppErrorComponent({ error }: { error: Error }) {
 
       <div className="flex flex-col gap-2">
         <div className="flex justify-center gap-4">
-          <button type="button" className="text-sm underline cursor-pointer" onClick={() => router.invalidate()}>
+          <button
+            type="button"
+            className="text-sm underline cursor-pointer"
+            onClick={() => router.invalidate()}
+          >
             Try again
           </button>
           <button
@@ -38,5 +42,5 @@ export function AppErrorComponent({ error }: { error: Error }) {
         )}
       </div>
     </div>
-  )
+  );
 }

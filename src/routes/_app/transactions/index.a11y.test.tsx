@@ -1,17 +1,17 @@
-import { render, screen, fireEvent } from '@testing-library/react'
-import 'vitest-axe/extend-expect'
-import { axe } from 'vitest-axe'
-import { describe, expect, it, vi } from 'vitest'
-import { TransactionsPage } from '@/components/transactions/TransactionsPage'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import React from 'react'
+import { fireEvent, render, screen } from '@testing-library/react';
+import 'vitest-axe/extend-expect';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import type React from 'react';
+import { describe, expect, it, vi } from 'vitest';
+import { axe } from 'vitest-axe';
+import { TransactionsPage } from '@/components/transactions/TransactionsPage';
 
 vi.mock('@tanstack/react-router', () => ({
   createLazyFileRoute: () => (options: { component: React.ComponentType }) => ({ options }),
   useNavigate: () => vi.fn(),
   useSearch: () => ({ add: undefined }),
-  Link: ({ children }: { children: React.ReactNode }) => <a>{children}</a>,
-}))
+  Link: ({ children }: { children: React.ReactNode }) => <a href="/">{children}</a>,
+}));
 
 vi.mock('@/hooks/useCategories', () => ({
   useCategories: () => ({
@@ -23,7 +23,7 @@ vi.mock('@/hooks/useCategories', () => ({
     },
     isLoading: false,
   }),
-}))
+}));
 
 vi.mock('@/hooks/useTransactions', () => ({
   useTransactions: () => ({
@@ -52,7 +52,7 @@ vi.mock('@/hooks/useTransactions', () => ({
   useDeleteTransaction: () => ({ mutate: vi.fn(), isPending: false }),
   useUpdateTransaction: () => ({ mutate: vi.fn(), isPending: false }),
   useTransaction: () => ({ data: null, isLoading: false }),
-}))
+}));
 
 describe('TransactionsPage a11y', () => {
   const queryClient = new QueryClient({
@@ -61,32 +61,32 @@ describe('TransactionsPage a11y', () => {
         retry: false,
       },
     },
-  })
+  });
 
   it('should have no accessibility violations', async () => {
     const { container } = render(
       <QueryClientProvider client={queryClient}>
         <TransactionsPage />
-      </QueryClientProvider>
-    )
-    
-    const results = await axe(container)
-    expect(results).toHaveNoViolations()
-  })
+      </QueryClientProvider>,
+    );
+
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
 
   it('should have no accessibility violations when filters dialog is open', async () => {
     render(
       <QueryClientProvider client={queryClient}>
         <TransactionsPage />
-      </QueryClientProvider>
-    )
-    
+      </QueryClientProvider>,
+    );
+
     // Open filters dialog
-    const filterButton = screen.getByLabelText(/toggle filters/i)
-    fireEvent.click(filterButton)
-    
+    const filterButton = screen.getByLabelText(/toggle filters/i);
+    fireEvent.click(filterButton);
+
     // Dialog teleports to body, so we check document.body
-    const results = await axe(document.body)
-    expect(results).toHaveNoViolations()
-  })
-})
+    const results = await axe(document.body);
+    expect(results).toHaveNoViolations();
+  });
+});

@@ -1,48 +1,48 @@
-import { Component, type ErrorInfo, type ReactNode, useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { logError } from '@/lib/error-logger'
+import { Component, type ErrorInfo, type ReactNode, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { logError } from '@/lib/error-logger';
 
 interface Props {
-  children: ReactNode
+  children: ReactNode;
   /** Optional custom fallback. Receives the error and a reset callback. */
-  fallback?: (error: Error, reset: () => void) => ReactNode
+  fallback?: (error: Error, reset: () => void) => ReactNode;
 }
 
 interface State {
-  error: Error | null
+  error: Error | null;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
-  state: State = { error: null }
+  state: State = { error: null };
 
   static getDerivedStateFromError(error: Error): State {
-    return { error }
+    return { error };
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
-    logError(error, { source: 'ErrorBoundary', componentStack: info.componentStack })
+    logError(error, { source: 'ErrorBoundary', componentStack: info.componentStack });
   }
 
   reset = () => {
-    this.setState({ error: null })
-  }
+    this.setState({ error: null });
+  };
 
   render() {
-    const { error } = this.state
+    const { error } = this.state;
 
     if (error) {
       if (this.props.fallback) {
-        return this.props.fallback(error, this.reset)
+        return this.props.fallback(error, this.reset);
       }
-      return <DefaultErrorFallback error={error} reset={this.reset} />
+      return <DefaultErrorFallback error={error} reset={this.reset} />;
     }
 
-    return this.props.children
+    return this.props.children;
   }
 }
 
 function DefaultErrorFallback({ error, reset }: { error: Error; reset: () => void }) {
-  const [showDetails, setShowDetails] = useState(false)
+  const [showDetails, setShowDetails] = useState(false);
 
   return (
     <div className="flex min-h-[200px] flex-col items-center justify-center gap-4 p-6 text-center">
@@ -73,5 +73,5 @@ function DefaultErrorFallback({ error, reset }: { error: Error; reset: () => voi
         )}
       </div>
     </div>
-  )
+  );
 }

@@ -1,18 +1,15 @@
-import { useThemeStore } from '@/stores/theme.store'
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import { PageHeader } from '@/components/layout/PageHeader'
-import { Moon, Sun, Monitor, Type, Palette, RefreshCw } from 'lucide-react'
+import { Monitor, Moon, Palette, RefreshCw, Sun, Type } from 'lucide-react';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { useThemeStore } from '@/stores/theme.store';
 
 export function SettingsPage() {
-  const { theme, setTheme, primaryHue, setPrimaryHue, fontSize, setFontSize } = useThemeStore()
+  const { theme, setTheme, primaryHue, setPrimaryHue, fontSize, setFontSize } = useThemeStore();
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <PageHeader
-        title="Settings"
-        subtitle="Manage your application appearance and preferences."
-      />
+      <PageHeader title="Settings" subtitle="Manage your application appearance and preferences." />
 
       <div className="grid gap-6">
         <section className="space-y-3">
@@ -49,7 +46,7 @@ export function SettingsPage() {
           </div>
           <Card className="p-4 space-y-4">
             <div className="flex items-center gap-4">
-              <div 
+              <div
                 className="h-10 w-10 rounded-full border shadow-sm"
                 style={{ backgroundColor: `hsl(${primaryHue} 70% 50%)` }}
               />
@@ -101,9 +98,7 @@ export function SettingsPage() {
                   +
                 </Button>
               </div>
-              <div className="text-sm border rounded px-2 py-1 bg-muted">
-                Sample Text
-              </div>
+              <div className="text-sm border rounded px-2 py-1 bg-muted">Sample Text</div>
             </div>
             <p className="text-xs text-muted-foreground">
               Increase or decrease the base font size for better readability.
@@ -122,9 +117,9 @@ export function SettingsPage() {
                 <p className="text-sm font-medium">Current Version</p>
                 <p className="text-xs text-muted-foreground">v{__APP_VERSION__}</p>
               </div>
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 className="gap-2 cursor-pointer"
                 onClick={() => window.location.reload()}
               >
@@ -139,5 +134,5 @@ export function SettingsPage() {
         </section>
       </div>
     </div>
-  )
+  );
 }

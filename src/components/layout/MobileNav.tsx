@@ -1,25 +1,25 @@
-import { Link } from '@tanstack/react-router'
-import { LayoutDashboard, Tag, ArrowLeftRight, Settings } from 'lucide-react'
-import { cn } from '@/lib/cn'
-import { useCallback, useRef } from 'react'
+import { Link } from '@tanstack/react-router';
+import { ArrowLeftRight, LayoutDashboard, Settings, Tag } from 'lucide-react';
+import { useCallback, useRef } from 'react';
+import { cn } from '@/lib/cn';
 
 const NAV_ITEMS = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/transactions', label: 'Transactions', icon: ArrowLeftRight },
   { to: '/categories', label: 'Categories', icon: Tag },
   { to: '/settings', label: 'Settings', icon: Settings },
-] as const
+] as const;
 
 export function MobileNav() {
-  const lastTapRef = useRef<{ [key: string]: number }>({})
+  const lastTapRef = useRef<{ [key: string]: number }>({});
 
   const handleTap = useCallback((to: string, timeStamp: number) => {
-    const last = lastTapRef.current[to] || 0
+    const last = lastTapRef.current[to] || 0;
     if (timeStamp - last < 300) {
-      window.scrollTo({ top: 0, behavior: 'smooth' })
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-    lastTapRef.current[to] = timeStamp
-  }, [])
+    lastTapRef.current[to] = timeStamp;
+  }, []);
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background pb-[env(safe-area-inset-bottom)] md:hidden">
@@ -39,7 +39,7 @@ export function MobileNav() {
         ))}
       </div>
     </nav>
-  )
+  );
 }
 
 export function SidebarNav({ className }: { className?: string }) {
@@ -58,5 +58,5 @@ export function SidebarNav({ className }: { className?: string }) {
         </Link>
       ))}
     </nav>
-  )
+  );
 }

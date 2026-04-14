@@ -1,29 +1,29 @@
-import { useMutation } from '@tanstack/react-query'
-import { Link, useNavigate } from '@tanstack/react-router'
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { registerUser } from '@budget-buddy-org/budget-buddy-contracts'
-import type { RegisterRequest, Problem } from '@budget-buddy-org/budget-buddy-contracts'
-import { UserPlus } from 'lucide-react'
+import type { Problem, RegisterRequest } from '@budget-buddy-org/budget-buddy-contracts';
+import { registerUser } from '@budget-buddy-org/budget-buddy-contracts';
+import { useMutation } from '@tanstack/react-query';
+import { Link, useNavigate } from '@tanstack/react-router';
+import { UserPlus } from 'lucide-react';
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 export function RegisterPage() {
-  const navigate = useNavigate()
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
+  const navigate = useNavigate();
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
   const register = useMutation({
     mutationFn: async (body: RegisterRequest) => {
-      const { error } = await registerUser({ body })
-      if (error) throw error
+      const { error } = await registerUser({ body });
+      if (error) throw error;
     },
     onSuccess: () => {
-      navigate({ to: '/login' })
+      navigate({ to: '/login' });
     },
-  })
+  });
 
-  const fieldErrors = (register.error as Problem)?.errors
-  const getFieldError = (field: string) => fieldErrors?.find((e) => e.field === field)?.message
+  const fieldErrors = (register.error as Problem)?.errors;
+  const getFieldError = (field: string) => fieldErrors?.find((e) => e.field === field)?.message;
 
   return (
     <div className="space-y-4">
@@ -34,8 +34,8 @@ export function RegisterPage() {
 
       <form
         onSubmit={(e) => {
-          e.preventDefault()
-          register.mutate({ username, password })
+          e.preventDefault();
+          register.mutate({ username, password });
         }}
         className="space-y-3"
       >
@@ -53,7 +53,11 @@ export function RegisterPage() {
             minLength={3}
             maxLength={50}
             required
-            className={getFieldError('username') ? 'border-destructive ring-destructive focus-visible:ring-destructive' : ''}
+            className={
+              getFieldError('username')
+                ? 'border-destructive ring-destructive focus-visible:ring-destructive'
+                : ''
+            }
           />
           {getFieldError('username') && (
             <p className="text-sm font-medium text-destructive">{getFieldError('username')}</p>
@@ -73,7 +77,11 @@ export function RegisterPage() {
             autoComplete="new-password"
             minLength={8}
             required
-            className={getFieldError('password') ? 'border-destructive ring-destructive focus-visible:ring-destructive' : ''}
+            className={
+              getFieldError('password')
+                ? 'border-destructive ring-destructive focus-visible:ring-destructive'
+                : ''
+            }
           />
           {getFieldError('password') && (
             <p className="text-sm font-medium text-destructive">{getFieldError('password')}</p>
@@ -98,10 +106,13 @@ export function RegisterPage() {
 
       <p className="text-center text-sm text-muted-foreground">
         Already have an account?{' '}
-        <Link to="/login" className="font-medium text-foreground underline-offset-4 hover:underline">
+        <Link
+          to="/login"
+          className="font-medium text-foreground underline-offset-4 hover:underline"
+        >
           Sign in
         </Link>
       </p>
     </div>
-  )
+  );
 }

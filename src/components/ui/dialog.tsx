@@ -1,16 +1,16 @@
-import * as React from 'react'
-import * as DialogPrimitives from '@radix-ui/react-dialog'
-import { X } from 'lucide-react'
+import * as DialogPrimitives from '@radix-ui/react-dialog';
+import { X } from 'lucide-react';
+import * as React from 'react';
 
-import { cn } from '@/lib/cn'
+import { cn } from '@/lib/cn';
 
-const Dialog = DialogPrimitives.Root
+const Dialog = DialogPrimitives.Root;
 
-const DialogTrigger = DialogPrimitives.Trigger
+const DialogTrigger = DialogPrimitives.Trigger;
 
-const DialogPortal = DialogPrimitives.Portal
+const DialogPortal = DialogPrimitives.Portal;
 
-const DialogClose = DialogPrimitives.Close
+const DialogClose = DialogPrimitives.Close;
 
 const DialogOverlay = React.forwardRef<
   React.ElementRef<typeof DialogPrimitives.Overlay>,
@@ -20,12 +20,12 @@ const DialogOverlay = React.forwardRef<
     ref={ref}
     className={cn(
       'fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-fade-in data-[state=closed]:animate-fade-out',
-      className
+      className,
     )}
     {...props}
   />
-))
-DialogOverlay.displayName = DialogPrimitives.Overlay.displayName
+));
+DialogOverlay.displayName = DialogPrimitives.Overlay.displayName;
 
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitives.Content>,
@@ -42,7 +42,7 @@ const DialogContent = React.forwardRef<
         'data-[state=open]:animate-in-bottom-sheet data-[state=closed]:animate-out-bottom-sheet',
         // Desktop: Centered Dialog
         'sm:bottom-auto sm:left-[50%] sm:top-[50%] sm:max-w-lg sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-lg sm:border sm:data-[state=open]:animate-fade-in sm:data-[state=closed]:animate-fade-out',
-        className
+        className,
       )}
       {...props}
     >
@@ -55,36 +55,21 @@ const DialogContent = React.forwardRef<
       )}
     </DialogPrimitives.Content>
   </DialogPortal>
-))
-DialogContent.displayName = DialogPrimitives.Content.displayName
+));
+DialogContent.displayName = DialogPrimitives.Content.displayName;
 
-const DialogHeader = ({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) => (
+const DialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+  <div className={cn('flex flex-col space-y-1.5 text-center sm:text-left', className)} {...props} />
+);
+DialogHeader.displayName = 'DialogHeader';
+
+const DialogFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
-    className={cn(
-      'flex flex-col space-y-1.5 text-center sm:text-left',
-      className
-    )}
+    className={cn('flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2', className)}
     {...props}
   />
-)
-DialogHeader.displayName = 'DialogHeader'
-
-const DialogFooter = ({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) => (
-  <div
-    className={cn(
-      'flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2',
-      className
-    )}
-    {...props}
-  />
-)
-DialogFooter.displayName = 'DialogFooter'
+);
+DialogFooter.displayName = 'DialogFooter';
 
 const DialogTitle = React.forwardRef<
   React.ElementRef<typeof DialogPrimitives.Title>,
@@ -92,14 +77,11 @@ const DialogTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitives.Title
     ref={ref}
-    className={cn(
-      'text-lg font-semibold leading-none tracking-tight',
-      className
-    )}
+    className={cn('text-lg font-semibold leading-none tracking-tight', className)}
     {...props}
   />
-))
-DialogTitle.displayName = DialogPrimitives.Title.displayName
+));
+DialogTitle.displayName = DialogPrimitives.Title.displayName;
 
 const DialogDescription = React.forwardRef<
   React.ElementRef<typeof DialogPrimitives.Description>,
@@ -110,18 +92,18 @@ const DialogDescription = React.forwardRef<
     className={cn('text-sm text-muted-foreground', className)}
     {...props}
   />
-))
-DialogDescription.displayName = DialogPrimitives.Description.displayName
+));
+DialogDescription.displayName = DialogPrimitives.Description.displayName;
 
 export {
   Dialog,
-  DialogPortal,
-  DialogOverlay,
   DialogClose,
-  DialogTrigger,
   DialogContent,
-  DialogHeader,
-  DialogFooter,
-  DialogTitle,
   DialogDescription,
-}
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle,
+  DialogTrigger,
+};

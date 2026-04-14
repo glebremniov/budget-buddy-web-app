@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router';
 
 export function NotFoundComponent() {
   return (
@@ -8,5 +8,5 @@ export function NotFoundComponent() {
         Go home
       </Link>
     </div>
-  )
+  );
 }

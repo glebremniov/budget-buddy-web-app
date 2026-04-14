@@ -1,4 +1,4 @@
-import { Skeleton } from '@/components/ui/skeleton'
+import { Skeleton } from '@/components/ui/skeleton';
 
 export function DashboardSkeleton() {
   return (
@@ -12,5 +12,5 @@ export function DashboardSkeleton() {
       <Skeleton className="hidden h-52 md:block" />
       <Skeleton className="h-64" />
     </div>
-  )
+  );
 }

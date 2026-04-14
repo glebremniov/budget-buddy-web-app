@@ -1,8 +1,8 @@
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { Outlet } from '@tanstack/react-router'
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
-import { Toaster } from '@/components/ui/toaster'
-import { VersionCheck } from '@/components/VersionCheck'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { Outlet } from '@tanstack/react-router';
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
+import { Toaster } from '@/components/ui/toaster';
+import { VersionCheck } from '@/components/VersionCheck';
 
 export function RootComponent() {
   return (
@@ -17,5 +17,5 @@ export function RootComponent() {
         </>
       )}
     </>
-  )
+  );
 }

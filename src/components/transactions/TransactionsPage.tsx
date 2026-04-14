@@ -1,41 +1,49 @@
-import { useNavigate } from '@tanstack/react-router'
-import { Filter } from 'lucide-react'
-import { useCallback, useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Skeleton } from '@/components/ui/skeleton'
-import { useCategories } from '@/hooks/useCategories'
-import { useTransactions, useTransaction } from '@/hooks/useTransactions'
-import { PageHeader } from '@/components/layout/PageHeader'
-import { Pagination } from '@/components/ui/pagination'
-import { TransactionFilters } from '@/components/transactions/TransactionFilters'
-import { TransactionForm } from '@/components/transactions/TransactionForm'
-import { TransactionList } from '@/components/transactions/TransactionList'
+import { useNavigate } from '@tanstack/react-router';
+import { Filter } from 'lucide-react';
+import { useCallback, useState } from 'react';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { TransactionFilters } from '@/components/transactions/TransactionFilters';
+import { TransactionForm } from '@/components/transactions/TransactionForm';
+import { TransactionList } from '@/components/transactions/TransactionList';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Pagination } from '@/components/ui/pagination';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useCategories } from '@/hooks/useCategories';
+import { useTransaction, useTransactions } from '@/hooks/useTransactions';
 
-const PAGE_SIZE = 20
+const PAGE_SIZE = 20;
 
 interface Filters {
-  categoryId: string
-  start: string
-  end: string
-  sort: 'asc' | 'desc'
-  search: string
+  categoryId: string;
+  start: string;
+  end: string;
+  sort: 'asc' | 'desc';
+  search: string;
 }
 
 export function TransactionsPage() {
-  const navigate = useNavigate()
-  const { data: categoriesData } = useCategories()
-  const categories = categoriesData?.items ?? []
+  const navigate = useNavigate();
+  const { data: categoriesData } = useCategories();
+  const categories = categoriesData?.items ?? [];
 
-  const [showForm, setShowForm] = useState(false)
-  const [showFilters, setShowFilters] = useState(false)
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const { data: editingTransaction, isLoading: isTransactionLoading } = useTransaction(editingId!)
+  const [showForm, setShowForm] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const { data: editingTransaction, isLoading: isTransactionLoading } = useTransaction(
+    editingId ?? '',
+  );
 
   const closeForm = useCallback(() => {
-    setShowForm(false)
-    setEditingId(null)
-  }, [])
+    setShowForm(false);
+    setEditingId(null);
+  }, []);
 
   const [filters, setFilters] = useState<Filters>({
     categoryId: '',
@@ -43,10 +51,10 @@ export function TransactionsPage() {
     end: '',
     sort: 'desc',
     search: '',
-  })
+  });
 
-  const [page, setPage] = useState(0)
-  const size = PAGE_SIZE
+  const [page, setPage] = useState(0);
+  const size = PAGE_SIZE;
 
   const queryFilters = {
     ...filters,
@@ -56,16 +64,15 @@ export function TransactionsPage() {
     start: filters.start || undefined,
     end: filters.end || undefined,
     search: filters.search || undefined,
-  }
+  };
 
-  const { data, isLoading } = useTransactions(queryFilters)
-  const transactions = data?.items ?? []
-  const total = data?.meta?.total ?? 0
+  const { data, isLoading } = useTransactions(queryFilters);
+  const transactions = data?.items ?? [];
+  const total = data?.meta?.total ?? 0;
 
-  const isFiltered = !!(filters.categoryId || filters.start || filters.end || filters.search)
+  const isFiltered = !!(filters.categoryId || filters.start || filters.end || filters.search);
 
-  const hasActiveFilters =
-    isFiltered || filters.sort !== 'desc'
+  const hasActiveFilters = isFiltered || filters.sort !== 'desc';
 
   const resetFilters = useCallback(() => {
     setFilters({
@@ -74,14 +81,14 @@ export function TransactionsPage() {
       end: '',
       sort: 'desc',
       search: '',
-    })
-    setPage(0)
-  }, [])
+    });
+    setPage(0);
+  }, []);
 
   const handleFilterChange = useCallback((newFilters: Filters) => {
-    setFilters(newFilters)
-    setPage(0)
-  }, [])
+    setFilters(newFilters);
+    setPage(0);
+  }, []);
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -107,9 +114,7 @@ export function TransactionsPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Filter Transactions</DialogTitle>
-            <DialogDescription>
-              Apply filters to your transaction history.
-            </DialogDescription>
+            <DialogDescription>Apply filters to your transaction history.</DialogDescription>
           </DialogHeader>
           <TransactionFilters
             categories={categories}
@@ -120,7 +125,7 @@ export function TransactionsPage() {
           />
         </DialogContent>
       </Dialog>
-      
+
       <Dialog open={showForm || !!editingId} onOpenChange={(open) => !open && closeForm()}>
         <DialogContent hideClose={!!editingId}>
           <DialogHeader>
@@ -137,15 +142,15 @@ export function TransactionsPage() {
               <Skeleton className="h-10 w-full" />
               <Skeleton className="h-10 w-full" />
             </div>
-          ) : (showForm || (editingId && editingTransaction)) ? (
+          ) : showForm || (editingId && editingTransaction) ? (
             <TransactionForm
               categories={categories}
               transaction={editingId ? editingTransaction : undefined}
               onSuccess={closeForm}
               onCancel={closeForm}
               onDeleteSuccess={() => {
-                closeForm()
-                navigate({ to: '/transactions' })
+                closeForm();
+                navigate({ to: '/transactions' });
               }}
             />
           ) : null}
@@ -162,13 +167,8 @@ export function TransactionsPage() {
       />
 
       {!isLoading && transactions.length > 0 && (
-        <Pagination
-          page={page}
-          total={total}
-          size={size}
-          onPageChange={setPage}
-        />
+        <Pagination page={page} total={total} size={size} onPageChange={setPage} />
       )}
     </div>
-  )
+  );
 }

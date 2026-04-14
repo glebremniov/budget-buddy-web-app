@@ -1,33 +1,33 @@
-import { useMutation } from '@tanstack/react-query'
-import { Link, useNavigate } from '@tanstack/react-router'
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { loginUser } from '@budget-buddy-org/budget-buddy-contracts'
-import { useAuthStore } from '@/stores/auth.store'
-import type { AuthToken, LoginRequest, Problem } from '@budget-buddy-org/budget-buddy-contracts'
-import { LogIn } from 'lucide-react'
+import type { AuthToken, LoginRequest, Problem } from '@budget-buddy-org/budget-buddy-contracts';
+import { loginUser } from '@budget-buddy-org/budget-buddy-contracts';
+import { useMutation } from '@tanstack/react-query';
+import { Link, useNavigate } from '@tanstack/react-router';
+import { LogIn } from 'lucide-react';
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { useAuthStore } from '@/stores/auth.store';
 
 export function LoginPage() {
-  const navigate = useNavigate()
-  const setAuth = useAuthStore((s) => s.setAuth)
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
+  const navigate = useNavigate();
+  const setAuth = useAuthStore((s) => s.setAuth);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
   const login = useMutation({
     mutationFn: async (body: LoginRequest) => {
-      const { data, error } = await loginUser({ body })
-      if (error) throw error
-      return data as AuthToken
+      const { data, error } = await loginUser({ body });
+      if (error) throw error;
+      return data as AuthToken;
     },
     onSuccess: (data) => {
-      setAuth(data.access_token, data.refresh_token, data.expires_in)
-      navigate({ to: '/' })
+      setAuth(data.access_token, data.refresh_token, data.expires_in);
+      navigate({ to: '/' });
     },
-  })
+  });
 
-  const fieldErrors = (login.error as Problem)?.errors
-  const getFieldError = (field: string) => fieldErrors?.find((e) => e.field === field)?.message
+  const fieldErrors = (login.error as Problem)?.errors;
+  const getFieldError = (field: string) => fieldErrors?.find((e) => e.field === field)?.message;
 
   return (
     <div className="space-y-4">
@@ -38,8 +38,8 @@ export function LoginPage() {
 
       <form
         onSubmit={(e) => {
-          e.preventDefault()
-          login.mutate({ username, password })
+          e.preventDefault();
+          login.mutate({ username, password });
         }}
         className="space-y-3"
       >
@@ -55,7 +55,11 @@ export function LoginPage() {
             onChange={(e) => setUsername(e.target.value)}
             autoComplete="username"
             required
-            className={getFieldError('username') ? 'border-destructive ring-destructive focus-visible:ring-destructive' : ''}
+            className={
+              getFieldError('username')
+                ? 'border-destructive ring-destructive focus-visible:ring-destructive'
+                : ''
+            }
           />
           {getFieldError('username') && (
             <p className="text-sm font-medium text-destructive">{getFieldError('username')}</p>
@@ -74,7 +78,11 @@ export function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
             autoComplete="current-password"
             required
-            className={getFieldError('password') ? 'border-destructive ring-destructive focus-visible:ring-destructive' : ''}
+            className={
+              getFieldError('password')
+                ? 'border-destructive ring-destructive focus-visible:ring-destructive'
+                : ''
+            }
           />
           {getFieldError('password') && (
             <p className="text-sm font-medium text-destructive">{getFieldError('password')}</p>
@@ -93,10 +101,13 @@ export function LoginPage() {
 
       <p className="text-center text-sm text-muted-foreground">
         Don&apos;t have an account?{' '}
-        <Link to="/register" className="font-medium text-foreground underline-offset-4 hover:underline">
+        <Link
+          to="/register"
+          className="font-medium text-foreground underline-offset-4 hover:underline"
+        >
           Sign up
         </Link>
       </p>
     </div>
-  )
+  );
 }
