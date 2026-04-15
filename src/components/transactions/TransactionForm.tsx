@@ -4,7 +4,7 @@ import type {
   Transaction,
   TransactionWrite,
 } from '@budget-buddy-org/budget-buddy-contracts';
-import { Check, MoreVertical, Plus, RotateCcw, Trash2, X } from 'lucide-react';
+import { Check, MoreHorizontal, Plus, RotateCcw, Trash2, X } from 'lucide-react';
 import { useState } from 'react';
 import { ConfirmationDialog } from '@/components/ConfirmationDialog';
 import { AmountInput } from '@/components/ui/amount-input';
@@ -21,6 +21,7 @@ import { Select } from '@/components/ui/select';
 import { TransactionTypeToggle } from '@/components/ui/transaction-type-toggle';
 import { useToast } from '@/hooks/use-toast';
 import { useCreateCategory } from '@/hooks/useCategories';
+import { useIsMobile } from '@/hooks/useIsMobile';
 import {
   useCreateTransaction,
   useDeleteTransaction,
@@ -46,6 +47,7 @@ export function TransactionForm({
   transaction,
 }: TransactionFormProps) {
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   const createTx = useCreateTransaction();
   const updateTx = useUpdateTransaction(transaction?.id ?? '');
   const deleteTx = useDeleteTransaction();
@@ -205,7 +207,7 @@ export function TransactionForm({
                   ? 'border-destructive ring-destructive focus-visible:ring-destructive'
                   : ''
               }
-              autoFocus
+              autoFocus={!isMobile}
             />
             {getFieldError('description') && (
               <p className="text-xs font-medium text-destructive">{getFieldError('description')}</p>
@@ -213,27 +215,6 @@ export function TransactionForm({
           </div>
 
           <div className="flex gap-4 sm:col-span-2">
-            <div className="flex-1 space-y-1">
-              <label htmlFor="tx-amount" className="text-xs font-medium text-muted-foreground">
-                Amount <span className="text-destructive">*</span>
-              </label>
-              <AmountInput
-                id="tx-amount"
-                placeholder="12.99"
-                value={form.amount}
-                onChange={(val) => setForm((f) => ({ ...f, amount: val }))}
-                required
-                className={
-                  getFieldError('amount')
-                    ? 'border-destructive ring-destructive focus-visible:ring-destructive'
-                    : ''
-                }
-              />
-              {getFieldError('amount') && (
-                <p className="text-xs font-medium text-destructive">{getFieldError('amount')}</p>
-              )}
-            </div>
-
             <div className="flex-1 space-y-1">
               <label htmlFor="tx-currency" className="text-xs font-medium text-muted-foreground">
                 Currency <span className="text-destructive">*</span>
@@ -256,6 +237,27 @@ export function TransactionForm({
               </Select>
               {getFieldError('currency') && (
                 <p className="text-xs font-medium text-destructive">{getFieldError('currency')}</p>
+              )}
+            </div>
+
+            <div className="flex-1 space-y-1">
+              <label htmlFor="tx-amount" className="text-xs font-medium text-muted-foreground">
+                Amount <span className="text-destructive">*</span>
+              </label>
+              <AmountInput
+                id="tx-amount"
+                placeholder="12.99"
+                value={form.amount}
+                onChange={(val) => setForm((f) => ({ ...f, amount: val }))}
+                required
+                className={
+                  getFieldError('amount')
+                    ? 'border-destructive ring-destructive focus-visible:ring-destructive'
+                    : ''
+                }
+              />
+              {getFieldError('amount') && (
+                <p className="text-xs font-medium text-destructive">{getFieldError('amount')}</p>
               )}
             </div>
           </div>
@@ -298,12 +300,12 @@ export function TransactionForm({
               >
                 {isAddingCategory ? (
                   <>
-                    <RotateCcw className="h-3.5 w-3.5 mr-1" />
+                    <RotateCcw className="h-4 w-4 mr-1" />
                     Choose existing
                   </>
                 ) : (
                   <>
-                    <Plus className="h-3.5 w-3.5 mr-1" />
+                    <Plus className="h-4 w-4 mr-1" />
                     Add new
                   </>
                 )}
@@ -324,7 +326,7 @@ export function TransactionForm({
                       ? 'border-destructive ring-destructive focus-visible:ring-destructive'
                       : ''
                   }
-                  autoFocus
+                  autoFocus={!isMobile}
                 />
                 {(createCategory.error as unknown as Problem)?.detail ||
                 (createCategory.error as unknown as Problem)?.title ? (
@@ -388,15 +390,15 @@ export function TransactionForm({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  className="h-8 w-8 rounded-sm opacity-70 transition-opacity hover:opacity-100"
                 >
-                  <MoreVertical className="h-4 w-4" />
+                  <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem
                   onClick={() => setShowDeleteConfirm(true)}
-                  className="text-destructive focus:text-destructive cursor-pointer"
+                  className="text-destructive cursor-pointer"
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
                   Remove

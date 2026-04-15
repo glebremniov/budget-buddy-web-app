@@ -1,6 +1,55 @@
 import { fireEvent, render, screen } from '@testing-library/react';
+import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
+import { useIsMobile } from '@/hooks/useIsMobile';
 import { TransactionFilters } from './TransactionFilters';
+
+vi.mock('@/hooks/useIsMobile', () => ({
+  useIsMobile: vi.fn(() => false),
+}));
+
+vi.mock('@/components/ui/input', () => ({
+  Input: ({
+    id,
+    value,
+    onChange,
+    placeholder,
+    autoFocus,
+  }: {
+    id?: string;
+    value: string;
+    onChange: React.ChangeEventHandler<HTMLInputElement>;
+    placeholder?: string;
+    autoFocus?: boolean;
+  }) =>
+    React.createElement('input', { id, value, onChange, placeholder, 'data-autofocus': autoFocus }),
+}));
+
+vi.mock('@/components/ui/date-picker', () => ({
+  DatePicker: ({
+    id,
+    value,
+    onChange,
+  }: {
+    id?: string;
+    value: string;
+    onChange: React.ChangeEventHandler<HTMLInputElement>;
+  }) => React.createElement('input', { id, type: 'date', value, onChange }),
+}));
+
+vi.mock('@/components/ui/select', () => ({
+  Select: ({
+    id,
+    children,
+    value,
+    onChange,
+  }: {
+    id?: string;
+    children: React.ReactNode;
+    value: string;
+    onChange: React.ChangeEventHandler<HTMLSelectElement>;
+  }) => React.createElement('select', { id, value, onChange }, children),
+}));
 
 describe('TransactionFilters', () => {
   const categories = [
@@ -69,5 +118,39 @@ describe('TransactionFilters', () => {
     const doneButton = screen.getByRole('button', { name: /done/i });
     fireEvent.click(doneButton);
     expect(onClose).toHaveBeenCalled();
+  });
+
+  it('applies autoFocus on desktop', () => {
+    vi.mocked(useIsMobile).mockReturnValue(false);
+    render(
+      <TransactionFilters
+        categories={categories}
+        filters={filters}
+        onFilterChange={onFilterChange}
+        onReset={onReset}
+        onClose={onClose}
+      />,
+    );
+    expect(screen.getByPlaceholderText(/Search transactions/i)).toHaveAttribute(
+      'data-autofocus',
+      'true',
+    );
+  });
+
+  it('skips autoFocus on mobile', () => {
+    vi.mocked(useIsMobile).mockReturnValue(true);
+    render(
+      <TransactionFilters
+        categories={categories}
+        filters={filters}
+        onFilterChange={onFilterChange}
+        onReset={onReset}
+        onClose={onClose}
+      />,
+    );
+    expect(screen.getByPlaceholderText(/Search transactions/i)).toHaveAttribute(
+      'data-autofocus',
+      'false',
+    );
   });
 });

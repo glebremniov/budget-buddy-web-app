@@ -10,7 +10,7 @@ import {
   listCategories,
   updateCategory,
 } from '@budget-buddy-org/budget-buddy-contracts';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 const KEYS = {
   all: ['categories'] as const,
@@ -19,8 +19,8 @@ const KEYS = {
   detail: (id: string) => ['categories', id] as const,
 };
 
-export function useCategories(size = 200, page = 0, search?: string) {
-  return useQuery({
+export const categoriesQueryOptions = (size = 200, page = 0, search?: string) =>
+  queryOptions({
     queryKey: KEYS.list(size, page, search),
     queryFn: async () => {
       const { data, error } = await listCategories({
@@ -43,10 +43,13 @@ export function useCategories(size = 200, page = 0, search?: string) {
       return data;
     },
   });
+
+export function useCategories(size = 200, page = 0, search?: string) {
+  return useQuery(categoriesQueryOptions(size, page, search));
 }
 
-export function useCategory(id: string) {
-  return useQuery({
+export const categoryDetailQueryOptions = (id: string) =>
+  queryOptions({
     queryKey: KEYS.detail(id),
     queryFn: async () => {
       const { data, error } = await getCategory({
@@ -57,6 +60,9 @@ export function useCategory(id: string) {
     },
     enabled: Boolean(id),
   });
+
+export function useCategory(id: string) {
+  return useQuery(categoryDetailQueryOptions(id));
 }
 
 export function useCreateCategory() {

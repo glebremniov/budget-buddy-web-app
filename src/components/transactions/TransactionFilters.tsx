@@ -5,6 +5,7 @@ import { DatePicker } from '@/components/ui/date-picker';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { useDebounce } from '@/hooks/use-debounce';
+import { useIsMobile } from '@/hooks/useIsMobile';
 
 interface TransactionFiltersProps {
   categories: { id: string; name: string }[];
@@ -27,6 +28,7 @@ export function TransactionFilters({
   onReset,
   onClose,
 }: TransactionFiltersProps) {
+  const isMobile = useIsMobile();
   const [searchTerm, setSearchTerm] = useState(filters.search);
   const [prevSearch, setPrevSearch] = useState(filters.search);
   const debouncedSearch = useDebounce(searchTerm);
@@ -59,6 +61,7 @@ export function TransactionFilters({
             className="pl-9"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
+            autoFocus={!isMobile}
           />
         </div>
       </div>

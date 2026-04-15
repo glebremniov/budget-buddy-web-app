@@ -24,8 +24,9 @@ import {
   useDeleteCategory,
   useUpdateCategory,
 } from '@/hooks/useCategories';
+import { useIsMobile } from '@/hooks/useIsMobile';
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 200;
 
 export function CategoriesPage() {
   const [page, setPage] = useState(0);
@@ -42,6 +43,7 @@ export function CategoriesPage() {
   }
 
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   const createCategory = useCreateCategory();
   const deleteCategory = useDeleteCategory();
 
@@ -178,7 +180,7 @@ export function CategoriesPage() {
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 maxLength={255}
-                autoFocus
+                autoFocus={!isMobile}
                 autoComplete="off"
                 className={
                   createFieldError
@@ -235,6 +237,7 @@ export function CategoriesPage() {
                 value={editName}
                 onChange={(e) => setEditName(e.target.value)}
                 maxLength={255}
+                autoFocus={!isMobile}
                 autoComplete="off"
                 className={
                   updateFieldError
@@ -274,9 +277,12 @@ export function CategoriesPage() {
       <Card>
         <CardContent className="p-0">
           {isLoading ? (
-            <div className="space-y-px p-2 animate-fade-in">
-              {[1, 2, 3, 4].map((i) => (
-                <Skeleton key={i} className="h-11 rounded-sm" />
+            <div className="divide-y animate-fade-in">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="flex items-center justify-between px-4 py-3">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-9 w-9 rounded-md" />
+                </div>
               ))}
             </div>
           ) : categories.length === 0 ? (

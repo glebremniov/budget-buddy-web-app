@@ -60,14 +60,7 @@ export function DashboardPage() {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <PageHeader
-        title="Dashboard"
-        subtitle="Current month summary"
-        primaryAction={{
-          label: 'Add',
-          onClick: () => navigate({ to: '/transactions' }),
-        }}
-      />
+      <PageHeader title="Dashboard" subtitle="Current month summary" />
 
       {/* Summary cards */}
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
@@ -140,7 +133,7 @@ export function DashboardPage() {
           {recent.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-4 py-12 px-6 text-center">
               <div className="rounded-full bg-muted p-3">
-                <PlusCircle className="h-6 w-6 text-muted-foreground" />
+                <PlusCircle className="h-4 w-4 text-muted-foreground" />
               </div>
               <div className="space-y-1">
                 <p className="text-sm font-medium">No transactions yet</p>

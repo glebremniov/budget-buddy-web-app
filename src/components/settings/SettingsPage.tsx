@@ -14,7 +14,7 @@ export function SettingsPage() {
       <div className="grid gap-6">
         <section className="space-y-3">
           <div className="flex items-center gap-2">
-            <Sun className="h-5 w-5 text-primary" />
+            <Sun className="h-4 w-4 text-primary" />
             <h2 className="text-lg font-semibold">Theme</h2>
           </div>
           <Card className="p-4">
@@ -31,7 +31,7 @@ export function SettingsPage() {
                   className="gap-2 cursor-pointer flex-col h-auto py-3 px-1 sm:flex-row sm:h-10 sm:py-0"
                   onClick={() => setTheme(t.value as 'light' | 'dark' | 'system')}
                 >
-                  <t.icon className="h-5 w-5" />
+                  <t.icon className="h-4 w-4" />
                   <span className="text-xs sm:text-sm">{t.label}</span>
                 </Button>
               ))}
@@ -41,7 +41,7 @@ export function SettingsPage() {
 
         <section className="space-y-3">
           <div className="flex items-center gap-2">
-            <Palette className="h-5 w-5 text-primary" />
+            <Palette className="h-4 w-4 text-primary" />
             <h2 className="text-lg font-semibold">Primary Color</h2>
           </div>
           <Card className="p-4 space-y-4">
@@ -72,7 +72,7 @@ export function SettingsPage() {
 
         <section className="space-y-3">
           <div className="flex items-center gap-2">
-            <Type className="h-5 w-5 text-primary" />
+            <Type className="h-4 w-4 text-primary" />
             <h2 className="text-lg font-semibold">Font Size</h2>
           </div>
           <Card className="p-4 space-y-4">
@@ -108,7 +108,7 @@ export function SettingsPage() {
 
         <section className="space-y-3">
           <div className="flex items-center gap-2">
-            <RefreshCw className="h-5 w-5 text-primary" />
+            <RefreshCw className="h-4 w-4 text-primary" />
             <h2 className="text-lg font-semibold">Version & Updates</h2>
           </div>
           <Card className="p-4 space-y-4">
@@ -123,7 +123,7 @@ export function SettingsPage() {
                 className="gap-2 cursor-pointer"
                 onClick={() => window.location.reload()}
               >
-                <RefreshCw className="h-3.5 w-3.5" />
+                <RefreshCw className="h-4 w-4" />
                 Reload App
               </Button>
             </div>

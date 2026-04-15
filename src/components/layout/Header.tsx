@@ -36,7 +36,7 @@ export function Header() {
             aria-label="Settings"
             className="cursor-pointer"
           >
-            <Settings className="h-5 w-5" />
+            <Settings className="h-4 w-4" />
           </Button>
         </Link>
         <Button
@@ -47,7 +47,7 @@ export function Header() {
           aria-label={`Switch theme (current: ${theme})`}
           className="cursor-pointer hidden md:inline-flex"
         >
-          <ThemeIcon className="h-5 w-5" />
+          <ThemeIcon className="h-4 w-4" />
         </Button>
         <Button
           variant="ghost"
@@ -57,7 +57,7 @@ export function Header() {
           aria-label="Log out"
           className="cursor-pointer"
         >
-          <LogOut className="h-5 w-5" />
+          <LogOut className="h-4 w-4" />
         </Button>
       </div>
     </header>

@@ -24,6 +24,10 @@ vi.mock('@/hooks/use-toast', () => ({
   }),
 }));
 
+vi.mock('@/hooks/useIsMobile', () => ({
+  useIsMobile: vi.fn(() => false),
+}));
+
 vi.mock('@/components/ConfirmationDialog', () => ({
   ConfirmationDialog: ({
     isOpen,
@@ -140,6 +144,8 @@ vi.mock('lucide-react', () => ({
   Search: () => React.createElement('span', null, 'search'),
 }));
 
+import { useIsMobile } from '@/hooks/useIsMobile';
+
 const { useCategories } = await import('@/hooks/useCategories');
 const { Route } = await import('./index.lazy');
 const CategoriesPage = (Route.options as { component: React.ComponentType }).component;
@@ -162,7 +168,8 @@ describe('CategoriesPage', () => {
       isLoading: true,
     } as unknown as ReturnType<typeof useCategories>);
     renderPage();
-    expect(screen.getAllByTestId('skeleton')).toHaveLength(4);
+    // 6 items, each has 2 skeletons (name + delete button)
+    expect(screen.getAllByTestId('skeleton')).toHaveLength(12);
   });
 
   it('shows an empty state message when there are no categories', () => {
@@ -353,6 +360,35 @@ describe('CategoriesPage', () => {
 
     // Edit dialog
     await user.click(screen.getByText('Groceries'));
-    expect(screen.getByPlaceholderText(/Category name/i)).not.toHaveAttribute('data-autofocus');
+    expect(screen.getByPlaceholderText(/Category name/i)).toHaveAttribute('data-autofocus', 'true');
+  });
+
+  it('skips autoFocus on mobile', async () => {
+    vi.mocked(useIsMobile).mockReturnValue(true);
+
+    vi.mocked(useCategories).mockReturnValue({
+      data: {
+        items: [{ id: 'cat-1', name: 'Groceries' }],
+        meta: { total: 1, size: 200, page: 0 },
+      },
+      isLoading: false,
+    } as unknown as ReturnType<typeof useCategories>);
+    renderPage();
+    const user = userEvent.setup();
+
+    // Add dialog
+    await user.click(screen.getByRole('button', { name: /Add/i }));
+    expect(screen.getByPlaceholderText(/New category name/i)).toHaveAttribute(
+      'data-autofocus',
+      'false',
+    );
+    await user.click(screen.getByRole('button', { name: /Cancel/i }));
+
+    // Edit dialog
+    await user.click(screen.getByText('Groceries'));
+    expect(screen.getByPlaceholderText(/Category name/i)).toHaveAttribute(
+      'data-autofocus',
+      'false',
+    );
   });
 });
