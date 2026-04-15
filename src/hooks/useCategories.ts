@@ -29,7 +29,7 @@ export const categoriesQueryOptions = (size = 200, page = 0, search?: string) =>
       if (error) throw error;
       if (!data) return data;
 
-      let items = [...data.items].sort((a, b) => a.name.localeCompare(b.name));
+      let items = [...data.items];
       let total = data.meta.total;
 
       if (search) {
