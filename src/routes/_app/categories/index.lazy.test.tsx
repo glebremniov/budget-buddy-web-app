@@ -363,7 +363,7 @@ describe('CategoriesPage', () => {
     expect(screen.getByPlaceholderText(/Category name/i)).toHaveAttribute('data-autofocus', 'true');
   });
 
-  it('skips autoFocus on mobile', async () => {
+  it('applies autoFocus on mobile', async () => {
     vi.mocked(useIsMobile).mockReturnValue(true);
 
     vi.mocked(useCategories).mockReturnValue({
@@ -380,15 +380,12 @@ describe('CategoriesPage', () => {
     await user.click(screen.getByRole('button', { name: /Add/i }));
     expect(screen.getByPlaceholderText(/New category name/i)).toHaveAttribute(
       'data-autofocus',
-      'false',
+      'true',
     );
     await user.click(screen.getByRole('button', { name: /Cancel/i }));
 
     // Edit dialog
     await user.click(screen.getByText('Groceries'));
-    expect(screen.getByPlaceholderText(/Category name/i)).toHaveAttribute(
-      'data-autofocus',
-      'false',
-    );
+    expect(screen.getByPlaceholderText(/Category name/i)).toHaveAttribute('data-autofocus', 'true');
   });
 });

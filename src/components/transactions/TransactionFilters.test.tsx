@@ -137,7 +137,7 @@ describe('TransactionFilters', () => {
     );
   });
 
-  it('skips autoFocus on mobile', () => {
+  it('applies autoFocus on mobile', () => {
     vi.mocked(useIsMobile).mockReturnValue(true);
     render(
       <TransactionFilters
@@ -150,7 +150,7 @@ describe('TransactionFilters', () => {
     );
     expect(screen.getByPlaceholderText(/Search transactions/i)).toHaveAttribute(
       'data-autofocus',
-      'false',
+      'true',
     );
   });
 });

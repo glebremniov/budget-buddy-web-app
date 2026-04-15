@@ -24,7 +24,6 @@ import {
   useDeleteCategory,
   useUpdateCategory,
 } from '@/hooks/useCategories';
-import { useIsMobile } from '@/hooks/useIsMobile';
 
 const PAGE_SIZE = 20;
 
@@ -44,7 +43,6 @@ export function CategoriesPage() {
   }
 
   const { toast } = useToast();
-  const isMobile = useIsMobile();
   const createCategory = useCreateCategory();
   const deleteCategory = useDeleteCategory();
 
@@ -142,7 +140,7 @@ export function CategoriesPage() {
   const categories = data?.items ?? [];
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 ">
       <PageHeader
         title="Categories"
         subtitle="Manage categories to organize your transactions."
@@ -170,7 +168,7 @@ export function CategoriesPage() {
             <DialogTitle>Add Category</DialogTitle>
             <DialogDescription>Create a new category to group your transactions.</DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleCreate} className="space-y-4 animate-fade-in">
+          <form onSubmit={handleCreate} className="space-y-4 ">
             <div className="space-y-1">
               <label htmlFor="category-name" className="text-xs font-medium text-muted-foreground">
                 Name <span className="text-destructive">*</span>
@@ -181,7 +179,7 @@ export function CategoriesPage() {
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 maxLength={255}
-                autoFocus={!isMobile}
+                autoFocus
                 autoComplete="off"
                 className={
                   createFieldError
@@ -224,7 +222,7 @@ export function CategoriesPage() {
             <DialogTitle>Edit Category</DialogTitle>
             <DialogDescription>Modify the name of your category.</DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleUpdate} className="space-y-4 animate-fade-in">
+          <form onSubmit={handleUpdate} className="space-y-4 ">
             <div className="space-y-1">
               <label
                 htmlFor="edit-category-name"
@@ -238,7 +236,7 @@ export function CategoriesPage() {
                 value={editName}
                 onChange={(e) => setEditName(e.target.value)}
                 maxLength={255}
-                autoFocus={!isMobile}
+                autoFocus
                 autoComplete="off"
                 className={
                   updateFieldError
@@ -278,7 +276,7 @@ export function CategoriesPage() {
       <Card>
         <CardContent className="p-0">
           {isLoading ? (
-            <div className="divide-y animate-fade-in">
+            <div className="divide-y ">
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <div key={i} className="flex items-center justify-between px-4 py-3">
                   <Skeleton className="h-4 w-32" />

@@ -91,7 +91,7 @@ export function TransactionsPage() {
   }, []);
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 ">
       <PageHeader
         title="Transactions"
         subtitle="View and manage your income and expenses."
@@ -137,7 +137,7 @@ export function TransactionsPage() {
             </DialogDescription>
           </DialogHeader>
           {isTransactionLoading && editingId ? (
-            <div className="space-y-6 py-4 animate-fade-in">
+            <div className="space-y-6 py-4 ">
               <div className="space-y-2">
                 <Skeleton className="h-4 w-12" />
                 <Skeleton className="h-10 w-full" />

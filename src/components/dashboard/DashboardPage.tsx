@@ -79,7 +79,7 @@ export function DashboardPage() {
   if (isLoading) return <DashboardSkeleton />;
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 ">
       <PageHeader title="Dashboard" subtitle="Current month summary" />
 
       {/* Summary cards */}

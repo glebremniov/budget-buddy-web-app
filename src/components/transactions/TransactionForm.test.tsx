@@ -292,11 +292,11 @@ describe('TransactionForm', () => {
     expect(editInput).toHaveAttribute('data-autofocus', 'true');
   });
 
-  it('skips autoFocus on mobile', () => {
+  it('applies autoFocus on mobile', () => {
     vi.mocked(useIsMobile).mockReturnValue(true);
 
     renderForm();
     const input = screen.getByPlaceholderText(/Coffee/i);
-    expect(input).toHaveAttribute('data-autofocus', 'false');
+    expect(input).toHaveAttribute('data-autofocus', 'true');
   });
 });
