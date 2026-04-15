@@ -1,3 +1,9 @@
+## [3.3.0](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v3.2.0...v3.3.0) (2026-04-15)
+
+### Features
+
+* improve performance with infinite query and global monitoring ([fbccd23](https://github.com/budget-buddy-org/budget-buddy-web-app/commit/fbccd238f0d3ded4d6d9abfdc094cd0d3ed68fe7))
+
 ## [3.2.0](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v3.1.1...v3.2.0) (2026-04-15)
 
 ### Features
