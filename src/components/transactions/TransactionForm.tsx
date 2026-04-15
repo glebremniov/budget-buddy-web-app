@@ -21,7 +21,6 @@ import { Select } from '@/components/ui/select';
 import { TransactionTypeToggle } from '@/components/ui/transaction-type-toggle';
 import { useToast } from '@/hooks/use-toast';
 import { useCreateCategory } from '@/hooks/useCategories';
-import { useIsMobile } from '@/hooks/useIsMobile';
 import {
   useCreateTransaction,
   useDeleteTransaction,
@@ -47,7 +46,6 @@ export function TransactionForm({
   transaction,
 }: TransactionFormProps) {
   const { toast } = useToast();
-  const isMobile = useIsMobile();
   const createTx = useCreateTransaction();
   const updateTx = useUpdateTransaction(transaction?.id ?? '');
   const deleteTx = useDeleteTransaction();
@@ -177,7 +175,7 @@ export function TransactionForm({
 
   return (
     <>
-      <form onSubmit={handleSubmit} className="space-y-4 animate-fade-in">
+      <form onSubmit={handleSubmit} className="space-y-4 ">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="sm:col-span-2 space-y-1">
             <div className="text-xs font-medium text-muted-foreground">
@@ -207,7 +205,7 @@ export function TransactionForm({
                   ? 'border-destructive ring-destructive focus-visible:ring-destructive'
                   : ''
               }
-              autoFocus={!isMobile}
+              autoFocus
             />
             {getFieldError('description') && (
               <p className="text-xs font-medium text-destructive">{getFieldError('description')}</p>
@@ -246,7 +244,7 @@ export function TransactionForm({
               </label>
               <AmountInput
                 id="tx-amount"
-                placeholder="12.99"
+                placeholder="0.00"
                 value={form.amount}
                 onChange={(val) => setForm((f) => ({ ...f, amount: val }))}
                 required
@@ -313,7 +311,7 @@ export function TransactionForm({
             </div>
 
             {isAddingCategory ? (
-              <div className="space-y-1 animate-fade-in">
+              <div className="space-y-1 ">
                 <Input
                   id="tx-new-category"
                   placeholder="New category name…"
@@ -326,7 +324,7 @@ export function TransactionForm({
                       ? 'border-destructive ring-destructive focus-visible:ring-destructive'
                       : ''
                   }
-                  autoFocus={!isMobile}
+                  autoFocus
                 />
                 {(createCategory.error as unknown as Problem)?.detail ||
                 (createCategory.error as unknown as Problem)?.title ? (
@@ -337,7 +335,7 @@ export function TransactionForm({
                 ) : null}
               </div>
             ) : (
-              <div className="space-y-1 animate-fade-in">
+              <div className="space-y-1 ">
                 <Select
                   id="tx-category"
                   value={form.categoryId}

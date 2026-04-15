@@ -1,5 +1,12 @@
-import { describe, expect, it } from 'vitest';
-import { formatCurrency, formatDate, todayIso, toMinorUnits } from './formatters';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  formatCurrency,
+  formatDate,
+  todayIso,
+  toLocalIsoDate,
+  toLocalYearMonth,
+  toMinorUnits,
+} from './formatters';
 
 describe('formatCurrency', () => {
   it('converts minor units to formatted EUR string', () => {
@@ -39,15 +46,43 @@ describe('formatDate', () => {
   });
 });
 
+describe('local date helpers', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('formats dates as local YYYY-MM-DD', () => {
+    vi.setSystemTime(new Date(2026, 3, 15, 23, 45, 0));
+    expect(toLocalIsoDate(new Date())).toBe('2026-04-15');
+  });
+
+  it('formats dates as local YYYY-MM', () => {
+    vi.setSystemTime(new Date(2026, 0, 5, 9, 30, 0));
+    expect(toLocalYearMonth(new Date())).toBe('2026-01');
+  });
+});
+
 describe('todayIso', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('returns a string in YYYY-MM-DD format', () => {
     const result = todayIso();
     expect(result).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });
 
   it("returns today's date", () => {
+    vi.setSystemTime(new Date(2026, 3, 15, 10, 0, 0));
     const result = todayIso();
-    const expected = new Date().toISOString().split('T')[0];
-    expect(result).toBe(expected);
+    expect(result).toBe('2026-04-15');
   });
 });

@@ -25,7 +25,6 @@ interface Filters {
   start: string;
   end: string;
   sort: 'asc' | 'desc';
-  search: string;
 }
 
 export function TransactionsPage() {
@@ -50,7 +49,6 @@ export function TransactionsPage() {
     start: '',
     end: '',
     sort: 'desc',
-    search: '',
   });
 
   const [page, setPage] = useState(0);
@@ -63,14 +61,13 @@ export function TransactionsPage() {
     categoryId: filters.categoryId || undefined,
     start: filters.start || undefined,
     end: filters.end || undefined,
-    search: filters.search || undefined,
   };
 
   const { data, isLoading } = useTransactions(queryFilters);
   const transactions = data?.items ?? [];
   const total = data?.meta?.total ?? 0;
 
-  const isFiltered = !!(filters.categoryId || filters.start || filters.end || filters.search);
+  const isFiltered = !!(filters.categoryId || filters.start || filters.end);
 
   const hasActiveFilters = isFiltered || filters.sort !== 'desc';
 
@@ -80,7 +77,6 @@ export function TransactionsPage() {
       start: '',
       end: '',
       sort: 'desc',
-      search: '',
     });
     setPage(0);
   }, []);
@@ -91,7 +87,7 @@ export function TransactionsPage() {
   }, []);
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 ">
       <PageHeader
         title="Transactions"
         subtitle="View and manage your income and expenses."
@@ -137,7 +133,7 @@ export function TransactionsPage() {
             </DialogDescription>
           </DialogHeader>
           {isTransactionLoading && editingId ? (
-            <div className="space-y-6 py-4 animate-fade-in">
+            <div className="space-y-6 py-4 ">
               <div className="space-y-2">
                 <Skeleton className="h-4 w-12" />
                 <Skeleton className="h-10 w-full" />

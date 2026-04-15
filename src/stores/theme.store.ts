@@ -3,6 +3,8 @@ import { persist } from 'zustand/middleware';
 
 export type Theme = 'light' | 'dark' | 'system';
 
+const SYSTEM_THEME_MEDIA = '(prefers-color-scheme: dark)';
+
 interface ThemeState {
   theme: Theme;
   primaryHue: number;
@@ -15,7 +17,7 @@ interface ThemeState {
 
 function getSystemTheme(): 'light' | 'dark' {
   if (typeof window === 'undefined' || !window.matchMedia) return 'light';
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  return window.matchMedia(SYSTEM_THEME_MEDIA).matches ? 'dark' : 'light';
 }
 
 function applyTheme(theme: Theme, primaryHue: number, fontSize: number) {
@@ -23,6 +25,23 @@ function applyTheme(theme: Theme, primaryHue: number, fontSize: number) {
   document.documentElement.classList.toggle('dark', resolved === 'dark');
   document.documentElement.style.setProperty('--primary-hue', primaryHue.toString());
   document.documentElement.style.setProperty('--font-size-base', `${fontSize}px`);
+}
+
+let systemThemeListenerAttached = false;
+
+function attachSystemThemeListener(getState: () => ThemeState) {
+  if (systemThemeListenerAttached || typeof window === 'undefined' || !window.matchMedia) return;
+
+  const mediaQuery = window.matchMedia(SYSTEM_THEME_MEDIA);
+  const handleSystemThemeChange = () => {
+    const { theme, primaryHue, fontSize } = getState();
+    if (theme === 'system') {
+      applyTheme(theme, primaryHue, fontSize);
+    }
+  };
+
+  mediaQuery.addEventListener('change', handleSystemThemeChange);
+  systemThemeListenerAttached = true;
 }
 
 export const useThemeStore = create<ThemeState>()(
@@ -51,8 +70,11 @@ export const useThemeStore = create<ThemeState>()(
     {
       name: 'budget-buddy-theme',
       onRehydrateStorage: () => (state) => {
+        attachSystemThemeListener(useThemeStore.getState);
         if (state) applyTheme(state.theme, state.primaryHue, state.fontSize);
       },
     },
   ),
 );
+
+attachSystemThemeListener(useThemeStore.getState);

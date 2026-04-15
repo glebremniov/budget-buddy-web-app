@@ -67,7 +67,10 @@ describe('API response interceptor', () => {
       accessToken: null,
       refreshToken: 'rt-current',
       setAuth: vi.fn(),
-      clearAuth: vi.fn(),
+      clearAuth: vi.fn(() => {
+        mockAuthState.accessToken = null;
+        mockAuthState.refreshToken = null;
+      }),
     };
   });
 
@@ -131,7 +134,7 @@ describe('API response interceptor', () => {
     await responseInterceptor?.(res, makeRequest(), {});
 
     expect(mockAuthState.clearAuth).not.toHaveBeenCalled();
-    expect(hrefSetter).toHaveBeenCalledWith('/login');
+    expect(hrefSetter).not.toHaveBeenCalled();
   });
 
   it('clears auth and redirects to /login when there is no refresh token', async () => {

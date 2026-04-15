@@ -1,29 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { useIsMobile } from '@/hooks/useIsMobile';
 import { TransactionFilters } from './TransactionFilters';
-
-vi.mock('@/hooks/useIsMobile', () => ({
-  useIsMobile: vi.fn(() => false),
-}));
-
-vi.mock('@/components/ui/input', () => ({
-  Input: ({
-    id,
-    value,
-    onChange,
-    placeholder,
-    autoFocus,
-  }: {
-    id?: string;
-    value: string;
-    onChange: React.ChangeEventHandler<HTMLInputElement>;
-    placeholder?: string;
-    autoFocus?: boolean;
-  }) =>
-    React.createElement('input', { id, value, onChange, placeholder, 'data-autofocus': autoFocus }),
-}));
 
 vi.mock('@/components/ui/date-picker', () => ({
   DatePicker: ({
@@ -61,7 +39,6 @@ describe('TransactionFilters', () => {
     start: '',
     end: '',
     sort: 'desc' as const,
-    search: '',
   };
   const onFilterChange = vi.fn();
   const onReset = vi.fn();
@@ -78,7 +55,6 @@ describe('TransactionFilters', () => {
       />,
     );
 
-    expect(screen.getByLabelText(/search/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/category/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/from/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/to/i)).toBeInTheDocument();
@@ -88,7 +64,7 @@ describe('TransactionFilters', () => {
   });
 
   it('calls onReset when reset button is clicked', () => {
-    const activeFilters = { ...filters, search: 'test' };
+    const activeFilters = { ...filters, categoryId: '1' };
     render(
       <TransactionFilters
         categories={categories}
@@ -118,39 +94,5 @@ describe('TransactionFilters', () => {
     const doneButton = screen.getByRole('button', { name: /done/i });
     fireEvent.click(doneButton);
     expect(onClose).toHaveBeenCalled();
-  });
-
-  it('applies autoFocus on desktop', () => {
-    vi.mocked(useIsMobile).mockReturnValue(false);
-    render(
-      <TransactionFilters
-        categories={categories}
-        filters={filters}
-        onFilterChange={onFilterChange}
-        onReset={onReset}
-        onClose={onClose}
-      />,
-    );
-    expect(screen.getByPlaceholderText(/Search transactions/i)).toHaveAttribute(
-      'data-autofocus',
-      'true',
-    );
-  });
-
-  it('skips autoFocus on mobile', () => {
-    vi.mocked(useIsMobile).mockReturnValue(true);
-    render(
-      <TransactionFilters
-        categories={categories}
-        filters={filters}
-        onFilterChange={onFilterChange}
-        onReset={onReset}
-        onClose={onClose}
-      />,
-    );
-    expect(screen.getByPlaceholderText(/Search transactions/i)).toHaveAttribute(
-      'data-autofocus',
-      'false',
-    );
   });
 });

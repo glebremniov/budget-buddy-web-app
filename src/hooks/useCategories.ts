@@ -14,36 +14,24 @@ import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/r
 
 const KEYS = {
   all: ['categories'] as const,
-  list: (size: number, page: number, search?: string) =>
-    ['categories', 'list', size, page, search] as const,
+  list: (size: number, page: number) => ['categories', 'list', size, page] as const,
   detail: (id: string) => ['categories', id] as const,
 };
 
-export const categoriesQueryOptions = (size = 200, page = 0, search?: string) =>
+export const categoriesQueryOptions = (size = 200, page = 0) =>
   queryOptions({
-    queryKey: KEYS.list(size, page, search),
+    queryKey: KEYS.list(size, page),
     queryFn: async () => {
       const { data, error } = await listCategories({
         query: { size, page },
       });
       if (error) throw error;
-      if (!data) return data;
-
-      let items = [...data.items];
-      let total = data.meta.total;
-
-      if (search) {
-        const term = search.toLowerCase();
-        items = items.filter((item) => item.name.toLowerCase().includes(term));
-        total = items.length;
-      }
-
-      return { ...data, items, meta: { ...data.meta, total } };
+      return data;
     },
   });
 
-export function useCategories(size = 200, page = 0, search?: string) {
-  return useQuery(categoriesQueryOptions(size, page, search));
+export function useCategories(size = 200, page = 0) {
+  return useQuery(categoriesQueryOptions(size, page));
 }
 
 export const categoryDetailQueryOptions = (id: string) =>

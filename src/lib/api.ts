@@ -69,6 +69,14 @@ export function refreshAuth() {
   return refreshPromise;
 }
 
+function shouldRedirectToLogin() {
+  return (
+    typeof window !== 'undefined' &&
+    !window.location.pathname.includes('/login') &&
+    !window.location.pathname.includes('/register')
+  );
+}
+
 // On 401: attempt refresh → retry; on refresh failure → clear auth + redirect to login
 client.interceptors.response.use(
   async (response: Response, _request: Request, options: unknown) => {
@@ -97,11 +105,8 @@ client.interceptors.response.use(
     const token = await refreshAuth();
 
     if (!token) {
-      if (
-        typeof window !== 'undefined' &&
-        !window.location.pathname.includes('/login') &&
-        !window.location.pathname.includes('/register')
-      ) {
+      const { refreshToken } = useAuthStore.getState();
+      if (!refreshToken && shouldRedirectToLogin()) {
         window.location.href = '/login';
       }
       return response;

@@ -13,6 +13,7 @@ interface AuthState {
   setAccessToken: (token: string, expiresIn?: number) => void;
   clearAuth: () => void;
   isAuthenticated: () => boolean;
+  hasRefreshToken: () => boolean;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -42,6 +43,7 @@ export const useAuthStore = create<AuthState>()(
           accessTokenExpiresAt: null,
         }),
       isAuthenticated: () => get().accessToken !== null,
+      hasRefreshToken: () => get().refreshToken !== null,
     }),
     {
       name: 'budget-buddy-auth',

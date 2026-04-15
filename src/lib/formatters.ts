@@ -8,6 +8,25 @@ export function toMinorUnits(amount: number): number {
   return Math.round(amount * 100);
 }
 
+function padDatePart(value: number): string {
+  return value.toString().padStart(2, '0');
+}
+
+/** Formats a Date as a local YYYY-MM-DD string. */
+export function toLocalIsoDate(date: Date): string {
+  const year = date.getFullYear();
+  const month = padDatePart(date.getMonth() + 1);
+  const day = padDatePart(date.getDate());
+  return `${year}-${month}-${day}`;
+}
+
+/** Formats a Date as a local YYYY-MM string. */
+export function toLocalYearMonth(date: Date): string {
+  const year = date.getFullYear();
+  const month = padDatePart(date.getMonth() + 1);
+  return `${year}-${month}`;
+}
+
 /** Formats an ISO date string (YYYY-MM-DD) for display. */
 export function formatDate(dateString: string, locale = 'en-US'): string {
   return new Intl.DateTimeFormat(locale, {
@@ -19,5 +38,5 @@ export function formatDate(dateString: string, locale = 'en-US'): string {
 
 /** Returns today's date as YYYY-MM-DD. */
 export function todayIso(): string {
-  return new Date().toISOString().split('T')[0] ?? '';
+  return toLocalIsoDate(new Date());
 }
