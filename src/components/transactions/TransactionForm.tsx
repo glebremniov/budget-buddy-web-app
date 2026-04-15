@@ -244,7 +244,7 @@ export function TransactionForm({
               </label>
               <AmountInput
                 id="tx-amount"
-                placeholder="12.99"
+                placeholder="0.00"
                 value={form.amount}
                 onChange={(val) => setForm((f) => ({ ...f, amount: val }))}
                 required

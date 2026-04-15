@@ -12,7 +12,7 @@ const AmountInput = React.forwardRef<HTMLInputElement, AmountInputProps>(
   ({ className, value, onChange, ...props }, ref) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       // Extract digits only
-      const digits = e.target.value.replace(/\D/g, '');
+      const digits = e.target.value.replaceAll(/\D/g, '');
 
       if (!digits) {
         onChange('');
@@ -31,7 +31,7 @@ const AmountInput = React.forwardRef<HTMLInputElement, AmountInputProps>(
     };
 
     // Ensure the display value is always correctly formatted
-    const displayValue = value ? Number.parseFloat(value).toFixed(2) : '0.00';
+    const displayValue = value ? Number.parseFloat(value).toFixed(2) : '';
 
     return (
       <Input
