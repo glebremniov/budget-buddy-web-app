@@ -24,10 +24,6 @@ vi.mock('@/hooks/use-toast', () => ({
   }),
 }));
 
-vi.mock('@/hooks/useIsMobile', () => ({
-  useIsMobile: vi.fn(() => false),
-}));
-
 vi.mock('@/components/ConfirmationDialog', () => ({
   ConfirmationDialog: ({
     isOpen,
@@ -142,8 +138,6 @@ vi.mock('lucide-react', () => ({
   X: () => React.createElement('span', null, 'x'),
   Check: () => React.createElement('span', null, 'check'),
 }));
-
-import { useIsMobile } from '@/hooks/useIsMobile';
 
 const { useCategories } = await import('@/hooks/useCategories');
 const { Route } = await import('./index.lazy');
@@ -315,32 +309,6 @@ describe('CategoriesPage', () => {
   });
 
   it('handles autoFocus correctly in dialogs', async () => {
-    vi.mocked(useCategories).mockReturnValue({
-      data: {
-        items: [{ id: 'cat-1', name: 'Groceries' }],
-        meta: { total: 1, size: 20, page: 0 },
-      },
-      isLoading: false,
-    } as unknown as ReturnType<typeof useCategories>);
-    renderPage();
-    const user = userEvent.setup();
-
-    // Add dialog
-    await user.click(screen.getByRole('button', { name: /Add/i }));
-    expect(screen.getByPlaceholderText(/New category name/i)).toHaveAttribute(
-      'data-autofocus',
-      'true',
-    );
-    await user.click(screen.getByRole('button', { name: /Cancel/i }));
-
-    // Edit dialog
-    await user.click(screen.getByText('Groceries'));
-    expect(screen.getByPlaceholderText(/Category name/i)).toHaveAttribute('data-autofocus', 'true');
-  });
-
-  it('applies autoFocus on mobile', async () => {
-    vi.mocked(useIsMobile).mockReturnValue(true);
-
     vi.mocked(useCategories).mockReturnValue({
       data: {
         items: [{ id: 'cat-1', name: 'Groceries' }],

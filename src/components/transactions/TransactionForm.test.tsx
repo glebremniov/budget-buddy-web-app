@@ -3,16 +3,11 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { useIsMobile } from '@/hooks/useIsMobile';
 import { TransactionForm } from './TransactionForm';
 
 const mockToast = vi.fn();
 vi.mock('@/hooks/use-toast', () => ({
   useToast: () => ({ toast: mockToast }),
-}));
-
-vi.mock('@/hooks/useIsMobile', () => ({
-  useIsMobile: vi.fn(() => false),
 }));
 
 const mockCreateTx = { mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false, error: null };
@@ -290,13 +285,5 @@ describe('TransactionForm', () => {
     renderForm({ transaction });
     const editInput = screen.getByPlaceholderText(/Coffee/i);
     expect(editInput).toHaveAttribute('data-autofocus', 'true');
-  });
-
-  it('applies autoFocus on mobile', () => {
-    vi.mocked(useIsMobile).mockReturnValue(true);
-
-    renderForm();
-    const input = screen.getByPlaceholderText(/Coffee/i);
-    expect(input).toHaveAttribute('data-autofocus', 'true');
   });
 });
