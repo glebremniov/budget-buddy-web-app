@@ -175,7 +175,7 @@ export function TransactionForm({
 
   return (
     <>
-      <form onSubmit={handleSubmit} className="space-y-4 ">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="sm:col-span-2 space-y-1">
             <div className="text-xs font-medium text-muted-foreground">
@@ -311,7 +311,7 @@ export function TransactionForm({
             </div>
 
             {isAddingCategory ? (
-              <div className="space-y-1 ">
+              <div className="space-y-1">
                 <Input
                   id="tx-new-category"
                   placeholder="New category name…"
@@ -335,7 +335,7 @@ export function TransactionForm({
                 ) : null}
               </div>
             ) : (
-              <div className="space-y-1 ">
+              <div className="space-y-1">
                 <Select
                   id="tx-category"
                   value={form.categoryId}

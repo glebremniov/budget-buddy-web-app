@@ -8,7 +8,7 @@ export function SettingsPage() {
   const { theme, setTheme, primaryHue, setPrimaryHue, fontSize, setFontSize } = useThemeStore();
 
   return (
-    <div className="space-y-6 ">
+    <div className="space-y-6">
       <PageHeader title="Settings" subtitle="Manage your application appearance and preferences." />
 
       <div className="grid gap-6">

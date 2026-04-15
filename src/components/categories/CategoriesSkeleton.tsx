@@ -4,7 +4,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export function CategoriesSkeleton() {
   return (
-    <div className="space-y-6 ">
+    <div className="space-y-6">
       <PageHeader
         title="Categories"
         subtitle="Manage categories to organize your transactions."

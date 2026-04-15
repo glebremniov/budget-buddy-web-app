@@ -4,7 +4,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export function SettingsSkeleton() {
   return (
-    <div className="space-y-6 ">
+    <div className="space-y-6">
       <PageHeader title="Settings" subtitle="Manage your account and app preferences." />
 
       <Card>
