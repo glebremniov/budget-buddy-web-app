@@ -27,7 +27,6 @@ export interface TransactionFilters {
   start?: string;
   end?: string;
   sort?: 'asc' | 'desc';
-  search?: string;
 }
 
 const KEYS = {
@@ -41,43 +40,9 @@ export const transactionsQueryOptions = (filters: TransactionFilters = {}) =>
   queryOptions({
     queryKey: KEYS.list(filters),
     queryFn: async () => {
-      // API doesn't support search yet, so we implement it client-side
-      const apiFilters = { ...filters };
-      delete apiFilters.search;
-
-      if (filters.search) {
-        // Fetch a larger set to perform local search — fetch up to 200 items
-        const { data, error } = await listTransactions({
-          query: {
-            ...apiFilters,
-            size: 200,
-            page: 0,
-          },
-        });
-        if (error) throw error;
-
-        const term = filters.search.toLowerCase();
-        const filtered = data.items.filter((item) =>
-          item.description?.toLowerCase().includes(term),
-        );
-
-        // Local pagination of filtered results
-        const page = filters.page ?? 0;
-        const size = filters.size ?? 20;
-        const start = page * size;
-        const items = filtered.slice(start, start + size);
-
-        return {
-          items,
-          meta: {
-            total: filtered.length,
-          },
-        };
-      }
-
       const { data, error } = await listTransactions({
         query: {
-          ...apiFilters,
+          ...filters,
           sort: filters.sort ?? 'desc',
         },
       });
@@ -95,15 +60,12 @@ export const infiniteTransactionsQueryOptions = (filters: TransactionFilters = {
     queryKey: KEYS.infinite(filters),
     initialPageParam: 0,
     queryFn: async ({ pageParam }) => {
-      const apiFilters = { ...filters };
-      delete apiFilters.search;
-
       const { data, error } = await listTransactions({
         query: {
-          ...apiFilters,
+          ...filters,
           page: pageParam,
-          size: apiFilters.size ?? 20,
-          sort: apiFilters.sort ?? 'desc',
+          size: filters.size ?? 20,
+          sort: filters.sort ?? 'desc',
         },
       });
       if (error) throw error;

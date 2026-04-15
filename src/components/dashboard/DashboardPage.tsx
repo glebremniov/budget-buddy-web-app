@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAllTransactions } from '@/hooks/useTransactions';
-import { formatCurrency, formatDate } from '@/lib/formatters';
+import { formatCurrency, formatDate, toLocalIsoDate, toLocalYearMonth } from '@/lib/formatters';
 import { useThemeStore } from '@/stores/theme.store';
 
 export function DashboardPage() {
@@ -23,8 +23,8 @@ export function DashboardPage() {
     const now = new Date();
     const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
     return {
-      currentMonth: now.toISOString().slice(0, 7),
-      startDate: sixMonthsAgo.toISOString().split('T')[0] ?? '',
+      currentMonth: toLocalYearMonth(now),
+      startDate: toLocalIsoDate(sixMonthsAgo),
     };
   }, []);
 

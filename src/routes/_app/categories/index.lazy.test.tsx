@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -141,7 +141,6 @@ vi.mock('lucide-react', () => ({
   Filter: () => React.createElement('span', null, 'filter'),
   X: () => React.createElement('span', null, 'x'),
   Check: () => React.createElement('span', null, 'check'),
-  Search: () => React.createElement('span', null, 'search'),
 }));
 
 import { useIsMobile } from '@/hooks/useIsMobile';
@@ -174,7 +173,7 @@ describe('CategoriesPage', () => {
 
   it('shows an empty state message when there are no categories', () => {
     vi.mocked(useCategories).mockReturnValue({
-      data: { items: [], meta: { total: 0, size: 200, page: 0 } },
+      data: { items: [], meta: { total: 0, size: 20, page: 0 } },
       isLoading: false,
     } as unknown as ReturnType<typeof useCategories>);
     renderPage();
@@ -190,7 +189,7 @@ describe('CategoriesPage', () => {
         ],
         meta: {
           total: 2,
-          size: 200,
+          size: 20,
           page: 0,
         },
       },
@@ -203,7 +202,7 @@ describe('CategoriesPage', () => {
 
   it('calls createCategory.mutate when the create form is submitted', async () => {
     vi.mocked(useCategories).mockReturnValue({
-      data: { items: [], meta: { total: 0, size: 200, page: 0 } },
+      data: { items: [], meta: { total: 0, size: 20, page: 0 } },
       isLoading: false,
     } as unknown as ReturnType<typeof useCategories>);
     renderPage();
@@ -221,7 +220,7 @@ describe('CategoriesPage', () => {
 
   it('does not submit create form when input is empty', async () => {
     vi.mocked(useCategories).mockReturnValue({
-      data: { items: [], meta: { total: 0, size: 200, page: 0 } },
+      data: { items: [], meta: { total: 0, size: 20, page: 0 } },
       isLoading: false,
     } as unknown as ReturnType<typeof useCategories>);
     renderPage();
@@ -239,7 +238,7 @@ describe('CategoriesPage', () => {
 
   it('enters edit mode when a category name is clicked', async () => {
     vi.mocked(useCategories).mockReturnValue({
-      data: { items: [{ id: 'cat-1', name: 'Groceries' }], meta: { total: 1, size: 200, page: 0 } },
+      data: { items: [{ id: 'cat-1', name: 'Groceries' }], meta: { total: 1, size: 20, page: 0 } },
       isLoading: false,
     } as unknown as ReturnType<typeof useCategories>);
     renderPage();
@@ -255,7 +254,7 @@ describe('CategoriesPage', () => {
 
   it('calls updateCategory.mutate when the edit form is saved', async () => {
     vi.mocked(useCategories).mockReturnValue({
-      data: { items: [{ id: 'cat-1', name: 'Groceries' }], meta: { total: 1, size: 200, page: 0 } },
+      data: { items: [{ id: 'cat-1', name: 'Groceries' }], meta: { total: 1, size: 20, page: 0 } },
       isLoading: false,
     } as unknown as ReturnType<typeof useCategories>);
     renderPage();
@@ -273,7 +272,7 @@ describe('CategoriesPage', () => {
 
   it('cancels edit mode without mutating when Cancel is clicked', async () => {
     vi.mocked(useCategories).mockReturnValue({
-      data: { items: [{ id: 'cat-1', name: 'Groceries' }], meta: { total: 1, size: 200, page: 0 } },
+      data: { items: [{ id: 'cat-1', name: 'Groceries' }], meta: { total: 1, size: 20, page: 0 } },
       isLoading: false,
     } as unknown as ReturnType<typeof useCategories>);
     renderPage();
@@ -287,33 +286,9 @@ describe('CategoriesPage', () => {
     expect(screen.getByRole('button', { name: 'Groceries' })).toBeInTheDocument();
   });
 
-  it('filters categories when searching', async () => {
-    vi.mocked(useCategories).mockReturnValue({
-      data: {
-        items: [
-          { id: 'cat-1', name: 'Groceries' },
-          { id: 'cat-2', name: 'Transport' },
-        ],
-        meta: { total: 2, size: 200, page: 0 },
-      },
-      isLoading: false,
-    } as unknown as ReturnType<typeof useCategories>);
-    renderPage();
-    const user = userEvent.setup();
-
-    const searchInput = screen.getByPlaceholderText(/search categories/i);
-    await user.type(searchInput, 'Groc');
-
-    expect(searchInput).toHaveValue('Groc');
-
-    await waitFor(() => {
-      expect(useCategories).toHaveBeenCalledWith(expect.any(Number), expect.any(Number), 'Groc');
-    });
-  });
-
   it('calls deleteCategory.mutate when the delete button is clicked and confirmed', async () => {
     vi.mocked(useCategories).mockReturnValue({
-      data: { items: [{ id: 'cat-1', name: 'Groceries' }], meta: { total: 1, size: 200, page: 0 } },
+      data: { items: [{ id: 'cat-1', name: 'Groceries' }], meta: { total: 1, size: 20, page: 0 } },
       isLoading: false,
     } as unknown as ReturnType<typeof useCategories>);
     renderPage();
@@ -343,7 +318,7 @@ describe('CategoriesPage', () => {
     vi.mocked(useCategories).mockReturnValue({
       data: {
         items: [{ id: 'cat-1', name: 'Groceries' }],
-        meta: { total: 1, size: 200, page: 0 },
+        meta: { total: 1, size: 20, page: 0 },
       },
       isLoading: false,
     } as unknown as ReturnType<typeof useCategories>);
@@ -369,7 +344,7 @@ describe('CategoriesPage', () => {
     vi.mocked(useCategories).mockReturnValue({
       data: {
         items: [{ id: 'cat-1', name: 'Groceries' }],
-        meta: { total: 1, size: 200, page: 0 },
+        meta: { total: 1, size: 20, page: 0 },
       },
       isLoading: false,
     } as unknown as ReturnType<typeof useCategories>);

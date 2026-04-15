@@ -1,10 +1,7 @@
-import { RotateCcw, Search } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DatePicker } from '@/components/ui/date-picker';
-import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
-import { useDebounce } from '@/hooks/use-debounce';
 
 interface TransactionFiltersProps {
   categories: { id: string; name: string }[];
@@ -13,7 +10,6 @@ interface TransactionFiltersProps {
     start: string;
     end: string;
     sort: 'asc' | 'desc';
-    search: string;
   };
   onFilterChange: (filters: TransactionFiltersProps['filters']) => void;
   onReset: () => void;
@@ -27,45 +23,11 @@ export function TransactionFilters({
   onReset,
   onClose,
 }: TransactionFiltersProps) {
-  const [searchTerm, setSearchTerm] = useState(filters.search);
-  const [prevSearch, setPrevSearch] = useState(filters.search);
-  const debouncedSearch = useDebounce(searchTerm);
-
-  // Sync local input when the parent resets filters externally (e.g. "Reset All" from parent).
-  // This is the React-recommended "setState during render" pattern for derived state.
-  if (filters.search !== prevSearch) {
-    setSearchTerm(filters.search);
-    setPrevSearch(filters.search);
-  }
-
-  useEffect(() => {
-    if (debouncedSearch !== filters.search) {
-      onFilterChange({ ...filters, search: debouncedSearch });
-    }
-  }, [debouncedSearch, filters, onFilterChange]);
-
   const hasActiveFilters =
-    filters.categoryId || filters.start || filters.end || filters.sort !== 'desc' || filters.search;
+    filters.categoryId || filters.start || filters.end || filters.sort !== 'desc';
 
   return (
     <div className="space-y-4 pt-2">
-      <div className="space-y-2">
-        <label htmlFor="search-filter" className="text-sm font-medium">
-          Search
-        </label>
-        <div className="relative">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            id="search-filter"
-            placeholder="Search transactions…"
-            className="pl-9"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            autoFocus
-          />
-        </div>
-      </div>
-
       <div className="space-y-2">
         <label htmlFor="category-filter" className="text-sm font-medium">
           Category
@@ -125,10 +87,7 @@ export function TransactionFilters({
         <Button
           variant="outline"
           size="sm"
-          onClick={() => {
-            setSearchTerm('');
-            onReset();
-          }}
+          onClick={onReset}
           disabled={!hasActiveFilters}
           className="flex-1"
         >

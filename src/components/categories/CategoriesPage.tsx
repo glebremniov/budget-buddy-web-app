@@ -1,5 +1,5 @@
 import type { Problem } from '@budget-buddy-org/budget-buddy-contracts';
-import { Check, Search, X } from 'lucide-react';
+import { Check, X } from 'lucide-react';
 import { useState } from 'react';
 import { ConfirmationDialog } from '@/components/ConfirmationDialog';
 import { CategoryRow } from '@/components/categories/CategoryRow';
@@ -16,7 +16,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { Pagination } from '@/components/ui/pagination';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useDebounce } from '@/hooks/use-debounce';
 import { useToast } from '@/hooks/use-toast';
 import {
   useCategories,
@@ -29,18 +28,8 @@ const PAGE_SIZE = 20;
 
 export function CategoriesPage() {
   const [page, setPage] = useState(0);
-  const [searchTerm, setSearchTerm] = useState('');
-  const debouncedSearch = useDebounce(searchTerm);
-  // Fetch a larger set when searching (client-side filter); use page size otherwise.
-  const size = debouncedSearch ? 200 : PAGE_SIZE;
-  const { data, isLoading } = useCategories(size, page, debouncedSearch || undefined);
+  const { data, isLoading } = useCategories(PAGE_SIZE, page);
   const total = data?.meta?.total ?? 0;
-
-  const [prevSearch, setPrevSearch] = useState(debouncedSearch);
-  if (debouncedSearch !== prevSearch) {
-    setPage(0);
-    setPrevSearch(debouncedSearch);
-  }
 
   const { toast } = useToast();
   const createCategory = useCreateCategory();
@@ -149,18 +138,6 @@ export function CategoriesPage() {
           onClick: () => setShowForm((v) => !v),
         }}
       />
-
-      <div className="relative">
-        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Search categories…"
-          className="pl-9 text-base"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          autoComplete="off"
-          aria-label="Search categories"
-        />
-      </div>
 
       <Dialog open={showForm} onOpenChange={setShowForm}>
         <DialogContent>
@@ -306,7 +283,7 @@ export function CategoriesPage() {
       </Card>
 
       {!isLoading && categories.length > 0 && (
-        <Pagination page={page} total={total} size={size} onPageChange={setPage} />
+        <Pagination page={page} total={total} size={PAGE_SIZE} onPageChange={setPage} />
       )}
 
       <ConfirmationDialog

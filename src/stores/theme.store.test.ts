@@ -1,0 +1,62 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+type ThemeChangeListener = (event: MediaQueryListEvent) => void;
+
+let mediaQueryMatches = false;
+let changeListener: ThemeChangeListener | null = null;
+
+vi.mock('zustand/middleware', async () => {
+  const actual = await vi.importActual<typeof import('zustand/middleware')>('zustand/middleware');
+  return {
+    ...actual,
+    persist: ((initializer: Parameters<typeof actual.persist>[0]) =>
+      initializer) as typeof actual.persist,
+  };
+});
+
+describe('useThemeStore', () => {
+  beforeEach(() => {
+    vi.resetModules();
+    mediaQueryMatches = false;
+    changeListener = null;
+
+    document.documentElement.classList.remove('dark');
+    document.documentElement.style.removeProperty('--primary-hue');
+    document.documentElement.style.removeProperty('--font-size-base');
+
+    Object.defineProperty(window, 'matchMedia', {
+      configurable: true,
+      writable: true,
+      value: vi.fn().mockImplementation(() => ({
+        matches: mediaQueryMatches,
+        media: '(prefers-color-scheme: dark)',
+        onchange: null,
+        addEventListener: (_event: string, listener: ThemeChangeListener) => {
+          changeListener = listener;
+        },
+        removeEventListener: vi.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
+    });
+  });
+
+  it('applies the current system theme when theme is set to system', async () => {
+    const { useThemeStore } = await import('./theme.store');
+
+    useThemeStore.getState().setTheme('system');
+
+    expect(document.documentElement.classList.contains('dark')).toBe(false);
+  });
+
+  it('updates the document theme when the system theme changes', async () => {
+    const { useThemeStore } = await import('./theme.store');
+
+    useThemeStore.getState().setTheme('system');
+    mediaQueryMatches = true;
+    changeListener?.({ matches: true } as MediaQueryListEvent);
+
+    expect(document.documentElement.classList.contains('dark')).toBe(true);
+  });
+});

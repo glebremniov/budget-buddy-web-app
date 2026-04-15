@@ -37,7 +37,7 @@ const AmountInput = React.forwardRef<HTMLInputElement, AmountInputProps>(
       <Input
         type="text"
         inputMode="decimal"
-        className={cn('text-right font-medium tabular-nums', className)}
+        className={cn('text-right tabular-nums', className)}
         value={displayValue}
         onChange={handleChange}
         ref={ref}
