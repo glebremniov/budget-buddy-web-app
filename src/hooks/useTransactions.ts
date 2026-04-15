@@ -11,7 +11,7 @@ import {
   listTransactions,
   updateTransaction,
 } from '@budget-buddy-org/budget-buddy-contracts';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export interface TransactionFilters {
   page?: number;
@@ -29,8 +29,8 @@ const KEYS = {
   detail: (id: string) => ['transactions', id] as const,
 };
 
-export function useTransactions(filters: TransactionFilters = {}) {
-  return useQuery({
+export const transactionsQueryOptions = (filters: TransactionFilters = {}) =>
+  queryOptions({
     queryKey: KEYS.list(filters),
     queryFn: async () => {
       // API doesn't support search yet, so we implement it client-side
@@ -77,10 +77,13 @@ export function useTransactions(filters: TransactionFilters = {}) {
       return data;
     },
   });
+
+export function useTransactions(filters: TransactionFilters = {}) {
+  return useQuery(transactionsQueryOptions(filters));
 }
 
-export function useAllTransactions(filters: TransactionFilters = {}) {
-  return useQuery({
+export const allTransactionsQueryOptions = (filters: TransactionFilters = {}) =>
+  queryOptions({
     queryKey: [...KEYS.list(filters), 'all'],
     queryFn: async () => {
       let allItems: Transaction[] = [];
@@ -105,10 +108,13 @@ export function useAllTransactions(filters: TransactionFilters = {}) {
       return { items: allItems, meta: { total } };
     },
   });
+
+export function useAllTransactions(filters: TransactionFilters = {}) {
+  return useQuery(allTransactionsQueryOptions(filters));
 }
 
-export function useTransaction(id: string) {
-  return useQuery({
+export const transactionDetailQueryOptions = (id: string) =>
+  queryOptions({
     queryKey: KEYS.detail(id),
     queryFn: async () => {
       const { data, error } = await getTransaction({
@@ -119,6 +125,9 @@ export function useTransaction(id: string) {
     },
     enabled: Boolean(id),
   });
+
+export function useTransaction(id: string) {
+  return useQuery(transactionDetailQueryOptions(id));
 }
 
 export function useCreateTransaction() {

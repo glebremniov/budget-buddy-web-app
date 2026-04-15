@@ -3,6 +3,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { createRouter, RouterProvider } from '@tanstack/react-router';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { RouteLoader } from './components/layout/RouteLoader';
 import { refreshAuth } from './lib/api';
 import { loadConfig } from './lib/config';
 import { queryClient } from './lib/query-client';
@@ -10,7 +11,12 @@ import { routeTree } from './routeTree.gen';
 import { useAuthStore } from './stores/auth.store';
 import './index.css';
 
-const router = createRouter({ routeTree });
+const router = createRouter({
+  routeTree,
+  defaultPendingComponent: RouteLoader,
+  defaultPendingMs: 100,
+  defaultPendingMinMs: 300,
+});
 
 declare module '@tanstack/react-router' {
   interface Register {
