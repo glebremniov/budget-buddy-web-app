@@ -1,3 +1,9 @@
+## [3.4.0](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v3.3.0...v3.4.0) (2026-04-15)
+
+### Features
+
+* update favicon ([c15c601](https://github.com/budget-buddy-org/budget-buddy-web-app/commit/c15c6013c9307bc28c3cef65bbe8ea4a21a9965a))
+
 ## [3.3.0](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v3.2.0...v3.3.0) (2026-04-15)
 
 ### Features
