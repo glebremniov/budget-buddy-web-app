@@ -1,3 +1,9 @@
+## [3.1.1](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v3.1.0...v3.1.1) (2026-04-15)
+
+### Bug Fixes
+
+* **ci:** centralize commit linting and add PR title validation ([#72](https://github.com/budget-buddy-org/budget-buddy-web-app/issues/72)) ([42663d9](https://github.com/budget-buddy-org/budget-buddy-web-app/commit/42663d9413b5957c30efa3accc37d928b9641b1f))
+
 ## [3.1.0](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v3.0.0...v3.1.0) (2026-04-15)
 
 ### Features
