@@ -14,15 +14,15 @@ import { formatCurrency, formatDate, todayIso, toLocalIsoDate } from '@/lib/form
 
 const VISIBLE_COUNT = 5;
 
-// Stable for the session — month boundaries don't shift while the app is open.
-const firstDayOfMonth = toLocalIsoDate(
-  new Date(new Date().getFullYear(), new Date().getMonth(), 1),
-);
-const today = todayIso();
-
 export function DashboardPage() {
   const navigate = useNavigate();
   const [showAll, setShowAll] = useState(false);
+
+  // Computed on each mount so the dashboard never shows stale dates if the app
+  // stays open overnight and the user navigates back after midnight.
+  const now = new Date();
+  const firstDayOfMonth = toLocalIsoDate(new Date(now.getFullYear(), now.getMonth(), 1));
+  const today = todayIso();
 
   const { data: txData, isLoading: txLoading } = useAllTransactions({
     start: firstDayOfMonth,

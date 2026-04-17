@@ -40,8 +40,8 @@ export default defineConfig({
     rolldownOptions: {
       output: {
         manualChunks(id: string) {
-          if (!id.includes('node_modules')) return undefined
-if (id.includes('react-dom') || id.includes('react/') || id.includes('/react.')) {
+          if (!id.includes('node_modules')) return undefined;
+          if (id.includes('react-dom') || id.includes('react/') || id.includes('/react.')) {
             return 'vendor-react'
           }
           if (id.includes('@tanstack/react-query') || id.includes('@tanstack/query-')) {
