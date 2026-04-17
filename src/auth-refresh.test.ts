@@ -1,6 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
 import { useAuthStore } from './stores/auth.store';
 
+vi.mock('@/lib/router', () => ({
+  router: { navigate: vi.fn() },
+}));
+
 // Mocking the router redirect
 vi.mock('@tanstack/react-router', () => ({
   redirect: vi.fn((obj) => obj),

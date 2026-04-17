@@ -1,14 +1,13 @@
 import { client } from '@budget-buddy-org/budget-buddy-contracts/client.gen';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { createRouter, RouterProvider } from '@tanstack/react-router';
+import { RouterProvider } from '@tanstack/react-router';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { RouteLoader } from './components/layout/RouteLoader';
 import { refreshAuth } from './lib/api';
 import { loadConfig } from './lib/config';
 import { logError } from './lib/error-logger';
 import { queryClient } from './lib/query-client';
-import { routeTree } from './routeTree.gen';
+import { router } from './lib/router';
 import { useAuthStore } from './stores/auth.store';
 import './index.css';
 
@@ -20,19 +19,6 @@ window.addEventListener('error', (event) => {
 window.addEventListener('unhandledrejection', (event) => {
   logError(event.reason, { source: 'UnhandledRejection' });
 });
-
-const router = createRouter({
-  routeTree,
-  defaultPendingComponent: RouteLoader,
-  defaultPendingMs: 100,
-  defaultPendingMinMs: 300,
-});
-
-declare module '@tanstack/react-router' {
-  interface Register {
-    router: typeof router;
-  }
-}
 
 const rootEl = document.getElementById('root');
 if (!rootEl) throw new Error('Root element not found');

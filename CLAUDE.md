@@ -48,14 +48,18 @@ Child routes are nested under these layouts by naming convention (`_app/`, `_aut
 
 **Test colocation in routes:** The router plugin is configured with `routeFileIgnorePattern: '\\.test\\.tsx?$'`, so test files (`*.test.tsx`) placed inside `src/routes/` are excluded from the generated route tree. This allows tests to live next to the route file they test.
 
+**Search parameter validation:** `validateSearch` uses explicit `typeof` checks rather than a Zod schema. This is intentional — Zod is not a project dependency, and the schemas are small enough that manual guards are clearer and have zero overhead. Do not add Zod just for URL param validation.
+
 ### API Client
 
 `src/lib/api.ts` configures the OpenAPI Fetch-based client from `@budget-buddy-org/budget-buddy-contracts`. It:
 - Uses `client.setConfig` only in `src/main.tsx` after the configuration is loaded. The `src/lib/api.ts` module only registers interceptors to ensure the global client is correctly configured before first use.
 - Attaches the access token from Zustand to every request via interceptors
-- On 401: queues concurrent requests, attempts a token refresh via `refreshToken()`, then replays queued requests; on refresh failure, clears auth and redirects to `/login`
+- On 401: queues concurrent requests, attempts a token refresh via `refreshToken()`, then replays queued requests; on refresh failure, clears auth and navigates to `/login` via the router (not `window.location.href` — that would discard React Query cache and all in-memory state)
 
 The application uses standalone functional API calls (e.g. `listTransactions`, `createCategory`) exported directly from the contracts package, which share the configured global client.
+
+**Router module:** The router is created in `src/lib/router.ts` (not `main.tsx`) so that `api.ts` can import it for programmatic navigation without creating a circular dependency. `main.tsx` imports the router from there too.
 
 ### Server State
 

@@ -10,6 +10,12 @@ type RefreshTokenResult = Awaited<ReturnType<typeof refreshToken>>;
 
 const mockClientRequest = vi.fn();
 
+const { mockNavigate } = vi.hoisted(() => ({ mockNavigate: vi.fn() }));
+
+vi.mock('@/lib/router', () => ({
+  router: { navigate: mockNavigate },
+}));
+
 vi.mock('@budget-buddy-org/budget-buddy-contracts/client.gen', () => ({
   client: {
     setConfig: vi.fn(),
@@ -63,6 +69,7 @@ function makeRequest(url = 'http://localhost/test'): Request {
 describe('API response interceptor', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockNavigate.mockReset();
     mockAuthState = {
       accessToken: null,
       refreshToken: 'rt-current',
@@ -119,43 +126,21 @@ describe('API response interceptor', () => {
     // where the bootstrap sequence will retry the refresh on reload.
     vi.mocked(refreshToken).mockRejectedValue(new Error('network error'));
 
-    const hrefSetter = vi.fn();
-    Object.defineProperty(window, 'location', {
-      configurable: true,
-      value: {
-        ...window.location,
-        set href(v: string) {
-          hrefSetter(v);
-        },
-      },
-    });
-
     const res = makeResponse(401);
     await responseInterceptor?.(res, makeRequest(), {});
 
     expect(mockAuthState.clearAuth).not.toHaveBeenCalled();
-    expect(hrefSetter).not.toHaveBeenCalled();
+    expect(mockNavigate).not.toHaveBeenCalled();
   });
 
   it('clears auth and redirects to /login when there is no refresh token', async () => {
     mockAuthState.refreshToken = null;
 
-    const hrefSetter = vi.fn();
-    Object.defineProperty(window, 'location', {
-      configurable: true,
-      value: {
-        ...window.location,
-        set href(v: string) {
-          hrefSetter(v);
-        },
-      },
-    });
-
     const res = makeResponse(401);
     await responseInterceptor?.(res, makeRequest(), {});
 
     expect(mockAuthState.clearAuth).toHaveBeenCalled();
-    expect(hrefSetter).toHaveBeenCalledWith('/login');
+    expect(mockNavigate).toHaveBeenCalledWith({ to: '/login' });
   });
 
   it('queues concurrent 401s and replays them once the refresh resolves', async () => {
@@ -202,30 +187,15 @@ describe('API response interceptor', () => {
       error: undefined,
     } as unknown as RefreshTokenResult);
 
-    const hrefSetter = vi.fn();
-    Object.defineProperty(window, 'location', {
-      configurable: true,
-      value: {
-        ...window.location,
-        set href(v: string) {
-          hrefSetter(v);
-        },
-      },
-    });
-
     await responseInterceptor?.(makeResponse(401), makeRequest(), {});
 
     expect(mockAuthState.clearAuth).toHaveBeenCalled();
-    expect(hrefSetter).toHaveBeenCalledWith('/login');
+    expect(mockNavigate).toHaveBeenCalledWith({ to: '/login' });
   });
 
   it('does not leave isRefreshing=true after the no-refresh-token path (regression)', async () => {
     // First 401 with no refresh token — previously left isRefreshing=true
     mockAuthState.refreshToken = null;
-    Object.defineProperty(window, 'location', {
-      configurable: true,
-      value: { ...window.location, set href(_v: string) {} },
-    });
     await responseInterceptor?.(makeResponse(401), makeRequest(), {});
 
     // Second 401 — now has a refresh token; must attempt refresh, not hang
