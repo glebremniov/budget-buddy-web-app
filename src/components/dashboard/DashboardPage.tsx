@@ -93,12 +93,14 @@ export function DashboardPage() {
         <SummaryCard
           label="Income"
           amount={totals.income}
+          currency={currency}
           icon={<ArrowUpRight className="h-4 w-4 text-income" />}
           className="text-income"
         />
         <SummaryCard
           label="Expenses"
           amount={totals.expense}
+          currency={currency}
           icon={<ArrowDownRight className="h-4 w-4 text-expense" />}
           className="text-expense"
         />

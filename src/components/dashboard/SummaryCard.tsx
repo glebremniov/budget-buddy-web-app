@@ -19,11 +19,13 @@ export function CardDescription({
 export function SummaryCard({
   label,
   amount,
+  currency,
   icon,
   className,
 }: {
   label: string;
   amount: number;
+  currency?: string;
   icon: ReactNode;
   className: string;
 }) {
@@ -36,7 +38,7 @@ export function SummaryCard({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <p className={`text-xl font-bold ${className}`}>{formatCurrency(amount)}</p>
+        <p className={`text-xl font-bold ${className}`}>{formatCurrency(amount, currency)}</p>
       </CardContent>
     </Card>
   );

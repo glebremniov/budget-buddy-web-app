@@ -30,10 +30,10 @@ export function applyTheme(theme: Theme, primaryHue: number, fontSize: number) {
   document.documentElement.style.setProperty('--font-size-base', `${fontSize}px`);
 }
 
-let systemThemeListenerAttached = false;
+let systemThemeCleanup: (() => void) | null = null;
 
 function attachSystemThemeListener(getState: () => ThemeState) {
-  if (systemThemeListenerAttached || typeof window === 'undefined' || !window.matchMedia) return;
+  if (systemThemeCleanup || typeof window === 'undefined' || !window.matchMedia) return;
 
   const mediaQuery = window.matchMedia(SYSTEM_THEME_MEDIA);
   const handleSystemThemeChange = () => {
@@ -44,7 +44,12 @@ function attachSystemThemeListener(getState: () => ThemeState) {
   };
 
   mediaQuery.addEventListener('change', handleSystemThemeChange);
-  systemThemeListenerAttached = true;
+  systemThemeCleanup = () => mediaQuery.removeEventListener('change', handleSystemThemeChange);
+}
+
+export function detachSystemThemeListener() {
+  systemThemeCleanup?.();
+  systemThemeCleanup = null;
 }
 
 export const useThemeStore = create<ThemeState>()(
