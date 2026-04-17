@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 import 'vitest-axe/extend-expect';
-import { expect } from 'vitest';
+import { expect, vi } from 'vitest';
 import * as axeMatchers from 'vitest-axe/matchers';
 
 expect.extend(axeMatchers);
@@ -36,3 +36,8 @@ const localStorageMock = (() => {
 })();
 
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
+
+// Mock scrollTo since it's not implemented in JSDOM
+if (typeof window !== 'undefined') {
+  Element.prototype.scrollTo = vi.fn();
+}
