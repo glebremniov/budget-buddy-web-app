@@ -2,6 +2,7 @@ import { Monitor, Moon, Navigation, Palette, RefreshCw, Sun, Type } from 'lucide
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
 import { useThemeStore } from '@/stores/theme.store';
 
 export function SettingsPage() {
@@ -128,22 +129,7 @@ export function SettingsPage() {
                   Display text labels below nav icons on mobile.
                 </p>
               </div>
-              <div className="grid grid-cols-2 gap-2">
-                {[
-                  { value: true, label: 'Show' },
-                  { value: false, label: 'Hide' },
-                ].map((opt) => (
-                  <Button
-                    key={String(opt.value)}
-                    variant={showNavLabels === opt.value ? 'default' : 'outline'}
-                    size="sm"
-                    className="cursor-pointer"
-                    onClick={() => setShowNavLabels(opt.value)}
-                  >
-                    {opt.label}
-                  </Button>
-                ))}
-              </div>
+              <Switch checked={showNavLabels} onCheckedChange={setShowNavLabels} />
             </div>
           </Card>
         </section>
