@@ -1,3 +1,9 @@
+## [3.6.0](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v3.5.3...v3.6.0) (2026-04-17)
+
+### Features
+
+* implement transaction type filter and minor UI fixes ([#78](https://github.com/budget-buddy-org/budget-buddy-web-app/issues/78)) ([b0bc37c](https://github.com/budget-buddy-org/budget-buddy-web-app/commit/b0bc37ce72e89dfc43ef8bbc3d660376690a6334))
+
 ## [3.5.3](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v3.5.2...v3.5.3) (2026-04-17)
 
 ### Bug Fixes
