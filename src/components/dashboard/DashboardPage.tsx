@@ -10,23 +10,52 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useCategories } from '@/hooks/useCategories';
 import { useAllTransactions } from '@/hooks/useTransactions';
 import { getCategoryColor } from '@/lib/categoryColor';
+import { cn } from '@/lib/cn';
 import { formatCurrency, formatDate, todayIso, toLocalIsoDate } from '@/lib/formatters';
 
 const VISIBLE_COUNT = 5;
-
-// Stable for the session — month boundaries don't shift while the app is open.
-const firstDayOfMonth = toLocalIsoDate(
-  new Date(new Date().getFullYear(), new Date().getMonth(), 1),
-);
-const today = todayIso();
+const MONTH_NAMES = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
 
 export function DashboardPage() {
   const navigate = useNavigate();
   const [showAll, setShowAll] = useState(false);
 
+  // Computed on each mount so the dashboard never shows stale dates if the app
+  // stays open overnight and the user navigates back after midnight.
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth();
+
+  const [selectedMonth, setSelectedMonth] = useState(currentMonth);
+
+  const firstDayOfPeriod = toLocalIsoDate(new Date(currentYear, selectedMonth, 1));
+  // For past months use the last day of that month; for the current month use today.
+  const lastDayOfPeriod =
+    selectedMonth === currentMonth
+      ? todayIso()
+      : toLocalIsoDate(new Date(currentYear, selectedMonth + 1, 0));
+
+  const handleMonthSelect = (month: number) => {
+    setSelectedMonth(month);
+    setShowAll(false);
+  };
+
   const { data: txData, isLoading: txLoading } = useAllTransactions({
-    start: firstDayOfMonth,
-    end: today,
+    start: firstDayOfPeriod,
+    end: lastDayOfPeriod,
     sort: 'desc',
   });
   const { data: catData, isLoading: catLoading } = useCategories();
@@ -37,27 +66,35 @@ export function DashboardPage() {
 
     let income = 0;
     let expense = 0;
-    const expenseByCategory: Record<string, number> = {};
+    // Key by categoryId (empty string = no category) to preserve the id for linking.
+    const expenseByCategory: Record<string, { name: string; amount: number }> = {};
 
     for (const t of transactions) {
       if (t.type === 'INCOME') {
         income += t.amount;
       } else {
         expense += t.amount;
+        const catId = t.categoryId ?? '';
         const name = (t.categoryId && categoryMap.get(t.categoryId)) || 'No Category';
-        expenseByCategory[name] = (expenseByCategory[name] ?? 0) + t.amount;
+        const entry = expenseByCategory[catId];
+        if (entry) {
+          entry.amount += t.amount;
+        } else {
+          expenseByCategory[catId] = { name, amount: t.amount };
+        }
       }
     }
 
-    const sorted = Object.entries(expenseByCategory).sort(([, a], [, b]) => b - a);
-    const maxAmount = sorted[0]?.[1] ?? 1; // top bar always fills 100%
+    const sorted = Object.entries(expenseByCategory).sort(([, a], [, b]) => b.amount - a.amount);
+    const maxAmount = sorted[0]?.[1].amount ?? 1; // top bar always fills 100%
 
     return {
       totals: { income, expense },
       balance: income - expense,
-      categoryRows: sorted.map(([name, amount]) => ({
+      categoryRows: sorted.map(([catId, { name, amount }]) => ({
         name,
         amount,
+        categoryId: catId || undefined,
         pct: Math.round((amount / maxAmount) * 100),
       })),
       recent: transactions.slice(0, 8),
@@ -70,9 +107,30 @@ export function DashboardPage() {
   const visibleRows = showAll ? categoryRows : categoryRows.slice(0, VISIBLE_COUNT);
   const hiddenCount = categoryRows.length - VISIBLE_COUNT;
 
+  const periodLabel = `${MONTH_NAMES[selectedMonth]} ${currentYear}`;
+
   return (
     <div className="space-y-6">
-      <PageHeader title="Dashboard" subtitle="Current month summary" />
+      <PageHeader title="Dashboard" subtitle={periodLabel} />
+
+      {/* Month selector — Jan through current month, no future months */}
+      <div className="flex gap-2 overflow-x-auto pb-1">
+        {Array.from({ length: currentMonth + 1 }, (_, i) => i).map((month) => (
+          <button
+            key={month}
+            type="button"
+            onClick={() => handleMonthSelect(month)}
+            className={cn(
+              'shrink-0 rounded-full px-3 py-1 text-sm font-medium transition-colors',
+              selectedMonth === month
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-muted text-muted-foreground hover:text-foreground',
+            )}
+          >
+            {MONTH_NAMES[month]}
+          </button>
+        ))}
+      </div>
 
       {/* Summary cards */}
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
@@ -96,6 +154,7 @@ export function DashboardPage() {
           currency={currency}
           icon={<ArrowUpRight className="h-4 w-4 text-income" />}
           className="text-income"
+          linkSearch={{ type: 'INCOME', start: firstDayOfPeriod, end: lastDayOfPeriod }}
         />
         <SummaryCard
           label="Expenses"
@@ -103,6 +162,7 @@ export function DashboardPage() {
           currency={currency}
           icon={<ArrowDownRight className="h-4 w-4 text-expense" />}
           className="text-expense"
+          linkSearch={{ type: 'EXPENSE', start: firstDayOfPeriod, end: lastDayOfPeriod }}
         />
       </div>
 
@@ -115,7 +175,9 @@ export function DashboardPage() {
         </CardHeader>
         <CardContent className="space-y-3">
           {categoryRows.length === 0 ? (
-            <p className="py-4 text-center text-sm text-muted-foreground">No expenses this month</p>
+            <p className="py-4 text-center text-sm text-muted-foreground">
+              No expenses in {periodLabel}
+            </p>
           ) : (
             <>
               <ul className="space-y-3">
@@ -123,24 +185,35 @@ export function DashboardPage() {
                   const color = getCategoryColor(row.name);
                   return (
                     <li key={row.name}>
-                      <div className="mb-1 flex items-center justify-between">
-                        <div className="mr-2 flex min-w-0 items-center gap-2">
-                          <span
-                            className="h-2 w-2 shrink-0 rounded-full"
-                            style={{ backgroundColor: color }}
-                          />
-                          <span className="truncate text-sm font-medium">{row.name}</span>
+                      <Link
+                        to="/transactions"
+                        search={{
+                          type: 'EXPENSE',
+                          start: firstDayOfPeriod,
+                          end: lastDayOfPeriod,
+                          categoryId: row.categoryId,
+                        }}
+                        className="block -mx-1 rounded-md p-1 transition-colors hover:bg-muted/30"
+                      >
+                        <div className="mb-1 flex items-center justify-between">
+                          <div className="mr-2 flex min-w-0 items-center gap-2">
+                            <span
+                              className="h-2 w-2 shrink-0 rounded-full"
+                              style={{ backgroundColor: color }}
+                            />
+                            <span className="truncate text-sm font-medium">{row.name}</span>
+                          </div>
+                          <span className="shrink-0 text-sm text-muted-foreground">
+                            {formatCurrency(row.amount, currency)}
+                          </span>
                         </div>
-                        <span className="shrink-0 text-sm text-muted-foreground">
-                          {formatCurrency(row.amount, currency)}
-                        </span>
-                      </div>
-                      <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                        <div
-                          className="h-full rounded-full"
-                          style={{ width: `${row.pct}%`, backgroundColor: color }}
-                        />
-                      </div>
+                        <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                          <div
+                            className="h-full rounded-full"
+                            style={{ width: `${row.pct}%`, backgroundColor: color }}
+                          />
+                        </div>
+                      </Link>
                     </li>
                   );
                 })}
@@ -194,7 +267,12 @@ export function DashboardPage() {
                   <button
                     type="button"
                     className="flex w-full cursor-pointer items-center justify-between px-6 py-3 text-left transition-colors hover:bg-muted/30 focus-visible:outline-none"
-                    onClick={() => navigate({ to: '/transactions' })}
+                    onClick={() =>
+                      navigate({
+                        to: '/transactions',
+                        search: { start: firstDayOfPeriod, end: lastDayOfPeriod },
+                      })
+                    }
                   >
                     <div className="min-w-0">
                       <p className="truncate text-sm font-medium">{t.description ?? '—'}</p>

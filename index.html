@@ -13,6 +13,26 @@
     <meta name="theme-color" content="#2563eb" />
     <link rel="manifest" href="/manifest.json" />
     <title>Budget Buddy</title>
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('budget-buddy-theme');
+          if (stored) {
+            var s = JSON.parse(stored).state;
+            var theme = s.theme || 'system';
+            var isDark =
+              theme === 'dark' ||
+              (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            if (isDark) document.documentElement.classList.add('dark');
+            document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
+            if (s.primaryHue !== undefined)
+              document.documentElement.style.setProperty('--primary-hue', s.primaryHue);
+            if (s.fontSize !== undefined)
+              document.documentElement.style.setProperty('--font-size-base', s.fontSize + 'px');
+          }
+        } catch (e) {}
+      })();
+    </script>
     <style>
       :root {
         --primary-hue: 240;

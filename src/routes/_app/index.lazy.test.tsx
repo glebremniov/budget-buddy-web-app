@@ -120,8 +120,6 @@ describe('DashboardPage', () => {
     const transactionItem = screen.getByText('Income this month');
     fireEvent.click(transactionItem);
 
-    expect(mockNavigate).toHaveBeenCalledWith({
-      to: '/transactions',
-    });
+    expect(mockNavigate).toHaveBeenCalledWith(expect.objectContaining({ to: '/transactions' }));
   });
 });
