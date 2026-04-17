@@ -1,10 +1,9 @@
-import { render } from '@testing-library/react';
 import 'vitest-axe/extend-expect';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 import { DashboardPage } from '@/components/dashboard/DashboardPage';
+import { render } from '@/test/utils';
 
 vi.mock('@tanstack/react-router', () => ({
   createLazyFileRoute: () => (options: { component: React.ComponentType }) => ({ options }),
@@ -58,19 +57,7 @@ vi.mock('@/hooks/useTransactions', () => {
 
 describe('DashboardPage a11y', () => {
   it('should have no accessibility violations', async () => {
-    const queryClient = new QueryClient({
-      defaultOptions: {
-        queries: {
-          retry: false,
-        },
-      },
-    });
-
-    const { container } = render(
-      <QueryClientProvider client={queryClient}>
-        <DashboardPage />
-      </QueryClientProvider>,
-    );
+    const { container } = render(<DashboardPage />);
 
     const results = await axe(container);
     expect(results).toHaveNoViolations();

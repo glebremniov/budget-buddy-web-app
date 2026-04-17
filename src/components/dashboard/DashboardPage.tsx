@@ -12,6 +12,7 @@ import { useAllTransactions } from '@/hooks/useTransactions';
 import { getCategoryColor } from '@/lib/categoryColor';
 import { cn } from '@/lib/cn';
 import { formatCurrency, formatDate, todayIso, toLocalIsoDate } from '@/lib/formatters';
+import { useThemeStore } from '@/stores/theme.store';
 
 const VISIBLE_COUNT = 5;
 const MONTH_NAMES = [
@@ -32,6 +33,7 @@ const MONTH_NAMES = [
 export function DashboardPage() {
   const navigate = useNavigate();
   const [showAll, setShowAll] = useState(false);
+  const { glassEffect } = useThemeStore();
 
   // Computed on each mount so the dashboard never shows stale dates if the app
   // stays open overnight and the user navigates back after midnight.
@@ -113,23 +115,29 @@ export function DashboardPage() {
     <div className="space-y-6">
       <PageHeader title="Dashboard" subtitle={periodLabel} />
 
-      {/* Month selector — Jan through current month, no future months */}
-      <div className="flex gap-2 overflow-x-auto pb-1">
-        {Array.from({ length: currentMonth + 1 }, (_, i) => i).map((month) => (
-          <button
-            key={month}
-            type="button"
-            onClick={() => handleMonthSelect(month)}
-            className={cn(
-              'shrink-0 rounded-full px-3 py-1 text-sm font-medium transition-colors',
-              selectedMonth === month
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-muted text-muted-foreground hover:text-foreground',
-            )}
-          >
-            {MONTH_NAMES[month]}
-          </button>
-        ))}
+      {/* Month selector — Jan through current month, wraps on small screens */}
+      <div className="flex flex-wrap gap-2">
+        {Array.from({ length: currentMonth + 1 }, (_, i) => i).map((month) => {
+          const isActive = selectedMonth === month;
+          return (
+            <button
+              key={month}
+              type="button"
+              onClick={() => handleMonthSelect(month)}
+              className={cn(
+                'shrink-0 rounded-full px-3 py-1 text-sm font-medium transition-all outline-none focus-visible:ring-2 focus-visible:ring-primary',
+                isActive
+                  ? cn(
+                      'bg-primary text-primary-foreground shadow-sm',
+                      glassEffect && 'bg-primary/80 backdrop-blur-sm',
+                    )
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground',
+              )}
+            >
+              {MONTH_NAMES[month]}
+            </button>
+          );
+        })}
       </div>
 
       {/* Summary cards */}
