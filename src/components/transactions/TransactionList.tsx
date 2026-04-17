@@ -102,6 +102,7 @@ export function TransactionList({
                 >
                   <button
                     type="button"
+                    aria-label={`Edit transaction: ${t.description ?? 'unnamed'}`}
                     className="min-w-0 flex-1 text-left focus-visible:outline-none cursor-pointer"
                     onClick={() => onEdit?.(t.id)}
                   >

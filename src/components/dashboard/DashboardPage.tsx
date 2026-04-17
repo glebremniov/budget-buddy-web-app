@@ -85,7 +85,7 @@ export function DashboardPage() {
           </CardHeader>
           <CardContent>
             <p className={`text-2xl font-bold ${balance >= 0 ? 'text-income' : 'text-expense'}`}>
-              {formatCurrency(balance)}
+              {formatCurrency(balance, currency)}
             </p>
           </CardContent>
         </Card>

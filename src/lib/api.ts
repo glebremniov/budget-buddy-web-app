@@ -50,6 +50,7 @@ export function refreshAuth() {
         if (!isTransientServerError) {
           useAuthStore.getState().clearAuth();
         }
+        refreshPromise = null;
         flushQueue(new Error('Refresh failed'), null);
         return null;
       }
@@ -100,7 +101,10 @@ client.interceptors.response.use(
       }).then(async (token) => {
         const newHeaders = new Headers(opts.headers as HeadersInit);
         newHeaders.set('Authorization', `Bearer ${token}`);
-        return client.request({ ...opts, headers: newHeaders }).then((r) => r.response);
+        const retryOpts: InternalOptions = { ...opts, _retry: true, headers: newHeaders };
+        return client
+          .request(retryOpts as Parameters<typeof client.request>[0])
+          .then((r) => r.response);
       });
     }
 

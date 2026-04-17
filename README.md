@@ -1,6 +1,6 @@
 # Budget Buddy — Web App
 
-React 19 frontend for the Budget Buddy personal finance app. Features includes transaction tracking with debounced search, category management, and real-time feedback with a global notification system.
+React 19 frontend for the Budget Buddy personal finance app. Features transaction and category management, a monthly spending dashboard with expenses by category, and real-time feedback with a global notification system.
 
 ## Prerequisites
 
@@ -30,7 +30,9 @@ pnpm format       # Biome auto-format
 pnpm test         # Vitest (run once)
 pnpm test:watch   # Vitest (watch mode)
 pnpm test:a11y    # Run accessibility tests
+pnpm test:coverage # HTML coverage report in coverage/
 pnpm type-check   # tsc --noEmit
+pnpm preview      # Preview production build locally
 ```
 
 ## Stack

@@ -238,7 +238,7 @@ describe('CategoriesPage', () => {
     renderPage();
     const user = userEvent.setup();
 
-    await user.click(screen.getByRole('button', { name: 'Groceries' }));
+    await user.click(screen.getByRole('button', { name: 'Edit category: Groceries' }));
 
     // Should now show an input with the category name and Save/Cancel buttons
     expect(screen.getByDisplayValue('Groceries')).toBeInTheDocument();
@@ -254,7 +254,7 @@ describe('CategoriesPage', () => {
     renderPage();
     const user = userEvent.setup();
 
-    await user.click(screen.getByRole('button', { name: 'Groceries' }));
+    await user.click(screen.getByRole('button', { name: 'Edit category: Groceries' }));
 
     const editInput = screen.getByDisplayValue('Groceries');
     await user.clear(editInput);
@@ -272,12 +272,12 @@ describe('CategoriesPage', () => {
     renderPage();
     const user = userEvent.setup();
 
-    await user.click(screen.getByRole('button', { name: 'Groceries' }));
+    await user.click(screen.getByRole('button', { name: 'Edit category: Groceries' }));
     await user.click(screen.getByRole('button', { name: /cancel/i }));
 
     expect(mockUpdateCategory.mutate).not.toHaveBeenCalled();
     // The category name button should be visible again
-    expect(screen.getByRole('button', { name: 'Groceries' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Edit category: Groceries' })).toBeInTheDocument();
   });
 
   it('calls deleteCategory.mutate when the delete button is clicked and confirmed', async () => {

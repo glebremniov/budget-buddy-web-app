@@ -98,7 +98,7 @@ The application uses a runtime configuration pattern to allow environment-specif
 
 ### UI Components
 
-shadcn/ui pattern: Radix UI primitives + Tailwind v4. Shared primitives live in `src/components/ui/`. Layout components (`AppShell`, `Header`, `MobileNav`) are in `src/components/layout/`. Charts use `recharts`. The `@` alias maps to `src/`.
+shadcn/ui pattern: Radix UI primitives + Tailwind v4. Shared primitives live in `src/components/ui/`. Layout components (`AppShell`, `Header`, `MobileNav`) are in `src/components/layout/`. The `@` alias maps to `src/`.
 
 ### Data Conventions
 

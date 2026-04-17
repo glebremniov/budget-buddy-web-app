@@ -16,6 +16,7 @@ export function CategoryRow({
     <li className="flex items-center justify-between px-4 py-3 transition-colors hover:bg-muted/30 cursor-pointer">
       <button
         type="button"
+        aria-label={`Edit category: ${name}`}
         className="flex-1 text-left text-sm font-medium focus-visible:outline-none cursor-pointer"
         onClick={onStartEdit}
       >
