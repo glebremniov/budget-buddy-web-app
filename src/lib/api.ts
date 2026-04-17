@@ -1,5 +1,6 @@
 import { refreshToken as refreshAction } from '@budget-buddy-org/budget-buddy-contracts';
 import { client } from '@budget-buddy-org/budget-buddy-contracts/client.gen';
+import { router } from '@/lib/router';
 import { useAuthStore } from '@/stores/auth.store';
 
 export type InternalOptions = Parameters<typeof client.request>[0] & {
@@ -73,14 +74,6 @@ export function refreshAuth() {
   return refreshPromise;
 }
 
-function shouldRedirectToLogin() {
-  return (
-    typeof window !== 'undefined' &&
-    !window.location.pathname.includes('/login') &&
-    !window.location.pathname.includes('/register')
-  );
-}
-
 // On 401: attempt refresh → retry; on refresh failure → clear auth + redirect to login
 client.interceptors.response.use(
   async (response: Response, _request: Request, options: unknown) => {
@@ -113,8 +106,8 @@ client.interceptors.response.use(
 
     if (!token) {
       const { refreshToken } = useAuthStore.getState();
-      if (!refreshToken && shouldRedirectToLogin()) {
-        window.location.href = '/login';
+      if (!refreshToken) {
+        router.navigate({ to: '/login' });
       }
       return response;
     }
