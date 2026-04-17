@@ -1,3 +1,9 @@
+## [3.8.1](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v3.8.0...v3.8.1) (2026-04-17)
+
+### Bug Fixes
+
+* **auth:** use router.navigate instead of window.location.href on 401 ([#84](https://github.com/budget-buddy-org/budget-buddy-web-app/issues/84)) ([6c2af0b](https://github.com/budget-buddy-org/budget-buddy-web-app/commit/6c2af0b688c3b1db68e5bef27c9164ed6fe87e43))
+
 ## [3.8.0](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v3.7.2...v3.8.0) (2026-04-17)
 
 ### Features
