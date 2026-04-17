@@ -1,3 +1,9 @@
+## [3.7.1](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v3.7.0...v3.7.1) (2026-04-17)
+
+### Bug Fixes
+
+* **ui:** navbar safe area ([#81](https://github.com/budget-buddy-org/budget-buddy-web-app/issues/81)) ([c19c0e9](https://github.com/budget-buddy-org/budget-buddy-web-app/commit/c19c0e905e96ba5ddf9d18f54d0b7e0b6b0219d2))
+
 ## [3.7.0](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v3.6.0...v3.7.0) (2026-04-17)
 
 ### Features
