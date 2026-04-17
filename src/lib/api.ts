@@ -55,14 +55,17 @@ export function refreshAuth() {
       }
 
       useAuthStore.getState().setAuth(data.access_token, data.refresh_token, data.expires_in);
+      // Clear the promise before flushing so any 401s that arrive while the queue
+      // is draining see refreshPromise = null and queue behind a fresh refresh
+      // rather than being silently dropped.
+      refreshPromise = null;
       flushQueue(null, data.access_token);
       return data.access_token;
     } catch (refreshError) {
       // Network-level error (no response): do not clear auth, allow retry on next request.
+      refreshPromise = null;
       flushQueue(refreshError, null);
       return null;
-    } finally {
-      refreshPromise = null;
     }
   })();
 

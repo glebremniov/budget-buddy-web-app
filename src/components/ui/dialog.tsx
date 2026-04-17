@@ -38,10 +38,10 @@ const DialogContent = React.forwardRef<
       className={cn(
         'fixed z-50 grid w-full gap-4 border bg-background p-6 shadow-lg duration-300',
         // Mobile: Bottom Sheet (Default)
-        'bottom-0 left-0 max-w-none rounded-t-xl border-x-0 border-b-0 translate-y-0',
+        'bottom-0 left-0 max-w-none rounded-t-xl border-x-0 border-b-0 translate-y-0 max-h-[90dvh] overflow-y-auto',
         'data-[state=open]:animate-in-bottom-sheet data-[state=closed]:animate-out-bottom-sheet',
         // Desktop: Centered Dialog
-        'sm:bottom-auto sm:left-[50%] sm:top-[50%] sm:max-w-lg sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-lg sm:border sm:data-[state=open]:animate-fade-in sm:data-[state=closed]:animate-fade-out',
+        'sm:bottom-auto sm:left-[50%] sm:top-[50%] sm:max-w-lg sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-lg sm:border sm:max-h-none sm:overflow-y-visible sm:data-[state=open]:animate-fade-in sm:data-[state=closed]:animate-fade-out',
         className,
       )}
       {...props}

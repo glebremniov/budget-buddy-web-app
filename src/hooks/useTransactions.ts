@@ -29,6 +29,12 @@ export interface TransactionFilters {
   sort?: 'asc' | 'desc';
 }
 
+// Client-side "fetch all" limits — the API doesn't support full-text search, so we
+// pull transactions in batches and filter locally. PAGE_SIZE_ALL controls the batch
+// size; MAX_PAGES_ALL is a safety cap so a misconfigured server can't loop forever.
+const PAGE_SIZE_ALL = 200;
+const MAX_PAGES_ALL = 10;
+
 const KEYS = {
   all: ['transactions'] as const,
   list: (filters: TransactionFilters) => ['transactions', 'list', filters] as const,
@@ -97,13 +103,12 @@ export const allTransactionsQueryOptions = (filters: TransactionFilters = {}) =>
       let allItems: Transaction[] = [];
       let page = 0;
       let total = 0;
-      const size = 200;
 
       do {
         const { data, error } = await listTransactions({
           query: {
             ...filters,
-            size,
+            size: PAGE_SIZE_ALL,
             page,
           },
         });
@@ -111,7 +116,7 @@ export const allTransactionsQueryOptions = (filters: TransactionFilters = {}) =>
         allItems = [...allItems, ...data.items];
         total = data.meta.total;
         page++;
-      } while (allItems.length < total && page < 10);
+      } while (allItems.length < total && page < MAX_PAGES_ALL);
 
       return { items: allItems, meta: { total } };
     },
@@ -132,6 +137,9 @@ export const transactionDetailQueryOptions = (id: string) =>
       return data;
     },
     enabled: Boolean(id),
+    // Always fetch fresh data when the edit modal opens so the form
+    // is never pre-populated with stale values from a previous edit.
+    staleTime: 0,
   });
 
 export function useTransaction(id: string) {

@@ -1,7 +1,6 @@
 import { Link, useNavigate } from '@tanstack/react-router';
 import { ArrowDownRight, ArrowUpRight, PlusCircle, Wallet } from 'lucide-react';
-import { useMemo } from 'react';
-import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { lazy, Suspense, useMemo, useState } from 'react';
 import { DashboardSkeleton } from '@/components/dashboard/DashboardSkeleton';
 import { CardDescription, SummaryCard } from '@/components/dashboard/SummaryCard';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -12,8 +11,20 @@ import { useAllTransactions } from '@/hooks/useTransactions';
 import { formatCurrency, formatDate, toLocalIsoDate, toLocalYearMonth } from '@/lib/formatters';
 import { useThemeStore } from '@/stores/theme.store';
 
+// Recharts is large — only load it on desktop where the chart is actually rendered.
+// Mobile users (where the chart is hidden) never download the vendor-recharts chunk.
+const MonthlyChart = lazy(() =>
+  import('@/components/dashboard/MonthlyChart').then((m) => ({ default: m.MonthlyChart })),
+);
+
 export function DashboardPage() {
   const navigate = useNavigate();
+
+  // Initialise once — avoids loading recharts on mobile where the chart is never shown.
+  // No effect needed: this is a client-only SPA and the value won't change between renders.
+  const [isDesktop] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(min-width: 768px)').matches,
+  );
 
   // Subscribe to theme so chart colors update when theme changes
   const resolvedTheme = useThemeStore((s) => s.resolvedTheme());
@@ -112,32 +123,23 @@ export function DashboardPage() {
         />
       </div>
 
-      {/* Chart */}
-      {chartData.length > 0 && (
-        <Card className="hidden md:block">
+      {/* Chart — desktop only; lazy-loaded so mobile never fetches the recharts chunk */}
+      {chartData.length > 0 && isDesktop && (
+        <Card>
           <CardHeader>
             <CardTitle className="text-lg font-semibold" as="h2">
               Monthly overview
             </CardTitle>
           </CardHeader>
           <CardContent className="pl-2">
-            <ResponsiveContainer width="100%" height={180}>
-              <BarChart data={chartData}>
-                <XAxis dataKey="month" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
-                <YAxis tick={{ fontSize: 11 }} tickLine={false} axisLine={false} width={40} />
-                <Tooltip
-                  formatter={(v, name) => [
-                    typeof v === 'number'
-                      ? new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(v)
-                      : v,
-                    name,
-                  ]}
-                  contentStyle={{ fontSize: 12 }}
-                />
-                <Bar dataKey="income" name="Income" fill={incomeColor} radius={[4, 4, 0, 0]} />
-                <Bar dataKey="expense" name="Expenses" fill={expenseColor} radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            <Suspense fallback={null}>
+              <MonthlyChart
+                data={chartData}
+                currency={currency}
+                incomeColor={incomeColor}
+                expenseColor={expenseColor}
+              />
+            </Suspense>
           </CardContent>
         </Card>
       )}
