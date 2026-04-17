@@ -34,7 +34,7 @@ export function Header() {
         <span className="ml-1.5 text-xs font-normal text-muted-foreground">v{__APP_VERSION__}</span>
       </Link>
       <div className="flex items-center gap-1 sm:gap-2">
-        <Link to="/settings" className="hidden md:inline-flex">
+        <Link to="/settings" className="inline-flex">
           <Button
             variant="ghost"
             size="icon"

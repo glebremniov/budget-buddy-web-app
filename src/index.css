@@ -170,3 +170,16 @@ textarea {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+@theme {
+  --easing-spring: linear(
+    0, 0.006, 0.025 2.8%, 0.101 6.1%, 0.539 18.9%, 0.721 25%, 0.849,
+    0.937 38.1%, 0.968 41.1%, 1.022 50.9%, 1.003 60.1%, 1
+  );
+}
+
+.transition-spring {
+  transition-property: transform, opacity, background-color, box-shadow, color;
+  transition-timing-function: var(--easing-spring);
+  transition-duration: 350ms;
+}
