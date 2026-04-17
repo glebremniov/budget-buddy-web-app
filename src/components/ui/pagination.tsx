@@ -24,7 +24,7 @@ export function Pagination({ page, total, size, onPageChange, className }: Pagin
       <div className="flex items-center space-x-2">
         <Button
           variant="outline"
-          size="sm"
+          size="default"
           onClick={() => onPageChange(page - 1)}
           disabled={!canPrevious}
           aria-label="Previous page"
@@ -34,7 +34,7 @@ export function Pagination({ page, total, size, onPageChange, className }: Pagin
         </Button>
         <Button
           variant="outline"
-          size="sm"
+          size="default"
           onClick={() => onPageChange(page + 1)}
           disabled={!canNext}
           aria-label="Next page"

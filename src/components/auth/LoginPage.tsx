@@ -1,4 +1,4 @@
-import type { AuthToken, LoginRequest, Problem } from '@budget-buddy-org/budget-buddy-contracts';
+import type { AuthToken, LoginRequest } from '@budget-buddy-org/budget-buddy-contracts';
 import { loginUser } from '@budget-buddy-org/budget-buddy-contracts';
 import { useMutation } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
@@ -6,6 +6,7 @@ import { LogIn } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { getApiError } from '@/lib/api-error';
 import { useAuthStore } from '@/stores/auth.store';
 
 export function LoginPage() {
@@ -26,8 +27,10 @@ export function LoginPage() {
     },
   });
 
-  const fieldErrors = (login.error as unknown as Problem)?.errors;
+  const fieldErrors = getApiError(login.error)?.errors;
   const getFieldError = (field: string) => fieldErrors?.find((e) => e.field === field)?.message;
+  const usernameError = getFieldError('username');
+  const passwordError = getFieldError('password');
 
   return (
     <div className="space-y-4">
@@ -56,14 +59,12 @@ export function LoginPage() {
             autoComplete="username"
             required
             className={
-              getFieldError('username')
+              usernameError
                 ? 'border-destructive ring-destructive focus-visible:ring-destructive'
                 : ''
             }
           />
-          {getFieldError('username') && (
-            <p className="text-sm font-medium text-destructive">{getFieldError('username')}</p>
-          )}
+          {usernameError && <p className="text-sm font-medium text-destructive">{usernameError}</p>}
         </div>
 
         <div className="space-y-1">
@@ -79,14 +80,12 @@ export function LoginPage() {
             autoComplete="current-password"
             required
             className={
-              getFieldError('password')
+              passwordError
                 ? 'border-destructive ring-destructive focus-visible:ring-destructive'
                 : ''
             }
           />
-          {getFieldError('password') && (
-            <p className="text-sm font-medium text-destructive">{getFieldError('password')}</p>
-          )}
+          {passwordError && <p className="text-sm font-medium text-destructive">{passwordError}</p>}
         </div>
 
         {login.isError && !fieldErrors?.length && (

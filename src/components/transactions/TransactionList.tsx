@@ -91,9 +91,9 @@ export function TransactionList({
       {groupedTransactions.map((group) => (
         <Card key={group.date}>
           <CardContent className="p-0">
-            <div className="bg-muted/30 px-4 py-1.5 text-xs font-semibold text-muted-foreground sticky top-0 z-10 backdrop-blur-sm">
+            <h2 className="bg-muted/30 px-4 py-1.5 text-xs font-semibold text-muted-foreground sticky top-0 z-10 backdrop-blur-sm">
               {formatDate(group.date)}
-            </div>
+            </h2>
             <ul className="divide-y">
               {group.items.map((t) => (
                 <li
@@ -102,14 +102,13 @@ export function TransactionList({
                 >
                   <button
                     type="button"
+                    aria-label={`Edit transaction: ${t.description ?? 'unnamed'}`}
                     className="min-w-0 flex-1 text-left focus-visible:outline-none cursor-pointer"
                     onClick={() => onEdit?.(t.id)}
                   >
                     <p className="truncate text-sm font-medium">{t.description ?? '—'}</p>
                     <p className="text-xs text-muted-foreground">
-                      {categoryMap[t.categoryId ?? '']
-                        ? categoryMap[t.categoryId ?? '']
-                        : 'No Category'}
+                      {(t.categoryId && categoryMap[t.categoryId]) || 'No Category'}
                     </p>
                   </button>
                   <Badge variant={t.type === 'INCOME' ? 'income' : 'expense'}>

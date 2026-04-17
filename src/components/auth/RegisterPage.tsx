@@ -1,4 +1,4 @@
-import type { Problem, RegisterRequest } from '@budget-buddy-org/budget-buddy-contracts';
+import type { RegisterRequest } from '@budget-buddy-org/budget-buddy-contracts';
 import { registerUser } from '@budget-buddy-org/budget-buddy-contracts';
 import { useMutation } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
@@ -6,6 +6,7 @@ import { UserPlus } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { getApiError } from '@/lib/api-error';
 
 export function RegisterPage() {
   const navigate = useNavigate();
@@ -22,8 +23,10 @@ export function RegisterPage() {
     },
   });
 
-  const fieldErrors = (register.error as unknown as Problem)?.errors;
+  const fieldErrors = getApiError(register.error)?.errors;
   const getFieldError = (field: string) => fieldErrors?.find((e) => e.field === field)?.message;
+  const usernameError = getFieldError('username');
+  const passwordError = getFieldError('password');
 
   return (
     <div className="space-y-4">
@@ -54,14 +57,12 @@ export function RegisterPage() {
             maxLength={50}
             required
             className={
-              getFieldError('username')
+              usernameError
                 ? 'border-destructive ring-destructive focus-visible:ring-destructive'
                 : ''
             }
           />
-          {getFieldError('username') && (
-            <p className="text-sm font-medium text-destructive">{getFieldError('username')}</p>
-          )}
+          {usernameError && <p className="text-sm font-medium text-destructive">{usernameError}</p>}
         </div>
 
         <div className="space-y-1">
@@ -78,14 +79,12 @@ export function RegisterPage() {
             minLength={8}
             required
             className={
-              getFieldError('password')
+              passwordError
                 ? 'border-destructive ring-destructive focus-visible:ring-destructive'
                 : ''
             }
           />
-          {getFieldError('password') && (
-            <p className="text-sm font-medium text-destructive">{getFieldError('password')}</p>
-          )}
+          {passwordError && <p className="text-sm font-medium text-destructive">{passwordError}</p>}
         </div>
 
         {register.isError && !fieldErrors?.length && (

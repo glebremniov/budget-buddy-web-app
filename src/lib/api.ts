@@ -50,19 +50,23 @@ export function refreshAuth() {
         if (!isTransientServerError) {
           useAuthStore.getState().clearAuth();
         }
+        refreshPromise = null;
         flushQueue(new Error('Refresh failed'), null);
         return null;
       }
 
       useAuthStore.getState().setAuth(data.access_token, data.refresh_token, data.expires_in);
+      // Clear the promise before flushing so any 401s that arrive while the queue
+      // is draining see refreshPromise = null and queue behind a fresh refresh
+      // rather than being silently dropped.
+      refreshPromise = null;
       flushQueue(null, data.access_token);
       return data.access_token;
     } catch (refreshError) {
       // Network-level error (no response): do not clear auth, allow retry on next request.
+      refreshPromise = null;
       flushQueue(refreshError, null);
       return null;
-    } finally {
-      refreshPromise = null;
     }
   })();
 
@@ -97,7 +101,10 @@ client.interceptors.response.use(
       }).then(async (token) => {
         const newHeaders = new Headers(opts.headers as HeadersInit);
         newHeaders.set('Authorization', `Bearer ${token}`);
-        return client.request({ ...opts, headers: newHeaders }).then((r) => r.response);
+        const retryOpts: InternalOptions = { ...opts, _retry: true, headers: newHeaders };
+        return client
+          .request(retryOpts as Parameters<typeof client.request>[0])
+          .then((r) => r.response);
       });
     }
 

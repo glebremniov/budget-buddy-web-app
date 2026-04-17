@@ -32,6 +32,13 @@ export function ConfirmationDialog({
   variant = 'default',
   isLoading = false,
 }: ConfirmationDialogProps) {
+  const handleConfirm = () => {
+    if (variant === 'destructive' && typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+      navigator.vibrate(50);
+    }
+    onConfirm();
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
@@ -54,7 +61,7 @@ export function ConfirmationDialog({
             type="button"
             variant={variant}
             className="flex-1 sm:flex-none sm:min-w-[100px]"
-            onClick={onConfirm}
+            onClick={handleConfirm}
             loading={isLoading}
           >
             {!isLoading &&
