@@ -61,7 +61,7 @@ The application uses standalone functional API calls (e.g. `listTransactions`, `
 
 TanStack Query v5. All query/mutation logic lives in hooks under `src/hooks/`. Each domain hook file (e.g. `useTransactions.ts`, `useCategories.ts`) exports a `KEYS` object for consistent cache key management, plus hooks for list, detail, create, update, and delete. Delete mutations use optimistic updates with rollback via `onMutate`/`onError`.
 
-- **Client-Side Search:** Since the current API version does not support filtering by search term, search functionality for transactions and categories is implemented on the client side. The `useTransactions` and `useCategories` hooks fetch larger datasets and filter them locally based on the search state.
+- **Dashboard aggregation fetch:** The API has no aggregation endpoint, so `useAllTransactions` fetches up to 2,000 transactions in batches of 200 to calculate monthly totals and chart data client-side. This is intentional and scoped to the Dashboard. The standard paginated `useTransactions` (size=20) is used everywhere else. There is no client-side text search — if search is needed in future it should be added to the API first (`?search=` query param), then wired into the UI.
 
 Global error logging is wired into `QueryCache` and `MutationCache` in `src/lib/query-client.ts` — don't add duplicate error reporting inside individual hooks.
 
