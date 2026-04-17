@@ -1,9 +1,9 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
 import type React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { DashboardPage } from '@/components/dashboard/DashboardPage';
+import { render } from '@/test/utils';
 
 vi.mock('@tanstack/react-router', () => ({
   createLazyFileRoute: () => (options: { component: React.ComponentType }) => ({ options }),
@@ -44,14 +44,6 @@ const mockTransactions = [
 ];
 
 describe('DashboardPage', () => {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: false,
-      },
-    },
-  });
-
   beforeEach(() => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date('2026-04-14'));
@@ -80,11 +72,7 @@ describe('DashboardPage', () => {
       isLoading: false,
     } as ReturnType<typeof useAllTransactions>);
 
-    render(
-      <QueryClientProvider client={queryClient}>
-        <DashboardPage />
-      </QueryClientProvider>,
-    );
+    render(<DashboardPage />);
 
     // Items: 10000 income, 5000 expense. Balance = 50.00
 
@@ -111,11 +99,7 @@ describe('DashboardPage', () => {
       isLoading: false,
     } as ReturnType<typeof useAllTransactions>);
 
-    render(
-      <QueryClientProvider client={queryClient}>
-        <DashboardPage />
-      </QueryClientProvider>,
-    );
+    render(<DashboardPage />);
 
     const transactionItem = screen.getByText('Income this month');
     fireEvent.click(transactionItem);

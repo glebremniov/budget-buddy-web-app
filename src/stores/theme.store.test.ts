@@ -93,4 +93,12 @@ describe('useThemeStore', () => {
     expect(document.documentElement.classList.contains('dark')).toBe(false);
     expect(document.documentElement.style.colorScheme).toBe('light');
   });
+
+  it('toggles showNavLabels', async () => {
+    const { useThemeStore } = await import('./theme.store');
+
+    expect(useThemeStore.getState().showNavLabels).toBe(true);
+    useThemeStore.getState().setShowNavLabels(false);
+    expect(useThemeStore.getState().showNavLabels).toBe(false);
+  });
 });

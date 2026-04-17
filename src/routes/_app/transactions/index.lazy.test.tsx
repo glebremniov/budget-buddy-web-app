@@ -1,9 +1,9 @@
 import type { Transaction } from '@budget-buddy-org/budget-buddy-contracts';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
 import type React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TransactionsPage } from '@/components/transactions/TransactionsPage';
+import { render } from '@/test/utils';
 
 const mockNavigate = vi.fn();
 
@@ -51,14 +51,6 @@ import { useCategories } from '@/hooks/useCategories';
 import { useTransaction, useTransactions } from '@/hooks/useTransactions';
 
 describe('TransactionsPage', () => {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: false,
-      },
-    },
-  });
-
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(useCategories).mockReturnValue({
@@ -104,11 +96,7 @@ describe('TransactionsPage', () => {
       isLoading: false,
     } as unknown as ReturnType<typeof useTransaction>);
 
-    render(
-      <QueryClientProvider client={queryClient}>
-        <TransactionsPage />
-      </QueryClientProvider>,
-    );
+    render(<TransactionsPage />);
 
     const transactionItem = screen.getByText('Test Transaction');
     fireEvent.click(transactionItem);
@@ -118,11 +106,7 @@ describe('TransactionsPage', () => {
   });
 
   it('opens add dialog when clicking Add button', async () => {
-    render(
-      <QueryClientProvider client={queryClient}>
-        <TransactionsPage />
-      </QueryClientProvider>,
-    );
+    render(<TransactionsPage />);
 
     const addButtons = screen.getAllByRole('button', { name: /add/i });
     fireEvent.click(addButtons[0]);

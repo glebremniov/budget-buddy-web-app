@@ -1,10 +1,10 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
 import 'vitest-axe/extend-expect';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { axe } from 'vitest-axe';
 import { TransactionsPage } from '@/components/transactions/TransactionsPage';
+import { render } from '@/test/utils';
 
 vi.mock('@tanstack/react-router', () => ({
   createLazyFileRoute: () => (options: { component: React.ComponentType }) => ({ options }),
@@ -63,31 +63,15 @@ vi.mock('@/hooks/useTransactions', () => ({
 }));
 
 describe('TransactionsPage a11y', () => {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: false,
-      },
-    },
-  });
-
   it('should have no accessibility violations', async () => {
-    const { container } = render(
-      <QueryClientProvider client={queryClient}>
-        <TransactionsPage />
-      </QueryClientProvider>,
-    );
+    const { container } = render(<TransactionsPage />);
 
     const results = await axe(container);
     expect(results).toHaveNoViolations();
   });
 
   it('should have no accessibility violations when filters dialog is open', async () => {
-    render(
-      <QueryClientProvider client={queryClient}>
-        <TransactionsPage />
-      </QueryClientProvider>,
-    );
+    render(<TransactionsPage />);
 
     // Open filters dialog
     const filterButton = screen.getByLabelText(/toggle filters/i);
