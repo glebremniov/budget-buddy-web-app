@@ -1,6 +1,8 @@
+import { Link } from '@tanstack/react-router';
 import type { ReactNode } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { formatCurrency } from '@/lib/formatters';
+import type { TransactionSearch } from '@/routes/_app/transactions/index';
 
 export function CardDescription({
   className,
@@ -22,15 +24,21 @@ export function SummaryCard({
   currency,
   icon,
   className,
+  linkSearch,
 }: {
   label: string;
   amount: number;
   currency?: string;
   icon: ReactNode;
   className: string;
+  linkSearch?: TransactionSearch;
 }) {
-  return (
-    <Card>
+  const card = (
+    <Card
+      className={
+        linkSearch ? 'h-full cursor-pointer transition-colors hover:bg-muted/30' : undefined
+      }
+    >
       <CardHeader className="pb-2">
         <CardDescription className="flex items-center gap-1">
           {icon}
@@ -42,4 +50,13 @@ export function SummaryCard({
       </CardContent>
     </Card>
   );
+
+  if (linkSearch) {
+    return (
+      <Link to="/transactions" search={linkSearch} className="block h-full">
+        {card}
+      </Link>
+    );
+  }
+  return card;
 }
