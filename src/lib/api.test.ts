@@ -137,7 +137,7 @@ describe('API response interceptor', () => {
     mockAuthState.refreshToken = null;
 
     const res = makeResponse(401);
-    await responseInterceptor?.(res, makeRequest(), {});
+    await expect(responseInterceptor?.(res, makeRequest(), {})).rejects.toThrow('Session expired');
 
     expect(mockAuthState.clearAuth).toHaveBeenCalled();
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/login' });
@@ -187,7 +187,9 @@ describe('API response interceptor', () => {
       error: undefined,
     } as unknown as RefreshTokenResult);
 
-    await responseInterceptor?.(makeResponse(401), makeRequest(), {});
+    await expect(responseInterceptor?.(makeResponse(401), makeRequest(), {})).rejects.toThrow(
+      'Session expired',
+    );
 
     expect(mockAuthState.clearAuth).toHaveBeenCalled();
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/login' });
@@ -196,7 +198,9 @@ describe('API response interceptor', () => {
   it('does not leave isRefreshing=true after the no-refresh-token path (regression)', async () => {
     // First 401 with no refresh token — previously left isRefreshing=true
     mockAuthState.refreshToken = null;
-    await responseInterceptor?.(makeResponse(401), makeRequest(), {});
+    await expect(responseInterceptor?.(makeResponse(401), makeRequest(), {})).rejects.toThrow(
+      'Session expired',
+    );
 
     // Second 401 — now has a refresh token; must attempt refresh, not hang
     mockAuthState.refreshToken = 'rt-valid';

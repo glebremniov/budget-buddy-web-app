@@ -83,7 +83,8 @@ client.interceptors.response.use(
       opts._retry ||
       opts._isRefresh ||
       opts.url?.includes('/auth/login') ||
-      opts.url?.includes('/auth/register')
+      opts.url?.includes('/auth/register') ||
+      opts.url?.includes('/auth/logout')
     ) {
       return response;
     }
@@ -108,6 +109,9 @@ client.interceptors.response.use(
       const { refreshToken } = useAuthStore.getState();
       if (!refreshToken) {
         router.navigate({ to: '/login' });
+        // Throw so the caller's promise rejects instead of processing the stale 401.
+        // The component is about to unmount due to navigation, so this is safe.
+        throw new Error('Session expired');
       }
       return response;
     }
