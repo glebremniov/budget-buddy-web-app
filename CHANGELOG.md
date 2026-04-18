@@ -1,3 +1,9 @@
+## [3.8.2](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v3.8.1...v3.8.2) (2026-04-18)
+
+### Bug Fixes
+
+* **ui:** comprehensive code review fixes for React 19 and Tailwind v4 ([#86](https://github.com/budget-buddy-org/budget-buddy-web-app/issues/86)) ([7570b13](https://github.com/budget-buddy-org/budget-buddy-web-app/commit/7570b13de2fe37c8bafa02525ed32dc5df30cb1c))
+
 ## [3.8.1](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v3.8.0...v3.8.1) (2026-04-17)
 
 ### Bug Fixes
