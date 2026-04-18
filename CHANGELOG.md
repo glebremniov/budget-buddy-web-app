@@ -1,3 +1,9 @@
+## [3.9.0](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v3.8.3...v3.9.0) (2026-04-18)
+
+### Features
+
+* add PWA service worker for offline support and install prompt ([#89](https://github.com/budget-buddy-org/budget-buddy-web-app/issues/89)) ([38885c7](https://github.com/budget-buddy-org/budget-buddy-web-app/commit/38885c76ef7bdfe2b3e0459f36feab8001e76e90))
+
 ## [3.8.3](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v3.8.2...v3.8.3) (2026-04-18)
 
 ### Bug Fixes
