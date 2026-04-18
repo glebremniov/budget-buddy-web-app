@@ -1,3 +1,9 @@
+## [3.8.3](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v3.8.2...v3.8.3) (2026-04-18)
+
+### Bug Fixes
+
+* improve auth flows ([#87](https://github.com/budget-buddy-org/budget-buddy-web-app/issues/87)) ([0cec966](https://github.com/budget-buddy-org/budget-buddy-web-app/commit/0cec966162dfc0b37dfc170420dabcdb00005818))
+
 ## [3.8.2](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v3.8.1...v3.8.2) (2026-04-18)
 
 ### Bug Fixes
