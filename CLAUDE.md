@@ -55,7 +55,8 @@ Child routes are nested under these layouts by naming convention (`_app/`, `_aut
 `src/lib/api.ts` configures the OpenAPI Fetch-based client from `@budget-buddy-org/budget-buddy-contracts`. It:
 - Uses `client.setConfig` only in `src/main.tsx` after the configuration is loaded. The `src/lib/api.ts` module only registers interceptors to ensure the global client is correctly configured before first use.
 - Attaches the access token from Zustand to every request via interceptors
-- On 401: queues concurrent requests, attempts a token refresh via `refreshToken()`, then replays queued requests; on refresh failure, clears auth and navigates to `/login` via the router (not `window.location.href` — that would discard React Query cache and all in-memory state)
+- On 401: queues concurrent requests, attempts a token refresh via `refreshToken()`, then replays queued requests; on refresh failure, clears auth, navigates to `/login` via the router (not `window.location.href` — that would discard React Query cache and all in-memory state), and throws `"Session expired"` so callers don't process the stale 401 response
+- Auth endpoints (`/auth/login`, `/auth/register`, `/auth/logout`) are excluded from 401 interception to avoid wasteful refresh attempts
 
 The application uses standalone functional API calls (e.g. `listTransactions`, `createCategory`) exported directly from the contracts package, which share the configured global client.
 
@@ -77,7 +78,9 @@ Two Zustand stores:
 - `src/stores/auth.store.ts` — persists `refreshToken` + `refreshTokenObtainedAt` to `localStorage` (`budget-buddy-auth`). `accessToken` and `accessTokenExpiresAt` are memory-only. The store tracks expiration via the `expires_in` field from the API.
 - `src/stores/theme.store.ts` — persists `theme` (`light`|`dark`|`system`), `primaryHue` (0-360), and `fontSize` (12-24) to `localStorage` (`budget-buddy-theme`). Applies CSS variables to `:root` on rehydration.
 
-`useTabVisibilityRefresh` (mounted in `_app.tsx`) proactively refreshes the auth token on tab focus when the refresh token is older than 6 days, preventing expiry mid-session.
+`useTabVisibilityRefresh` (mounted in `_app.tsx`) proactively refreshes the auth token on tab focus when the refresh token is older than 6 days or the access token has expired, preventing expiry mid-session.
+
+**Zustand selectors:** Always use selectors when subscribing to stores (e.g. `useThemeStore((s) => s.glassEffect)` instead of `useThemeStore()`). Subscribing to the entire store causes unnecessary re-renders in every consuming component.
 
 ### Version Updates
 
@@ -98,11 +101,20 @@ The application uses a runtime configuration pattern to allow environment-specif
 
 - **Error Boundaries:** Use `src/components/ErrorBoundary.tsx` to wrap UI components. The default fallback shows a generic message and a toggle for technical details (`error.message` and `error.stack`).
 - **Route Errors:** Use the `errorComponent` property in TanStack Router route definitions (e.g., `src/routes/_app.tsx`). Similar to the Error Boundary, it should provide a generic message with toggleable details.
-- **Logging:** All errors caught by boundaries or route components are logged via `src/lib/error-logger.ts`. Global Query/Mutation errors are handled in `src/lib/query-client.ts`.
+- **Logging:** All errors caught by boundaries or route components are logged via `src/lib/error-logger.ts`. Global Query/Mutation errors are handled in `src/lib/query-client.ts`. Global `error` and `unhandledrejection` listeners in `src/main.tsx` are guarded with `import.meta.hot.dispose()` to prevent duplicate handlers during HMR.
+- **`getApiError()`** in `src/lib/api-error.ts` uses discriminant checks (`'status' in error || 'title' in error`) to safely distinguish API Problem objects from plain `Error` instances.
 
 ### UI Components
 
 shadcn/ui pattern: Radix UI primitives + Tailwind v4. Shared primitives live in `src/components/ui/`. Layout components (`AppShell`, `Header`, `MobileNav`) are in `src/components/layout/`. The `@` alias maps to `src/`.
+
+**Component conventions:**
+- **No `forwardRef`:** React 19 passes `ref` as a regular prop. All UI components accept `ref` directly in their props type (e.g. `ref?: React.Ref<HTMLInputElement>`). Do not use `React.forwardRef`.
+- **`error` prop:** `Input`, `Select`, `AmountInput`, and `DatePicker` accept an `error?: boolean` prop that applies destructive border/ring styles. Use `error={!!fieldError}` instead of conditional classNames.
+- **`size-N` shorthand:** Use Tailwind v4's `size-4` instead of `h-4 w-4` for simultaneous width + height.
+- **Custom animations:** Defined as `@theme` tokens (`--animate-fade-in`, `--animate-in-bottom-sheet`, etc.) in `src/index.css`. Custom utilities use the `@utility` directive. Do not add raw `@keyframes` or `.animate-*` classes.
+- **Accessibility:** Segmented controls use `role="tablist"` / `role="tab"` / `aria-selected`. Sheet animations respect `prefers-reduced-motion`.
+- **Dark mode colors:** `getCategoryColor()` in `src/lib/categoryColor.ts` uses CSS `light-dark()` for automatic theme adaptation.
 
 ### Data Conventions
 
@@ -130,6 +142,8 @@ Vitest + Testing Library, jsdom environment. Setup file at `src/test/setup.ts` p
 ### Linting / Formatting
 
 Biome handles both lint and format (single quotes, 2-space indent, 100 char line width). ESLint is used for React-specific rules (purity, hooks, Fast Refresh). The `pnpm lint` command runs both tools. Run it before committing.
+
+**`import type` convention:** When a module only uses React for type annotations (e.g. `React.Ref`, `React.HTMLAttributes`), use `import type * as React from 'react'` instead of `import * as React from 'react'`. Biome enforces this.
 
 ### Commits and Releases
 

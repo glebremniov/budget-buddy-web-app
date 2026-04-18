@@ -15,7 +15,7 @@ export function useLogout() {
     onError: () => {
       toast({
         title: 'Sign out failed',
-        description: 'Could not reach the server. You have been signed out locally.',
+        description: 'Something went wrong. You have been signed out locally.',
         variant: 'destructive',
       });
     },
