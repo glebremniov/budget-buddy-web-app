@@ -3,9 +3,11 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { RouterProvider } from '@tanstack/react-router';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { AuthProvider } from 'react-oidc-context';
 import { refreshAuth } from './lib/api';
 import { loadConfig } from './lib/config';
 import { logError } from './lib/error-logger';
+import { getOidcConfig, onOidcSigninCallback } from './lib/oidc';
 import { queryClient } from './lib/query-client';
 import { router } from './lib/router';
 import { useAuthStore } from './stores/auth.store';
@@ -32,6 +34,8 @@ if (!rootEl) throw new Error('Root element not found');
 // Bootstrapping: Load runtime config, update the API client, then render the app.
 loadConfig()
   .then(async (config) => {
+    const oidcConfig = getOidcConfig();
+
     client.setConfig({
       baseUrl: config.VITE_API_URL,
       auth: () => useAuthStore.getState().accessToken ?? undefined,
@@ -50,9 +54,11 @@ loadConfig()
 
     createRoot(rootEl).render(
       <StrictMode>
-        <QueryClientProvider client={queryClient}>
-          <RouterProvider router={router} />
-        </QueryClientProvider>
+        <AuthProvider {...oidcConfig} onSigninCallback={onOidcSigninCallback}>
+          <QueryClientProvider client={queryClient}>
+            <RouterProvider router={router} />
+          </QueryClientProvider>
+        </AuthProvider>
       </StrictMode>,
     );
   })
