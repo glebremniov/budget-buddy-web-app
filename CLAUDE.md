@@ -38,9 +38,8 @@ pnpm test:a11y       # Run accessibility tests
 
 TanStack Router v1 with file-based routing. Routes live in `src/routes/`. The route tree is auto-generated into `src/routeTree.gen.ts` by the Vite plugin — never edit that file by hand.
 
-Two layout routes act as auth guards:
-- `_app.tsx` — requires authentication (`isAuthenticated()`); redirects to `/login` if not. Wraps pages in `AppShell` and mounts `useTabVisibilityRefresh`.
-- `_auth.tsx` — redirects already-authenticated users to `/`.
+One layout route acts as an auth guard:
+- `_app.tsx` — requires authentication; delegates to `ProtectedAppLayout` which calls `useAuth()` from `react-oidc-context` and triggers `signinRedirect()` if the user is not authenticated.
 
 Child routes are nested under these layouts by naming convention (`_app/`, `_auth/`).
 
@@ -53,10 +52,10 @@ Child routes are nested under these layouts by naming convention (`_app/`, `_aut
 ### API Client
 
 `src/lib/api.ts` configures the OpenAPI Fetch-based client from `@budget-buddy-org/budget-buddy-contracts`. It:
-- Uses `client.setConfig` only in `src/main.tsx` after the configuration is loaded. The `src/lib/api.ts` module only registers interceptors to ensure the global client is correctly configured before first use.
-- Attaches the access token from Zustand to every request via interceptors
-- On 401: queues concurrent requests, attempts a token refresh via `refreshToken()`, then replays queued requests; on refresh failure, clears auth, navigates to `/login` via the router (not `window.location.href` — that would discard React Query cache and all in-memory state), and throws `"Session expired"` so callers don't process the stale 401 response
-- Auth endpoints (`/auth/login`, `/auth/register`, `/auth/logout`) are excluded from 401 interception to avoid wasteful refresh attempts
+- Uses `client.setConfig` in `src/main.tsx` after `loadConfig()` resolves, setting only `baseUrl`.
+- Exports `getAuthToken()` — a request interceptor helper that reads the current OIDC user via `getUserManager().getUser()` and proactively calls `signinSilent()` when the token expires within 60 seconds.
+- On 401: triggers `getUserManager().signinRedirect()` to re-authenticate. All `/auth/*` paths are excluded from this behaviour to prevent redirect loops on the callback route.
+- Auth-related redirects (`signinRedirect`, `signoutRedirect`) are handled by the OIDC SDK; no manual router navigation is needed.
 
 The application uses standalone functional API calls (e.g. `listTransactions`, `createCategory`) exported directly from the contracts package, which share the configured global client.
 
@@ -74,11 +73,12 @@ Default query `staleTime` is 1 minute; `retry` is 1.
 
 ### Auth State
 
-Two Zustand stores:
-- `src/stores/auth.store.ts` — persists `refreshToken` + `refreshTokenObtainedAt` to `localStorage` (`budget-buddy-auth`). `accessToken` and `accessTokenExpiresAt` are memory-only. The store tracks expiration via the `expires_in` field from the API.
-- `src/stores/theme.store.ts` — persists `theme` (`light`|`dark`|`system`), `primaryHue` (0-360), and `fontSize` (12-24) to `localStorage` (`budget-buddy-theme`). Applies CSS variables to `:root` on rehydration.
+The application uses `react-oidc-context` and `oidc-client-ts` for authentication.
+- **Zitadel OIDC:** Manages tokens internally with memory storage and silent renewal.
+- **UserManager:** Shared instance exported from `src/lib/oidc.ts` for accessing auth state outside of React components.
+- **ProtectedAppLayout:** Component that guards routes and handles OIDC login redirection.
 
-`useTabVisibilityRefresh` (mounted in `_app.tsx`) proactively refreshes the auth token on tab focus when the refresh token is older than 6 days or the access token has expired, preventing expiry mid-session.
+- `src/stores/theme.store.ts` — persists `theme` (`light`|`dark`|`system`), `primaryHue` (0-360), and `fontSize` (12-24) to `localStorage` (`budget-buddy-theme`). Applies CSS variables to `:root` on rehydration.
 
 **Zustand selectors:** Always use selectors when subscribing to stores (e.g. `useThemeStore((s) => s.glassEffect)` instead of `useThemeStore()`). Subscribing to the entire store causes unnecessary re-renders in every consuming component.
 

@@ -16,9 +16,14 @@ React 19 frontend for the Budget Buddy personal finance app. Features transactio
 echo "//npm.pkg.github.com/:_authToken=ghp_<your-token>" >> ~/.npmrc
 
 pnpm install
-cp .env.example .env.local   # set VITE_API_URL if needed
+cp .env.example .env.local   # set VITE_API_URL and OIDC vars
 pnpm dev                      # http://localhost:5173
 ```
+
+Required OIDC environment variables:
+
+- `VITE_OIDC_ISSUER` — OIDC issuer URL (e.g. your Zitadel issuer)
+- `VITE_OIDC_CLIENT_ID` — frontend SPA client ID
 
 ## Commands
 
@@ -58,11 +63,15 @@ docker build \
   -t budget-buddy-web-app .
 
 # Run locally with Docker Compose (app available at http://localhost:3000)
-# VITE_API_URL is injected into the container at runtime
-GITHUB_TOKEN=$(gh auth token) VITE_API_URL=http://localhost:8080 docker compose up --build
+# VITE_API_URL and OIDC vars are injected into the container at runtime
+GITHUB_TOKEN=$(gh auth token) \
+VITE_API_URL=http://localhost:8080 \
+VITE_OIDC_ISSUER=https://issuer.example.com \
+VITE_OIDC_CLIENT_ID=web-client \
+docker compose up --build
 ```
 
-`VITE_API_URL` is injected into the container at runtime — no need to rebuild the image when the API URL changes.
+`VITE_API_URL`, `VITE_OIDC_ISSUER`, and `VITE_OIDC_CLIENT_ID` are injected into the container at runtime — no need to rebuild the image when these values change.
 
 Pre-built images are published to `ghcr.io/budget-buddy-org/budget-buddy-web-app` on every merge to `main` and every GitHub Release.
 

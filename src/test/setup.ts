@@ -5,6 +5,10 @@ import * as axeMatchers from 'vitest-axe/matchers';
 
 expect.extend(axeMatchers);
 
+// Mock OIDC environment variables for tests
+vi.stubEnv('VITE_OIDC_ISSUER', 'https://auth.example.com');
+vi.stubEnv('VITE_OIDC_CLIENT_ID', 'test-client-id');
+
 declare module 'vitest' {
   export interface Assertion<T> extends axeMatchers.AxeMatchers {
     _branded?: T;
