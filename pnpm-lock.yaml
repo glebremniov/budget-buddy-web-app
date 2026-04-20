@@ -2656,9 +2656,9 @@ packages:
     resolution: {integrity: sha512-Qohcme7V1inbAfvjItgw0EaxVX5q2rdVEZHRBrEQdRZTssLDGsL8Lwrznl8oQ/6kuTJONLaDcGjkNP247XEhcA==}
     engines: {node: '>=10.13.0'}
 
-  entities@6.0.1:
-    resolution: {integrity: sha512-aN97NXWF6AWBTahfVOIrB/NShkzi5H7F9r1s9mD3cDj4Ko5f2qhhVoYMibXF7GlLveb/D2ioWay8lxI97Ven3g==}
-    engines: {node: '>=0.12'}
+  entities@8.0.0:
+    resolution: {integrity: sha512-zwfzJecQ/Uej6tusMqwAqU/6KL2XaB2VZ2Jg54Je6ahNBGNH6Ek6g3jjNCF0fG9EWQKGZNddNjU5F1ZQn/sBnA==}
+    engines: {node: '>=20.19.0'}
 
   env-ci@11.2.0:
     resolution: {integrity: sha512-D5kWfzkmaOQDioPmiviWAVtKmpPT4/iJmMVQxWxMPJTFyTkdc5JQUfc5iXEeWxcOdsYTKSAiA/Age4NUOqKsRA==}
@@ -3922,8 +3922,8 @@ packages:
   parse5@6.0.1:
     resolution: {integrity: sha512-Ofn/CTFzRGTTxwpNEs9PP93gXShHcTq255nzRYSKe8AkVpZY7e1fpmTfOyoIvjP5HG7Z2ZM7VS9PPhQGW2pOpw==}
 
-  parse5@8.0.0:
-    resolution: {integrity: sha512-9m4m5GSgXjL4AjumKzq1Fgfp3Z8rsvjRNbnkVwfu2ImRqE5D0LnY2QfDen18FSY9C573YU5XxSapdHZTZ2WolA==}
+  parse5@8.0.1:
+    resolution: {integrity: sha512-z1e/HMG90obSGeidlli3hj7cbocou0/wa5HacvI3ASx34PecNjNQeaHNo5WIZpWofN9kgkqV1q5YvXe3F0FoPw==}
 
   path-exists@3.0.0:
     resolution: {integrity: sha512-bpC7GYwiDYQ4wYLe+FA8lhRjhQCMcQGuSgGGqDkg/QerRWw9CmGRT0iSOVRSZJ29NMLZgIzqaljJ63oaL4NIJQ==}
@@ -4177,8 +4177,8 @@ packages:
     engines: {node: '>=10.0.0'}
     hasBin: true
 
-  safe-array-concat@1.1.3:
-    resolution: {integrity: sha512-AURm5f0jYEOydBj7VQlVvDrjeFgthDdEF5H1dP+6mNpoXOMo1quQqJ4wvJDyRZ9+pO3kGWoOdmV08cSv2aJV6Q==}
+  safe-array-concat@1.1.4:
+    resolution: {integrity: sha512-wtZlHyOje6OZTGqAoaDKxFkgRtkF9CnHAVnCHKfuj200wAgL+bSJhdsCD2l0Qx/2ekEXjPWcyKkfGb5CPboslg==}
     engines: {node: '>=0.4'}
 
   safe-buffer@5.1.2:
@@ -7626,7 +7626,7 @@ snapshots:
       graceful-fs: 4.2.11
       tapable: 2.3.2
 
-  entities@6.0.1: {}
+  entities@8.0.0: {}
 
   env-ci@11.2.0:
     dependencies:
@@ -7683,7 +7683,7 @@ snapshots:
       object.assign: 4.1.7
       own-keys: 1.0.1
       regexp.prototype.flags: 1.5.4
-      safe-array-concat: 1.1.3
+      safe-array-concat: 1.1.4
       safe-push-apply: 1.0.0
       safe-regex-test: 1.1.0
       set-proto: 1.0.0
@@ -8434,7 +8434,7 @@ snapshots:
       html-encoding-sniffer: 6.0.0
       is-potential-custom-element-name: 1.0.1
       lru-cache: 11.3.5
-      parse5: 8.0.0
+      parse5: 8.0.1
       saxes: 6.0.0
       symbol-tree: 3.2.4
       tough-cookie: 6.0.1
@@ -8845,9 +8845,9 @@ snapshots:
 
   parse5@6.0.1: {}
 
-  parse5@8.0.0:
+  parse5@8.0.1:
     dependencies:
-      entities: 6.0.1
+      entities: 8.0.0
 
   path-exists@3.0.0: {}
 
@@ -9112,7 +9112,7 @@ snapshots:
     optionalDependencies:
       fsevents: 2.3.3
 
-  safe-array-concat@1.1.3:
+  safe-array-concat@1.1.4:
     dependencies:
       call-bind: 1.0.9
       call-bound: 1.0.4
