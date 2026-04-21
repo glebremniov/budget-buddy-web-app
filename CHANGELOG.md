@@ -1,3 +1,9 @@
+## [4.0.5](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v4.0.4...v4.0.5) (2026-04-21)
+
+### Bug Fixes
+
+* **vite:** attempt to fix vite config ([abb0b3e](https://github.com/budget-buddy-org/budget-buddy-web-app/commit/abb0b3edaadee05985576bdcf1dbc1091381ce4f))
+
 ## [4.0.4](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v4.0.3...v4.0.4) (2026-04-21)
 
 ### Bug Fixes
