@@ -1,3 +1,9 @@
+## [4.0.4](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v4.0.3...v4.0.4) (2026-04-21)
+
+### Bug Fixes
+
+* **security:** use single-line CSP header to prevent 502 from proxy ([#93](https://github.com/budget-buddy-org/budget-buddy-web-app/issues/93)) ([acf620a](https://github.com/budget-buddy-org/budget-buddy-web-app/commit/acf620abd372d0d2253437ac76329d0a28ca0738))
+
 ## [4.0.3](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v4.0.2...v4.0.3) (2026-04-20)
 
 ### Bug Fixes
