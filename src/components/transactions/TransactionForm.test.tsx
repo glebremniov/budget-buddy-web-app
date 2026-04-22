@@ -255,9 +255,11 @@ describe('TransactionForm', () => {
     expect(screen.getByText(/Delete Transaction/)).toBeInTheDocument();
 
     // Mock delete success
-    mockDeleteTx.mutate.mockImplementationOnce((_id: string, options: { onSuccess: () => void }) => {
-      options.onSuccess();
-    });
+    mockDeleteTx.mutate.mockImplementationOnce(
+      (_id: string, options: { onSuccess: () => void }) => {
+        options.onSuccess();
+      },
+    );
 
     // Confirm delete
     await user.click(screen.getByText(/Confirm Delete/i));
