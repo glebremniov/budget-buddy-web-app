@@ -10,9 +10,10 @@ add_header Referrer-Policy        "strict-origin-when-cross-origin"             
 add_header Permissions-Policy     "camera=(), microphone=(), geolocation=()"          always;
 
 # Content Security Policy
-# - script-src 'unsafe-inline': required for the inline theme-init script in
-#   index.html. Replace with a SHA-256 hash if the script is ever extracted.
+# - script-src uses a SHA-256 hash of the inline theme-init script in index.html.
+#   IMPORTANT: regenerate the hash if that script ever changes:
+#   python3 -c "import hashlib,base64; f=open('index.html'); c=f.read(); s=c[c.index('<script>\n')+9:c.index('\n    </script>')]; print(base64.b64encode(hashlib.sha256(s.encode()).digest()).decode())"
+# - style-src 'unsafe-inline' is required for Tailwind v4 runtime styles (accepted trade-off).
 # - connect-src includes the API and OIDC issuer for token/userinfo endpoints.
-# - frame-src includes the OIDC issuer for the silent-renew hidden iframe.
 # - frame-ancestors 'none': blocks all framing (replaces X-Frame-Options).
-add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' $VITE_API_URL $VITE_OIDC_ISSUER; frame-src $VITE_OIDC_ISSUER; base-uri 'self'; form-action 'self'; frame-ancestors 'none';" always;
+add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'sha256-BU3i5kJoqq+zoV0GtVJMrCHToZIxLjoYdRDeSeydpk4='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' $VITE_API_URL $VITE_OIDC_ISSUER; base-uri 'self'; form-action 'self'; frame-ancestors 'none';" always;
