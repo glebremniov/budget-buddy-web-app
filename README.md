@@ -24,6 +24,7 @@ Required OIDC environment variables:
 
 - `VITE_OIDC_ISSUER` — OIDC issuer URL (e.g. your Zitadel issuer)
 - `VITE_OIDC_CLIENT_ID` — frontend SPA client ID
+- `VITE_OIDC_JWT_AUD` — (optional) audience to request in the access token. When set, the frontend sends this as an extra query parameter to the IdP so the issued access token contains the desired `aud` claim.
 
 ## Commands
 
@@ -69,6 +70,7 @@ GITHUB_TOKEN=$(gh auth token) \
 VITE_API_URL=http://localhost:8080 \
 VITE_OIDC_ISSUER=https://issuer.example.com \
 VITE_OIDC_CLIENT_ID=web-client \
+VITE_OIDC_JWT_AUD=test-audience \
 docker compose up --build
 ```
 

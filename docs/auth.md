@@ -22,7 +22,7 @@ Tokens are stored in **`sessionStorage`** by `oidc-client-ts` (the library defau
 
 ## Background Token Renewal
 
-`automaticSilentRenew: true` instructs `oidc-client-ts` to refresh tokens in the background before they expire. The library creates a hidden iframe pointing to the IdP's authorization endpoint and redirects to `/silent-renew.html`. That page posts the response URL back to the parent frame via `postMessage` — the React bundle is never loaded in the iframe.
+`automaticSilentRenew: true` instructs `oidc-client-ts` to refresh tokens in the background before they expire. The library creates a hidden iframe pointing to the IdP's authorization endpoint and redirects to the configured silent redirect URI. The app uses `/auth/silent-renew` as the silent redirect callback; configure your IdP's silent redirect URI accordingly (see Zitadel setup below). The callback returns the response to the parent frame via `postMessage` so the React bundle is not loaded in the iframe.
 
 In addition, `getAuthToken()` in `src/lib/api.ts` performs a **proactive refresh** via `signinSilent()` if the token expires within 60 seconds. This prevents mid-request token expiry in the window between `automaticSilentRenew` cycles.
 
@@ -39,6 +39,7 @@ All three settings are injected at container startup via `envsubst` — **no ima
 | `VITE_API_URL` | Backend API base URL |
 | `VITE_OIDC_ISSUER` | OIDC issuer URL (e.g. `https://your-tenant.zitadel.cloud`) |
 | `VITE_OIDC_CLIENT_ID` | SPA client ID registered in Zitadel |
+| `VITE_OIDC_JWT_AUD` | (optional) audience to request in the access token; sent to the IdP as an extra query parameter when set |
 
 In Docker, the entrypoint substitutes these into `config.json` (served at `/config.json`) and into the nginx Content-Security-Policy header. `src/lib/config.ts` reads `config.json` at startup before the app renders.
 
@@ -58,7 +59,7 @@ Register a **SPA** application in Zitadel with:
 - **Auth method:** None (PKCE only — no client secret)
 - **Redirect URI:** `https://your-app.example.com/auth/callback`
 - **Post-logout redirect URI:** `https://your-app.example.com/`
-- **Silent renew URI:** `https://your-app.example.com/silent-renew.html`
+- **Silent renew URI:** `https://your-app.example.com/auth/silent-renew`
 - **Scopes:** `openid profile email offline_access`
 
 ## Content Security Policy
@@ -83,6 +84,6 @@ This prevents credentials from being exfiltrated to unexpected origins even if a
 | `src/lib/config.ts` | Runtime config loader (reads `/config.json`) |
 | `src/components/layout/ProtectedAppLayout.tsx` | Auth guard for all `_app/` routes |
 | `src/routes/auth/callback.tsx` | OIDC callback landing page |
-| `public/silent-renew.html` | Minimal page for background token renewal |
+| `src/routes/auth/silent-renew` | Silent renew callback route used by the OIDC SDK |
 | `nginx.security-headers.conf.template` | CSP + security headers template |
 | `docker/docker-entrypoint.sh` | `envsubst` injection at container startup |

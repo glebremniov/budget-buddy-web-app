@@ -36,7 +36,11 @@ loadConfig()
     client.setConfig({ baseUrl: config.VITE_API_URL });
     // UserManager must be initialised before the first React render so that
     // api.ts interceptors and ProtectedAppLayout can call getUserManager().
-    const userManager = initUserManager(config.VITE_OIDC_ISSUER, config.VITE_OIDC_CLIENT_ID);
+    const userManager = initUserManager(
+      config.VITE_OIDC_ISSUER,
+      config.VITE_OIDC_CLIENT_ID,
+      config.VITE_OIDC_JWT_AUD,
+    );
 
     createRoot(rootEl).render(
       <StrictMode>

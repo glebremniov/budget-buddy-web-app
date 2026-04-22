@@ -10,7 +10,19 @@ describe('buildOidcSettings', () => {
     expect(settings.redirect_uri).toBe(`${window.location.origin}/auth/callback`);
     expect(settings.post_logout_redirect_uri).toBe(`${window.location.origin}/`);
     expect(settings.response_type).toBe('code');
-    expect(settings.silent_redirect_uri).toBeUndefined();
+    // silent_redirect_uri should be present to support silent renew flows
+    expect(settings.silent_redirect_uri).toBe(`${window.location.origin}/auth/silent-renew`);
+  });
+
+  it('includes audience in extraQueryParams when provided', () => {
+    const settings = buildOidcSettings('https://issuer.example.com', 'web-client', 'my-audience');
+
+    // extraQueryParams is optional; when provided it should contain the audience
+    // The typings are loose on the exact shape, so check presence via index access.
+    // @ts-ignore - test-time access
+    expect(settings.extraQueryParams).toBeDefined();
+    // @ts-ignore
+    expect(settings.extraQueryParams?.audience).toBe('my-audience');
   });
 
   it('uses sessionStorage for PKCE state store', () => {
@@ -38,7 +50,7 @@ describe('getUserManager / initUserManager', () => {
 
   it('returns the same UserManager instance after initialisation', async () => {
     const { initUserManager: freshInit, getUserManager: freshGet } = await import('./oidc');
-    const mgr = freshInit('https://issuer.example.com', 'web-client');
+    const mgr = freshInit('https://issuer.example.com', 'web-client', 'my-audience');
 
     expect(freshGet()).toBe(mgr);
   });
