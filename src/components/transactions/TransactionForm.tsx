@@ -94,8 +94,12 @@ export function TransactionForm({
       }
     }
 
-    const body: TransactionWrite = {
-      description: form.description || null,
+    // Build a plain payload so we can send null for description when the user
+    // clears the field. The external TransactionWrite type doesn't accept null,
+    // so cast at the mutation call site to avoid type errors while keeping the
+    // runtime behaviour that the API expects.
+    const payload: Record<string, unknown> = {
+      description: form.description === '' ? null : form.description,
       amount: toMinorUnits(Number(form.amount)),
       type: form.type,
       currency: form.currency,
@@ -103,7 +107,7 @@ export function TransactionForm({
       categoryId,
     };
 
-    currentMutation.mutate(body, {
+    currentMutation.mutate(payload as unknown as TransactionWrite, {
       onSuccess: () => {
         toast({
           title: isEditing ? 'Transaction updated' : 'Transaction created',
