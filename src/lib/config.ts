@@ -2,6 +2,7 @@ export interface AppConfig {
   VITE_API_URL: string;
   VITE_OIDC_ISSUER: string;
   VITE_OIDC_CLIENT_ID: string;
+  VITE_SENTRY_DSN?: string;
 }
 
 let config: AppConfig | null = null;
@@ -38,10 +39,12 @@ export async function loadConfig(): Promise<AppConfig> {
   }
 
   if (!config) {
+    const sentryDsn = import.meta.env.VITE_SENTRY_DSN;
     config = {
       VITE_API_URL: import.meta.env.VITE_API_URL ?? 'http://localhost:8080',
       VITE_OIDC_ISSUER: import.meta.env.VITE_OIDC_ISSUER ?? '',
       VITE_OIDC_CLIENT_ID: import.meta.env.VITE_OIDC_CLIENT_ID ?? '',
+      ...(sentryDsn ? { VITE_SENTRY_DSN: sentryDsn } : {}),
     };
   }
 

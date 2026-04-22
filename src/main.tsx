@@ -7,6 +7,7 @@ import { client } from './lib/api.ts';
 import { loadConfig } from './lib/config';
 import { logError } from './lib/error-logger';
 import { initUserManager, onOidcSigninCallback } from './lib/oidc';
+import { initSentry } from './lib/sentry';
 import { queryClient } from './lib/query-client';
 import { router } from './lib/router';
 import './index.css';
@@ -33,6 +34,7 @@ if (!rootEl) throw new Error('Root element not found');
 // client with the resolved values, then render the app.
 loadConfig()
   .then(async (config) => {
+    initSentry(config.VITE_SENTRY_DSN);
     client.setConfig({ baseUrl: config.VITE_API_URL });
     // UserManager must be initialised before the first React render so that
     // api.ts interceptors and ProtectedAppLayout can call getUserManager().

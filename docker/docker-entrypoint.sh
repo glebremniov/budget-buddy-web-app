@@ -3,7 +3,7 @@ set -e
 
 # Replace environment variables in config.json.template and save to config.json.
 # Explicit variable list prevents accidental substitution of other $ tokens in the JSON.
-envsubst '$VITE_API_URL $VITE_OIDC_ISSUER $VITE_OIDC_CLIENT_ID' \
+envsubst '$VITE_API_URL $VITE_OIDC_ISSUER $VITE_OIDC_CLIENT_ID $VITE_SENTRY_DSN' \
   < /usr/share/nginx/html/config.json.template \
   > /usr/share/nginx/html/config.json
 

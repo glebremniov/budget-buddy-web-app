@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useAuth } from 'react-oidc-context';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { clearSentryUser, setSentryUser } from '@/lib/sentry';
 
 export function ProtectedAppLayout() {
   const auth = useAuth();
@@ -10,6 +11,14 @@ export function ProtectedAppLayout() {
 
     void auth.signinRedirect();
   }, [auth]);
+
+  useEffect(() => {
+    if (auth.isAuthenticated && auth.user?.profile.sub) {
+      setSentryUser(auth.user.profile.sub);
+    } else {
+      clearSentryUser();
+    }
+  }, [auth.isAuthenticated, auth.user?.profile.sub]);
 
   if (auth.isLoading || auth.activeNavigator) {
     return (
