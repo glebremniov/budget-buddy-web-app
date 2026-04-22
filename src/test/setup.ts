@@ -8,6 +8,7 @@ expect.extend(axeMatchers);
 // Mock OIDC environment variables for tests
 vi.stubEnv('VITE_OIDC_ISSUER', 'https://auth.example.com');
 vi.stubEnv('VITE_OIDC_CLIENT_ID', 'test-client-id');
+vi.stubEnv('VITE_OIDC_SCOPES', 'openid profile email offline_access');
 
 declare module 'vitest' {
   export interface Assertion<T> extends axeMatchers.AxeMatchers {

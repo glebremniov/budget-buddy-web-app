@@ -1,30 +1,37 @@
-import { UserManager, type UserManagerSettings } from 'oidc-client-ts';
+import { UserManager, type UserManagerSettings, WebStorageStateStore } from 'oidc-client-ts';
 
 let _userManager: UserManager | null = null;
 
-export function buildOidcSettings(issuer: string, clientId: string): UserManagerSettings {
+export function buildOidcSettings(
+  issuer: string,
+  clientId: string,
+  scopes?: string,
+): UserManagerSettings {
+  const scopeValue = scopes ?? 'openid profile email offline_access';
+
   return {
     authority: issuer,
     client_id: clientId,
-    redirect_uri: `${window.location.origin}/auth/callback`,
-    post_logout_redirect_uri: `${window.location.origin}/`,
-    // Dedicated minimal page for background token renewal via hidden iframe.
-    // Using a separate page avoids loading the full React bundle inside the iframe.
-    silent_redirect_uri: `${window.location.origin}/silent-renew.html`,
-    response_type: 'code', // Authorization Code Flow with PKCE (oidc-client-ts default)
-    scope: 'openid profile email offline_access',
+    redirect_uri: `${globalThis.location.origin}/auth/callback`,
+    post_logout_redirect_uri: `${globalThis.location.origin}/`,
+    // Enable silent renew with a dedicated callback route so the SDK can
+    // refresh tokens without navigating the top-level application.
+    silent_redirect_uri: `${globalThis.location.origin}/auth/silent-renew`,
+    response_type: 'code',
+    scope: scopeValue,
     automaticSilentRenew: true,
     filterProtocolClaims: true,
     loadUserInfo: true,
+    stateStore: new WebStorageStateStore({ store: globalThis.sessionStorage }),
   };
 }
 
 /**
- * Initialises the shared UserManager with runtime-loaded OIDC config.
+ * Initializes the shared UserManager with runtime-loaded OIDC config.
  * Must be called once in main.tsx after loadConfig() resolves, before rendering.
  */
-export function initUserManager(issuer: string, clientId: string): UserManager {
-  _userManager = new UserManager(buildOidcSettings(issuer, clientId));
+export function initUserManager(issuer: string, clientId: string, scopes?: string): UserManager {
+  _userManager = new UserManager(buildOidcSettings(issuer, clientId, scopes));
   return _userManager;
 }
 

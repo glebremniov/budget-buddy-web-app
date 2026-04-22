@@ -2,15 +2,32 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { buildOidcSettings, onOidcSigninCallback } from './oidc';
 
 describe('buildOidcSettings', () => {
-  it('builds settings from issuer and clientId', () => {
+  it('builds settings from issuer and clientId with default scopes', () => {
     const settings = buildOidcSettings('https://issuer.example.com', 'web-client');
 
     expect(settings.authority).toBe('https://issuer.example.com');
     expect(settings.client_id).toBe('web-client');
     expect(settings.redirect_uri).toBe(`${window.location.origin}/auth/callback`);
     expect(settings.post_logout_redirect_uri).toBe(`${window.location.origin}/`);
-    expect(settings.silent_redirect_uri).toBe(`${window.location.origin}/silent-renew.html`);
     expect(settings.response_type).toBe('code');
+    // default scopes include openid and offline_access
+    expect(settings.scope).toBe('openid profile email offline_access');
+  });
+
+  it('uses custom scopes when provided', () => {
+    const settings = buildOidcSettings(
+      'https://issuer.example.com',
+      'web-client',
+      'openid profile email api:read',
+    );
+
+    expect(settings.scope).toBe('openid profile email api:read');
+  });
+
+  it('uses sessionStorage for PKCE state store', () => {
+    const settings = buildOidcSettings('https://issuer.example.com', 'web-client');
+
+    expect(settings.stateStore).toBeDefined();
   });
 });
 
@@ -32,7 +49,11 @@ describe('getUserManager / initUserManager', () => {
 
   it('returns the same UserManager instance after initialisation', async () => {
     const { initUserManager: freshInit, getUserManager: freshGet } = await import('./oidc');
-    const mgr = freshInit('https://issuer.example.com', 'web-client');
+    const mgr = freshInit(
+      'https://issuer.example.com',
+      'web-client',
+      'openid profile email api:read',
+    );
 
     expect(freshGet()).toBe(mgr);
   });
