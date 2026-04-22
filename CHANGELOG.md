@@ -1,3 +1,9 @@
+## [4.0.7](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v4.0.6...v4.0.7) (2026-04-22)
+
+### Bug Fixes
+
+* **security:** use sessionStorage for PKCE state and remove iframe silent renew ([#104](https://github.com/budget-buddy-org/budget-buddy-web-app/issues/104)) ([ba9a871](https://github.com/budget-buddy-org/budget-buddy-web-app/commit/ba9a871638695c1935858bde610330be67bf051b))
+
 ## [4.0.6](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v4.0.5...v4.0.6) (2026-04-21)
 
 ### Bug Fixes
