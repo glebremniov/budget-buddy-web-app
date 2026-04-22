@@ -6,8 +6,9 @@ export function buildOidcSettings(
   issuer: string,
   clientId: string,
   jwtAudience?: string,
+  audienceParamName = 'audience',
 ): UserManagerSettings {
-  const extraQueryParams = jwtAudience ? { audience: jwtAudience } : undefined;
+  const extraQueryParams = jwtAudience ? { [audienceParamName]: jwtAudience } : undefined;
 
   return {
     authority: issuer,
@@ -35,8 +36,11 @@ export function initUserManager(
   issuer: string,
   clientId: string,
   jwtAudience?: string,
+  audienceParamName?: string,
 ): UserManager {
-  _userManager = new UserManager(buildOidcSettings(issuer, clientId, jwtAudience));
+  _userManager = new UserManager(
+    buildOidcSettings(issuer, clientId, jwtAudience, audienceParamName ?? 'audience'),
+  );
   return _userManager;
 }
 

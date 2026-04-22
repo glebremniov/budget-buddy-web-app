@@ -4,6 +4,8 @@ export interface AppConfig {
   VITE_OIDC_CLIENT_ID: string;
   // Optional audience to request in the access token (sent as an extraQueryParam).
   VITE_OIDC_JWT_AUD?: string;
+  // Optional name of the query parameter used to request audience. Defaults to 'audience'.
+  VITE_OIDC_JWT_AUD_PARAM?: string;
 }
 
 let config: AppConfig | null = null;
@@ -45,6 +47,7 @@ export async function loadConfig(): Promise<AppConfig> {
       VITE_OIDC_ISSUER: import.meta.env.VITE_OIDC_ISSUER ?? '',
       VITE_OIDC_CLIENT_ID: import.meta.env.VITE_OIDC_CLIENT_ID ?? '',
       VITE_OIDC_JWT_AUD: import.meta.env.VITE_OIDC_JWT_AUD ?? undefined,
+      VITE_OIDC_JWT_AUD_PARAM: import.meta.env.VITE_OIDC_JWT_AUD_PARAM ?? undefined,
     };
   }
 
@@ -62,6 +65,7 @@ export function getConfig(): AppConfig {
       VITE_OIDC_ISSUER: import.meta.env.VITE_OIDC_ISSUER ?? '',
       VITE_OIDC_CLIENT_ID: import.meta.env.VITE_OIDC_CLIENT_ID ?? '',
       VITE_OIDC_JWT_AUD: import.meta.env.VITE_OIDC_JWT_AUD ?? undefined,
+      VITE_OIDC_JWT_AUD_PARAM: import.meta.env.VITE_OIDC_JWT_AUD_PARAM ?? undefined,
     };
   }
   return config;
