@@ -188,23 +188,6 @@ export function TransactionForm({
             )}
           </div>
 
-          <div className="sm:col-span-2 space-y-1">
-            <label htmlFor="tx-description" className="text-xs font-medium text-muted-foreground">
-              Description
-            </label>
-            <Input
-              id="tx-description"
-              placeholder="Coffee, salary…"
-              value={form.description}
-              onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-              error={!!getFieldError('description')}
-              autoFocus
-            />
-            {getFieldError('description') && (
-              <p className="text-xs font-medium text-destructive">{getFieldError('description')}</p>
-            )}
-          </div>
-
           <div className="flex gap-4 sm:col-span-2">
             <div className="flex-1 space-y-1">
               <label htmlFor="tx-currency" className="text-xs font-medium text-muted-foreground">
@@ -238,11 +221,28 @@ export function TransactionForm({
                 onChange={(val) => setForm((f) => ({ ...f, amount: val }))}
                 required
                 error={!!getFieldError('amount')}
+                autoFocus={!isEditing}
               />
               {getFieldError('amount') && (
                 <p className="text-xs font-medium text-destructive">{getFieldError('amount')}</p>
               )}
             </div>
+          </div>
+
+          <div className="sm:col-span-2 space-y-1">
+            <label htmlFor="tx-description" className="text-xs font-medium text-muted-foreground">
+              Description
+            </label>
+            <Input
+              id="tx-description"
+              placeholder="Coffee, salary…"
+              value={form.description}
+              onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+              error={!!getFieldError('description')}
+            />
+            {getFieldError('description') && (
+              <p className="text-xs font-medium text-destructive">{getFieldError('description')}</p>
+            )}
           </div>
 
           <div className="sm:col-span-2 space-y-1">

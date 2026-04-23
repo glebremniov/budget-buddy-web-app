@@ -70,11 +70,23 @@ vi.mock('@/components/ui/select', () => ({
   }) => React.createElement('select', { value, onChange }, children),
 }));
 vi.mock('@/components/ui/amount-input', () => ({
-  AmountInput: ({ value, onChange }: { value: string; onChange: (val: string) => void }) =>
+  AmountInput: ({
+    value,
+    onChange,
+    autoFocus,
+    placeholder,
+  }: {
+    value: string;
+    onChange: (val: string) => void;
+    autoFocus?: boolean;
+    placeholder?: string;
+  }) =>
     React.createElement('input', {
       type: 'number',
       value,
       onChange: (e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value),
+      'data-autofocus': autoFocus,
+      placeholder,
     }),
 }));
 vi.mock('@/components/ui/date-picker', () => ({
@@ -337,12 +349,14 @@ describe('TransactionForm', () => {
     });
   });
 
-  it('handles autoFocus always', () => {
+  it('handles autoFocus correctly', () => {
+    // Create mode: should have autofocus
     const { unmount } = renderForm();
-    const createInput = screen.getByPlaceholderText(/Coffee/i);
+    const createInput = screen.getByPlaceholderText(/0\.00/i);
     expect(createInput).toHaveAttribute('data-autofocus', 'true');
     unmount();
 
+    // Edit mode: should NOT have autofocus
     const transaction = {
       id: 'tx-1',
       description: 'Old Coffee',
@@ -353,7 +367,7 @@ describe('TransactionForm', () => {
       categoryId: 'cat-1',
     };
     renderForm({ transaction });
-    const editInput = screen.getByPlaceholderText(/Coffee/i);
-    expect(editInput).toHaveAttribute('data-autofocus', 'true');
+    const editInput = screen.getByPlaceholderText(/0\.00/i);
+    expect(editInput).toHaveAttribute('data-autofocus', 'false');
   });
 });
