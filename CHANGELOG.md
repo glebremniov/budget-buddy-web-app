@@ -1,3 +1,9 @@
+## [4.2.0](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v4.1.0...v4.2.0) (2026-04-23)
+
+### Features
+
+* OIDC user management ([#112](https://github.com/budget-buddy-org/budget-buddy-web-app/issues/112)) ([aac0fad](https://github.com/budget-buddy-org/budget-buddy-web-app/commit/aac0fadaaf475bd051cbdbf120bbaac447b66756))
+
 ## [4.1.0](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v4.0.8...v4.1.0) (2026-04-23)
 
 ### Features
