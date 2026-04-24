@@ -1,3 +1,9 @@
+## [4.3.0](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v4.2.1...v4.3.0) (2026-04-24)
+
+### Features
+
+* **security:** adopt DPoP sender-constrained tokens and fix session bugs ([#113](https://github.com/budget-buddy-org/budget-buddy-web-app/issues/113)) ([f6ecee4](https://github.com/budget-buddy-org/budget-buddy-web-app/commit/f6ecee46e92f789da3ef999995c2d57ae6166be8))
+
 ## [4.2.1](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v4.2.0...v4.2.1) (2026-04-24)
 
 ### Bug Fixes
