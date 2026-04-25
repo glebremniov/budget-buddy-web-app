@@ -80,9 +80,21 @@ docker compose up --build
 
 Pre-built images are published to `ghcr.io/budget-buddy-org/budget-buddy-web-app` on every merge to `main` and every GitHub Release.
 
-## Deployment
+## Deployment targets
 
-See [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) for production deployment instructions and environment setup.
+The app supports two deployment targets in parallel — neither path blocks the other.
+
+### Cloudflare Pages (managed)
+
+Static `dist/` is served from Cloudflare's edge. Runtime configuration is served by a Pages Function ([functions/config.json.ts](./functions/config.json.ts)) that reads CF environment variables — same shape as the Docker `envsubst` model, no rebuild needed when env values change.
+
+- Required CF Pages env vars (set per Production / Preview environment in the dashboard): `VITE_API_URL`, `VITE_OIDC_ISSUER`, `VITE_OIDC_CLIENT_ID`, `VITE_OIDC_SCOPES`, `VITE_OIDC_USER_MANAGEMENT_URL`.
+- HTTP headers and SPA fallback come from [public/_headers](./public/_headers) and [public/_redirects](./public/_redirects).
+- Test the Functions setup locally with `pnpm dlx wrangler pages dev ./dist` after `pnpm build`.
+
+### Self-hosted (Docker on Raspberry Pi)
+
+Multi-stage Docker image published to `ghcr.io/budget-buddy-org/budget-buddy-web-app`, served by nginx with runtime config injected by `docker/docker-entrypoint.sh`. Deployed via `../budget-buddy-deployment/deploy.sh`. See [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) for the Pi-side environment setup.
 
 ## Architecture notes
 
