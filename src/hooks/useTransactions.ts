@@ -103,25 +103,27 @@ export const allTransactionsQueryOptions = (filters: TransactionFilters = {}) =>
   queryOptions({
     queryKey: [...KEYS.list(filters), 'all'],
     queryFn: async () => {
-      let allItems: Transaction[] = [];
-      let page = 0;
-      let total = 0;
-
-      do {
+      const fetchPage = async (page: number) => {
         const { data, error } = await listTransactions({
-          query: {
-            ...filters,
-            size: PAGE_SIZE_ALL,
-            page,
-          },
+          query: { ...filters, size: PAGE_SIZE_ALL, page },
         });
         if (error) throw error;
-        allItems = [...allItems, ...data.items];
-        total = data.meta.total;
-        page++;
-      } while (allItems.length < total && page < MAX_PAGES_ALL);
+        return data;
+      };
 
-      return { items: allItems, meta: { total } };
+      const first = await fetchPage(0);
+      const total = first.meta.total;
+      const totalPages = Math.min(Math.ceil(total / PAGE_SIZE_ALL), MAX_PAGES_ALL);
+
+      if (totalPages <= 1) return { items: first.items, meta: { total } };
+
+      const rest = await Promise.all(
+        Array.from({ length: totalPages - 1 }, (_, i) => fetchPage(i + 1)),
+      );
+
+      const items: Transaction[] = first.items;
+      for (const page of rest) items.push(...page.items);
+      return { items, meta: { total } };
     },
   });
 
