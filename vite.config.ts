@@ -121,6 +121,18 @@ export default defineConfig({
           if (id.includes('@tanstack/react-router') || id.includes('@tanstack/router-') || id.includes('@tanstack/history')) {
             return 'vendor-router'
           }
+          if (id.includes('@radix-ui/')) {
+            return 'vendor-radix'
+          }
+          if (id.includes('recharts') || id.includes('d3-')) {
+            return 'vendor-charts'
+          }
+          if (id.includes('oidc-client-ts') || id.includes('react-oidc-context')) {
+            return 'vendor-oidc'
+          }
+          if (id.includes('lucide-react')) {
+            return 'vendor-icons'
+          }
           return 'vendor'
         },
       },

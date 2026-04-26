@@ -1,4 +1,12 @@
-export function CategoryRow({ name, onStartEdit }: { name: string; onStartEdit: () => void }) {
+import { memo } from 'react';
+
+export const CategoryRow = memo(function CategoryRow({
+  name,
+  onStartEdit,
+}: {
+  name: string;
+  onStartEdit: () => void;
+}) {
   return (
     <li className="flex items-center px-4 py-3 transition-colors hover:bg-muted/30 cursor-pointer">
       <button
@@ -11,4 +19,4 @@ export function CategoryRow({ name, onStartEdit }: { name: string; onStartEdit: 
       </button>
     </li>
   );
-}
+});

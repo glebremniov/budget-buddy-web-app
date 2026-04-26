@@ -1,10 +1,10 @@
 import type { Transaction } from '@budget-buddy-org/budget-buddy-contracts';
 import { useMemo } from 'react';
-import { Badge } from '@/components/ui/badge';
+import { TransactionRow } from '@/components/transactions/TransactionRow';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { formatCurrency, formatDate } from '@/lib/formatters';
+import { formatDate } from '@/lib/formatters';
 
 interface TransactionListProps {
   transactions: Transaction[];
@@ -91,31 +91,17 @@ export function TransactionList({
       {groupedTransactions.map((group) => (
         <Card key={group.date}>
           <CardContent className="p-0">
-            <h2 className="bg-muted/30 px-4 py-1.5 text-xs font-semibold text-muted-foreground sticky top-0 z-10 backdrop-blur-sm">
+            <h2 className="bg-muted px-4 py-1.5 text-xs font-semibold text-muted-foreground sticky top-0 z-10">
               {formatDate(group.date)}
             </h2>
             <ul className="divide-y">
               {group.items.map((t) => (
-                <li
+                <TransactionRow
                   key={t.id}
-                  className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-muted/30 cursor-pointer"
-                >
-                  <button
-                    type="button"
-                    aria-label={`Edit transaction: ${t.description ?? 'unnamed'}`}
-                    className="min-w-0 flex-1 cursor-pointer text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
-                    onClick={() => onEdit?.(t.id)}
-                  >
-                    <p className="truncate text-sm font-medium">{t.description ?? '—'}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {(t.categoryId && categoryMap[t.categoryId]) || 'No Category'}
-                    </p>
-                  </button>
-                  <Badge variant={t.type === 'INCOME' ? 'income' : 'expense'}>
-                    {t.type === 'INCOME' ? '+' : '-'}
-                    {formatCurrency(t.amount, t.currency)}
-                  </Badge>
-                </li>
+                  transaction={t}
+                  categoryName={t.categoryId ? categoryMap[t.categoryId] : undefined}
+                  onEdit={onEdit}
+                />
               ))}
             </ul>
           </CardContent>
