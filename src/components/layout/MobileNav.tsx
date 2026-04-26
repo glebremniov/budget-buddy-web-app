@@ -31,7 +31,7 @@ export function MobileNav() {
         className={cn(
           'flex items-center gap-0.5 rounded-full border border-border/40 px-1.5 py-1.5 shadow-xl',
           glassEffect
-            ? 'bg-background/80 shadow-black/10 backdrop-blur-2xl dark:bg-background/70 dark:shadow-black/40'
+            ? 'bg-background/80 shadow-black/10 backdrop-blur-md dark:bg-background/70 dark:shadow-black/40'
             : 'bg-background shadow-black/5',
         )}
       >
