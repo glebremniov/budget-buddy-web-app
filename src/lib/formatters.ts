@@ -2,11 +2,31 @@ function browserLocale(): string {
   return (typeof navigator !== 'undefined' && navigator.language) || 'en-US';
 }
 
+const currencyFormatters = new Map<string, Intl.NumberFormat>();
+const dateFormatters = new Map<string, Intl.DateTimeFormat>();
+
+function getCurrencyFormatter(locale: string, currency: string): Intl.NumberFormat {
+  const key = `${locale}|${currency}`;
+  let f = currencyFormatters.get(key);
+  if (!f) {
+    f = new Intl.NumberFormat(locale, { style: 'currency', currency });
+    currencyFormatters.set(key, f);
+  }
+  return f;
+}
+
+function getDateFormatter(locale: string): Intl.DateTimeFormat {
+  let f = dateFormatters.get(locale);
+  if (!f) {
+    f = new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'short', day: 'numeric' });
+    dateFormatters.set(locale, f);
+  }
+  return f;
+}
+
 /** Converts minor currency units (e.g. 1299) to a formatted string (e.g. "€12.99"). */
 export function formatCurrency(minorUnits: number, currency = 'EUR', locale?: string): string {
-  return new Intl.NumberFormat(locale ?? browserLocale(), { style: 'currency', currency }).format(
-    minorUnits / 100,
-  );
+  return getCurrencyFormatter(locale ?? browserLocale(), currency).format(minorUnits / 100);
 }
 
 /** Converts a decimal amount (e.g. 12.99) to minor units (e.g. 1299). */
@@ -35,11 +55,7 @@ export function toLocalYearMonth(date: Date): string {
 
 /** Formats an ISO date string (YYYY-MM-DD) for display. */
 export function formatDate(dateString: string, locale?: string): string {
-  return new Intl.DateTimeFormat(locale ?? browserLocale(), {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  }).format(new Date(`${dateString}T00:00:00`));
+  return getDateFormatter(locale ?? browserLocale()).format(new Date(`${dateString}T00:00:00`));
 }
 
 /** Returns today's date as YYYY-MM-DD. */
