@@ -1,3 +1,9 @@
+## [4.3.2](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v4.3.1...v4.3.2) (2026-04-28)
+
+### Bug Fixes
+
+* address cloudflare delployment issues ([#120](https://github.com/budget-buddy-org/budget-buddy-web-app/issues/120)) ([22363d3](https://github.com/budget-buddy-org/budget-buddy-web-app/commit/22363d375ee4d2796b1e50bc703a05222094620e))
+
 ## [4.3.1](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v4.3.0...v4.3.1) (2026-04-26)
 
 ### Performance Improvements
