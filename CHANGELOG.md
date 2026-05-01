@@ -1,3 +1,15 @@
+## [4.3.4](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v4.3.3...v4.3.4) (2026-04-30)
+
+### Bug Fixes
+
+* improve transactions page ([4dffad3](https://github.com/budget-buddy-org/budget-buddy-web-app/commit/4dffad34f176a08355b1c642c069e6382557d8c9))
+
+## [4.3.3](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v4.3.2...v4.3.3) (2026-04-30)
+
+### Bug Fixes
+
+* improve toast behavior ([9aecd0b](https://github.com/budget-buddy-org/budget-buddy-web-app/commit/9aecd0b286fee380c2f3afc2d173e59376d262a0))
+
 ## [4.3.2](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v4.3.1...v4.3.2) (2026-04-28)
 
 ### Bug Fixes
