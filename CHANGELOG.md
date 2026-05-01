@@ -1,3 +1,9 @@
+## [4.4.0](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v4.3.4...v4.4.0) (2026-05-01)
+
+### Features
+
+* use health checks in API ([#122](https://github.com/budget-buddy-org/budget-buddy-web-app/issues/122)) ([4398d3d](https://github.com/budget-buddy-org/budget-buddy-web-app/commit/4398d3de8d9a5b1ab645eff729342f1179644d60))
+
 ## [4.3.4](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v4.3.3...v4.3.4) (2026-04-30)
 
 ### Bug Fixes
