@@ -1,16 +1,24 @@
 import type * as React from 'react';
 import { cn } from '@/lib/cn';
+import { useThemeStore } from '@/stores/theme.store';
 
 function Card({
   className,
+  glass,
   ref,
   ...props
-}: React.HTMLAttributes<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> }) {
+}: React.HTMLAttributes<HTMLDivElement> & {
+  ref?: React.Ref<HTMLDivElement>;
+  /** Opt into the translucent + blur treatment when the user has glass enabled. */
+  glass?: boolean;
+}) {
+  const glassEffect = useThemeStore((s) => s.glassEffect);
   return (
     <div
       ref={ref}
       className={cn(
         'rounded-lg border bg-card text-card-foreground shadow-sm overflow-hidden',
+        glass && glassEffect && 'border-border/40 bg-card/60 backdrop-blur-xl',
         className,
       )}
       {...props}

@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { DashboardSkeleton } from '@/components/dashboard/DashboardSkeleton';
 import { SummaryCard, SummaryCardDescription } from '@/components/dashboard/SummaryCard';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { AnimatedNumber } from '@/components/ui/animated-number';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,6 +13,7 @@ import { useAllTransactions } from '@/hooks/useTransactions';
 import { getCategoryColor } from '@/lib/categoryColor';
 import { cn } from '@/lib/cn';
 import { formatCurrency, formatDate, todayIso, toLocalIsoDate } from '@/lib/formatters';
+import { haptic } from '@/lib/haptics';
 import { useThemeStore } from '@/stores/theme.store';
 
 const VISIBLE_COUNT = 5;
@@ -56,6 +58,7 @@ export function DashboardPage() {
   );
 
   const handleMonthSelect = (month: number) => {
+    if (month !== selectedMonth) haptic('tap');
     setSelectedMonth(month);
     setShowAll(false);
   };
@@ -147,7 +150,7 @@ export function DashboardPage() {
 
       {/* Summary cards */}
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-        <Card className="col-span-2 md:col-span-1">
+        <Card glass className="col-span-2 md:col-span-1">
           <CardHeader className="pb-2">
             <SummaryCardDescription>
               <Wallet className="size-4" />
@@ -155,9 +158,11 @@ export function DashboardPage() {
             </SummaryCardDescription>
           </CardHeader>
           <CardContent>
-            <p className={`text-2xl font-bold ${balance >= 0 ? 'text-income' : 'text-expense'}`}>
-              {formatCurrency(balance, currency)}
-            </p>
+            <AnimatedNumber
+              value={balance}
+              format={(v) => formatCurrency(Math.round(v), currency)}
+              className={cn('text-2xl font-bold', balance >= 0 ? 'text-income' : 'text-expense')}
+            />
           </CardContent>
         </Card>
 

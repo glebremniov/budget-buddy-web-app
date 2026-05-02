@@ -1,5 +1,6 @@
 import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
 import { cn } from '@/lib/cn';
+import { haptic } from '@/lib/haptics';
 import { useThemeStore } from '@/stores/theme.store';
 
 type StrictProps = {
@@ -44,7 +45,10 @@ export function TransactionTypeToggle({
           type="button"
           role="tab"
           aria-selected={value === ''}
-          onClick={() => (onChange as NullableProps['onChange'])('')}
+          onClick={() => {
+            if (value !== '') haptic('tap');
+            (onChange as NullableProps['onChange'])('');
+          }}
           className={cn(
             'flex-1 flex items-center justify-center gap-2 px-3 rounded-md text-sm font-medium transition-colors cursor-pointer select-none outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
             value === ''
@@ -62,7 +66,10 @@ export function TransactionTypeToggle({
         type="button"
         role="tab"
         aria-selected={value === 'EXPENSE'}
-        onClick={() => onChange('EXPENSE')}
+        onClick={() => {
+          if (value !== 'EXPENSE') haptic('tap');
+          onChange('EXPENSE');
+        }}
         className={cn(
           'flex-1 flex items-center justify-center gap-2 px-3 rounded-md text-sm font-medium transition-colors cursor-pointer select-none outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
           value === 'EXPENSE'
@@ -80,7 +87,10 @@ export function TransactionTypeToggle({
         type="button"
         role="tab"
         aria-selected={value === 'INCOME'}
-        onClick={() => onChange('INCOME')}
+        onClick={() => {
+          if (value !== 'INCOME') haptic('tap');
+          onChange('INCOME');
+        }}
         className={cn(
           'flex-1 flex items-center justify-center gap-2 px-3 rounded-md text-sm font-medium transition-colors cursor-pointer select-none outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
           value === 'INCOME'
