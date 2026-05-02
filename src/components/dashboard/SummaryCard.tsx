@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import type { ReactNode } from 'react';
+import { AnimatedNumber } from '@/components/ui/animated-number';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { cn } from '@/lib/cn';
 import { formatCurrency } from '@/lib/formatters';
@@ -36,9 +37,8 @@ export function SummaryCard({
 }) {
   const card = (
     <Card
-      className={
-        linkSearch ? 'h-full cursor-pointer transition-colors hover:bg-muted/30' : undefined
-      }
+      glass
+      className={cn('h-full', linkSearch && 'cursor-pointer transition-colors hover:bg-muted/30')}
     >
       <CardHeader className="pb-2">
         <SummaryCardDescription>
@@ -47,7 +47,11 @@ export function SummaryCard({
         </SummaryCardDescription>
       </CardHeader>
       <CardContent>
-        <p className={cn('text-xl font-bold', className)}>{formatCurrency(amount, currency)}</p>
+        <AnimatedNumber
+          value={amount}
+          format={(v) => formatCurrency(Math.round(v), currency)}
+          className={cn('text-xl font-bold', className)}
+        />
       </CardContent>
     </Card>
   );

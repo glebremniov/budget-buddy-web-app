@@ -147,6 +147,15 @@ textarea {
   to { transform: translateY(105%); }
 }
 
+/* Shimmer used by Skeleton. Animates background-position, which repaints
+   each frame (it is not GPU-composited). Acceptable for the small number
+   of skeletons currently rendered — switch to a translated pseudo-element
+   overlay if we ever show long skeleton lists. */
+@keyframes skeleton-shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
 /* Respect reduced motion for sheet animations */
 @media (prefers-reduced-motion: reduce) {
   @keyframes sheet-enter {
@@ -164,4 +173,22 @@ textarea {
   transition-property: transform, opacity, background-color, box-shadow, color;
   transition-timing-function: var(--easing-spring);
   transition-duration: 350ms;
+}
+
+@utility skeleton-shimmer {
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in oklab, var(--color-foreground) 6%, transparent) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  background-position: 200% 0;
+  animation: skeleton-shimmer 1.6s linear infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+    opacity: 0.6;
+  }
 }

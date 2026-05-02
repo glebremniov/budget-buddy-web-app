@@ -1,8 +1,9 @@
-import { Link } from '@tanstack/react-router';
+import { Link, useRouterState } from '@tanstack/react-router';
 import { ArrowLeftRight, LayoutDashboard, Plus, Tag } from 'lucide-react';
 import { useCallback, useRef } from 'react';
 import { useFABContext } from '@/contexts/fab-context';
 import { cn } from '@/lib/cn';
+import { haptic } from '@/lib/haptics';
 import { useThemeStore } from '@/stores/theme.store';
 
 const NAV_ITEMS = [
@@ -15,15 +16,22 @@ export function MobileNav() {
   const { fab } = useFABContext();
   const showNavLabels = useThemeStore((s) => s.showNavLabels);
   const glassEffect = useThemeStore((s) => s.glassEffect);
+  const currentPath = useRouterState({ select: (s) => s.location.pathname });
   const lastTapRef = useRef<{ [key: string]: number }>({});
 
-  const handleTap = useCallback((to: string, timeStamp: number) => {
-    const last = lastTapRef.current[to] || 0;
-    if (timeStamp - last < 300) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-    lastTapRef.current[to] = timeStamp;
-  }, []);
+  const handleTap = useCallback(
+    (to: string, timeStamp: number) => {
+      // Only buzz when the tap actually navigates — re-tapping the active
+      // tab to scroll-to-top should be silent.
+      if (to !== currentPath) haptic('tap');
+      const last = lastTapRef.current[to] || 0;
+      if (timeStamp - last < 300) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      lastTapRef.current[to] = timeStamp;
+    },
+    [currentPath],
+  );
 
   return (
     <div className="fixed left-1/2 z-50 flex -translate-x-1/2 items-center gap-3 md:hidden bottom-[env(safe-area-inset-bottom)]">
@@ -56,7 +64,10 @@ export function MobileNav() {
       {fab && (
         <button
           type="button"
-          onClick={fab.onClick}
+          onClick={() => {
+            haptic('select');
+            fab.onClick();
+          }}
           aria-label={fab.label}
           className={cn(
             'flex shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-xl shadow-primary/20 transition-spring hover:brightness-110 active:scale-90 active:rotate-45 motion-reduce:transition-none starting:scale-75 starting:opacity-0',

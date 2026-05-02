@@ -43,7 +43,16 @@ function DialogContent({
 }) {
   const contentRef = React.useRef<HTMLDivElement>(null);
   const hiddenCloseRef = React.useRef<HTMLButtonElement>(null);
-  const dragState = React.useRef({ isDragging: false, startY: 0, rafId: 0, pendingDelta: 0 });
+  const dragState = React.useRef({
+    isDragging: false,
+    startY: 0,
+    rafId: 0,
+    pendingDelta: 0,
+    // Sliding window of recent (timestamp, delta) samples used to derive
+    // dismiss velocity on pointer-up — a fast flick should dismiss even if
+    // the absolute drag distance is below the static threshold.
+    samples: [] as { t: number; d: number }[],
+  });
   // Track pending transitionend listeners so we can clean them up if the
   // component unmounts mid-animation (e.g. portal destruction).
   const pendingListeners = React.useRef<Set<{ el: HTMLElement; fn: () => void }>>(new Set());
@@ -105,7 +114,13 @@ function DialogContent({
 
   const handlePointerDown = React.useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     e.currentTarget.setPointerCapture(e.pointerId);
-    dragState.current = { isDragging: true, startY: e.clientY, rafId: 0, pendingDelta: 0 };
+    dragState.current = {
+      isDragging: true,
+      startY: e.clientY,
+      rafId: 0,
+      pendingDelta: 0,
+      samples: [{ t: e.timeStamp, d: 0 }],
+    };
     if (contentRef.current) {
       contentRef.current.style.willChange = 'transform';
       contentRef.current.style.transition = 'none';
@@ -113,27 +128,53 @@ function DialogContent({
   }, []);
 
   const handlePointerMove = React.useCallback((e: React.PointerEvent<HTMLDivElement>) => {
-    if (!dragState.current.isDragging) return;
-    dragState.current.pendingDelta = Math.max(0, e.clientY - dragState.current.startY);
-    if (dragState.current.rafId) return;
-    dragState.current.rafId = requestAnimationFrame(() => {
-      dragState.current.rafId = 0;
+    const state = dragState.current;
+    if (!state.isDragging) return;
+    state.pendingDelta = Math.max(0, e.clientY - state.startY);
+    state.samples.push({ t: e.timeStamp, d: state.pendingDelta });
+    // Keep only ~120ms of history so velocity reflects the *recent* motion.
+    const cutoff = e.timeStamp - 120;
+    while (state.samples.length > 2 && state.samples[0].t < cutoff) {
+      state.samples.shift();
+    }
+    if (state.rafId) return;
+    state.rafId = requestAnimationFrame(() => {
+      state.rafId = 0;
       if (contentRef.current) {
-        contentRef.current.style.transform = `translateY(${dragState.current.pendingDelta}px)`;
+        contentRef.current.style.transform = `translateY(${state.pendingDelta}px)`;
       }
     });
   }, []);
 
   const handlePointerUp = React.useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
-      if (!dragState.current.isDragging) return;
+      const state = dragState.current;
+      if (!state.isDragging) return;
       cancelPendingFrame();
-      const delta = e.clientY - dragState.current.startY;
-      if (delta > 80) {
-        dragState.current.isDragging = false;
+      const delta = e.clientY - state.startY;
+
+      // Velocity in px/ms over the last ~120ms (downward = positive).
+      const samples = state.samples;
+      let velocity = 0;
+      if (samples.length >= 2) {
+        const first = samples[0];
+        const last = samples[samples.length - 1];
+        const dt = last.t - first.t;
+        if (dt > 0) velocity = (last.d - first.d) / dt;
+      }
+      // Dismiss when dragged far enough, or when the *recent* motion was a
+      // downward flick (even if the finger lifted near the start). The
+      // `delta > 20` floor prevents accidental dismissal from a stationary
+      // tap that registers a tiny jitter.
+      const shouldDismiss = delta > 80 || (velocity > 0.5 && delta > 20);
+
+      if (shouldDismiss) {
+        state.isDragging = false;
         const el = contentRef.current;
         if (el) {
-          el.style.transition = 'transform 0.22s ease-in';
+          // Faster exit when the flick was fast.
+          const exitMs = velocity > 0.8 ? 160 : 220;
+          el.style.transition = `transform ${exitMs}ms ease-in`;
           el.style.transform = 'translateY(100vh)';
           addTransitionEndListener(el, () => {
             hiddenCloseRef.current?.click();
@@ -155,7 +196,7 @@ function DialogContent({
           'fixed z-[200] grid w-full gap-4 border bg-background shadow-lg',
           // Mobile: Bottom Sheet — extra top padding to clear the drag handle
           'bottom-0 left-0 max-w-none rounded-t-xl border-x-0 border-b-0 translate-y-0 max-h-[90dvh] overflow-y-auto',
-          'px-6 pt-8 pb-6',
+          'px-6 pt-12 pb-6',
           'data-[state=open]:animate-in-bottom-sheet data-[state=closed]:animate-out-bottom-sheet',
           // Desktop: Centered Dialog
           'sm:bottom-auto sm:left-[50%] sm:top-[50%] sm:max-w-lg sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-lg sm:border sm:max-h-none sm:overflow-y-visible sm:p-6 sm:data-[state=open]:animate-fade-in sm:data-[state=closed]:animate-fade-out',
@@ -163,9 +204,11 @@ function DialogContent({
         )}
         {...props}
       >
-        {/* Drag handle — mobile only */}
+        {/* Drag handle — mobile only. The interactive region is taller than
+            the visible pill so a thumb can comfortably grab anywhere in the
+            sheet's top padding without precision. */}
         <div
-          className="sm:hidden absolute top-0 inset-x-0 h-8 flex items-center justify-center touch-none cursor-grab active:cursor-grabbing"
+          className="sm:hidden absolute top-0 inset-x-0 h-12 flex items-start justify-center pt-3 touch-none cursor-grab active:cursor-grabbing"
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
