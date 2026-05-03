@@ -1,6 +1,7 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/cn';
+import { haptic } from '@/lib/haptics';
 
 interface PaginationProps {
   page: number;
@@ -15,17 +16,23 @@ export function Pagination({ page, total, size, onPageChange, className }: Pagin
   const canPrevious = page > 0;
   const canNext = (page + 1) * size < total;
 
+  const goTo = (next: number) => {
+    haptic('tap');
+    onPageChange(next);
+  };
+
   return (
-    <div className={cn('flex items-center justify-between md:pb-4', className)}>
-      <div className="flex-1 text-sm text-muted-foreground">
+    <div className={cn('flex items-center justify-between gap-3 md:pb-4', className)}>
+      <div className="text-sm text-muted-foreground">
         Page {page + 1} of {totalPages}
         <span className="ml-2 hidden sm:inline">({total} total items)</span>
       </div>
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center gap-2">
         <Button
           variant="outline"
-          size="default"
-          onClick={() => onPageChange(page - 1)}
+          size="icon"
+          className="sm:w-auto sm:px-4"
+          onClick={() => goTo(page - 1)}
           disabled={!canPrevious}
           aria-label="Previous page"
         >
@@ -34,8 +41,9 @@ export function Pagination({ page, total, size, onPageChange, className }: Pagin
         </Button>
         <Button
           variant="outline"
-          size="default"
-          onClick={() => onPageChange(page + 1)}
+          size="icon"
+          className="sm:w-auto sm:px-4"
+          onClick={() => goTo(page + 1)}
           disabled={!canNext}
           aria-label="Next page"
         >

@@ -105,7 +105,7 @@ export function SettingsPage() {
               role="tablist"
               aria-label="Theme"
               className={cn(
-                'flex h-10 p-1 bg-muted rounded-lg transition-colors',
+                'flex h-10 p-1 bg-muted rounded-pill transition-colors',
                 glassEffect && 'bg-muted/50 backdrop-blur-md',
               )}
             >
@@ -122,7 +122,7 @@ export function SettingsPage() {
                   role="tab"
                   aria-selected={theme === t.value}
                   className={cn(
-                    'flex-1 flex items-center justify-center gap-2 px-3 rounded-md text-sm font-medium transition-colors cursor-pointer select-none outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
+                    'flex-1 flex items-center justify-center gap-2 px-3 rounded-pill text-sm font-medium transition-colors cursor-pointer select-none outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
                     theme === t.value
                       ? cn(
                           'bg-background text-foreground shadow-sm',
@@ -148,7 +148,7 @@ export function SettingsPage() {
           <Card className="p-4 space-y-4">
             <div className="flex items-center gap-4">
               <div
-                className="h-10 w-10 rounded-full border shadow-sm"
+                className="h-10 w-10 rounded-pill border shadow-sm"
                 style={{ backgroundColor: `hsl(${primaryHue} 70% 50%)` }}
               />
               <div className="flex-1 space-y-1">
@@ -161,7 +161,7 @@ export function SettingsPage() {
                   max="360"
                   value={primaryHue}
                   onChange={(e) => setPrimaryHue(Number(e.target.value))}
-                  className="w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer accent-primary"
+                  className="w-full h-2 bg-secondary rounded-pill appearance-none cursor-pointer accent-primary"
                 />
               </div>
             </div>
@@ -199,7 +199,7 @@ export function SettingsPage() {
                   +
                 </Button>
               </div>
-              <div className="text-sm border rounded px-2 py-1 bg-muted">Sample Text</div>
+              <div className="text-sm border rounded-md px-2 py-1 bg-muted">Sample Text</div>
             </div>
             <p className="text-xs text-muted-foreground">
               Increase or decrease the base font size for better readability.

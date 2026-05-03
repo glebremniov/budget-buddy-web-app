@@ -195,7 +195,7 @@ function DialogContent({
         className={cn(
           'fixed z-[200] grid w-full gap-4 border bg-background shadow-lg',
           // Mobile: Bottom Sheet — extra top padding to clear the drag handle
-          'bottom-0 left-0 max-w-none rounded-t-xl border-x-0 border-b-0 translate-y-0 max-h-[90dvh] overflow-y-auto',
+          'bottom-0 left-0 max-w-none rounded-t-lg border-x-0 border-b-0 translate-y-0 max-h-[90dvh] overflow-y-auto',
           'px-6 pt-12 pb-6',
           'data-[state=open]:animate-in-bottom-sheet data-[state=closed]:animate-out-bottom-sheet',
           // Desktop: Centered Dialog
@@ -228,7 +228,7 @@ function DialogContent({
         {children}
 
         {!hideClose && (
-          <DialogPrimitives.Close className="absolute right-4 top-4 sm:top-4 rounded-sm opacity-70 ring-offset-background transition hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground cursor-pointer active:scale-90 motion-reduce:transition-none">
+          <DialogPrimitives.Close className="absolute right-4 top-4 sm:top-4 rounded-pill opacity-70 ring-offset-background transition hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground cursor-pointer active:scale-90 motion-reduce:transition-none">
             <X className="size-4" />
             <span className="sr-only">Close</span>
           </DialogPrimitives.Close>

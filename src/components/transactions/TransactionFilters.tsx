@@ -175,7 +175,7 @@ export function TransactionFilters({
           role="tablist"
           aria-label="Sort"
           className={cn(
-            'flex h-10 p-1 bg-muted rounded-lg transition-colors',
+            'flex h-10 p-1 bg-muted rounded-pill transition-colors',
             glassEffect && 'bg-muted/50 backdrop-blur-md',
           )}
         >
@@ -185,7 +185,7 @@ export function TransactionFilters({
             aria-selected={draft.sort === 'desc'}
             onClick={() => setDraft({ ...draft, sort: 'desc' })}
             className={cn(
-              'flex-1 flex items-center justify-center gap-2 px-3 rounded-md text-sm font-medium transition-colors cursor-pointer select-none outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
+              'flex-1 flex items-center justify-center gap-2 px-3 rounded-pill text-sm font-medium transition-colors cursor-pointer select-none outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
               draft.sort === 'desc'
                 ? cn(
                     'bg-background text-foreground shadow-sm',
@@ -203,7 +203,7 @@ export function TransactionFilters({
             aria-selected={draft.sort === 'asc'}
             onClick={() => setDraft({ ...draft, sort: 'asc' })}
             className={cn(
-              'flex-1 flex items-center justify-center gap-2 px-3 rounded-md text-sm font-medium transition-colors cursor-pointer select-none outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
+              'flex-1 flex items-center justify-center gap-2 px-3 rounded-pill text-sm font-medium transition-colors cursor-pointer select-none outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
               draft.sort === 'asc'
                 ? cn(
                     'bg-background text-foreground shadow-sm',

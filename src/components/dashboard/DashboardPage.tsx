@@ -133,7 +133,7 @@ export function DashboardPage() {
               type="button"
               onClick={() => handleMonthSelect(month)}
               className={cn(
-                'shrink-0 rounded-full px-3 py-1 text-sm font-medium transition outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.98] motion-reduce:transition-none',
+                'shrink-0 rounded-pill px-3 py-1 text-sm font-medium transition outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.98] motion-reduce:transition-none',
                 isActive
                   ? cn(
                       'bg-primary text-primary-foreground shadow-sm',
@@ -216,7 +216,7 @@ export function DashboardPage() {
                         <div className="mb-1 flex items-center justify-between">
                           <div className="mr-2 flex min-w-0 items-center gap-2">
                             <span
-                              className="h-2 w-2 shrink-0 rounded-full"
+                              className="h-2 w-2 shrink-0 rounded-pill"
                               style={{ backgroundColor: color }}
                             />
                             <span className="truncate text-sm font-medium">{row.name}</span>
@@ -225,9 +225,9 @@ export function DashboardPage() {
                             {formatCurrency(row.amount, currency)}
                           </span>
                         </div>
-                        <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                        <div className="h-1.5 w-full overflow-hidden rounded-pill bg-muted">
                           <div
-                            className="h-full rounded-full"
+                            className="h-full rounded-pill"
                             style={{ width: `${row.pct}%`, backgroundColor: color }}
                           />
                         </div>
@@ -265,7 +265,7 @@ export function DashboardPage() {
         <CardContent className="p-0">
           {recent.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-4 px-6 py-12 text-center">
-              <div className="rounded-full bg-muted p-3">
+              <div className="rounded-pill bg-muted p-3">
                 <PlusCircle className="size-4 text-muted-foreground" />
               </div>
               <div className="space-y-1">

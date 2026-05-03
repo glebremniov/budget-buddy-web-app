@@ -14,7 +14,7 @@ export function DashboardSkeleton() {
       <div className="flex gap-2">
         {[28, 28, 28, 28].map((w, i) => (
           // biome-ignore lint/suspicious/noArrayIndexKey: static skeleton
-          <Skeleton key={i} className="h-7 rounded-full" style={{ width: w * 1.2 }} />
+          <Skeleton key={i} className="h-7 rounded-pill" style={{ width: w * 1.2 }} />
         ))}
       </div>
 
@@ -23,7 +23,7 @@ export function DashboardSkeleton() {
         <Card className="col-span-2 md:col-span-1">
           <CardHeader className="pb-2">
             <div className="flex items-center gap-2">
-              <Skeleton className="h-4 w-4 rounded-full" />
+              <Skeleton className="h-4 w-4 rounded-pill" />
               <Skeleton className="h-3 w-16" />
             </div>
           </CardHeader>
@@ -35,7 +35,7 @@ export function DashboardSkeleton() {
           <Card key={i}>
             <CardHeader className="pb-2">
               <div className="flex items-center gap-2">
-                <Skeleton className="h-4 w-4 rounded-full" />
+                <Skeleton className="h-4 w-4 rounded-pill" />
                 <Skeleton className="h-3 w-16" />
               </div>
             </CardHeader>
@@ -56,12 +56,12 @@ export function DashboardSkeleton() {
             <div key={i} className="space-y-1.5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Skeleton className="h-2 w-2 rounded-full" />
+                  <Skeleton className="h-2 w-2 rounded-pill" />
                   <Skeleton className="h-4 w-28" />
                 </div>
                 <Skeleton className="h-4 w-16" />
               </div>
-              <Skeleton className="h-1.5 w-full rounded-full" />
+              <Skeleton className="h-1.5 w-full rounded-pill" />
             </div>
           ))}
         </CardContent>
@@ -80,7 +80,7 @@ export function DashboardSkeleton() {
                   <Skeleton className="h-4 w-32" />
                   <Skeleton className="h-3 w-20" />
                 </div>
-                <Skeleton className="h-6 w-24 rounded-full" />
+                <Skeleton className="h-6 w-24 rounded-pill" />
               </div>
             ))}
           </div>

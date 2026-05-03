@@ -37,7 +37,7 @@ export function MobileNav() {
     <div className="fixed left-1/2 z-50 flex -translate-x-1/2 items-center gap-3 md:hidden bottom-[env(safe-area-inset-bottom)]">
       <nav
         className={cn(
-          'flex items-center gap-0.5 rounded-full border border-border/40 px-1.5 py-1.5 shadow-xl',
+          'flex items-center gap-0.5 rounded-pill border border-border/40 px-1.5 py-1.5 shadow-xl',
           glassEffect
             ? 'bg-background/80 shadow-black/10 backdrop-blur-md dark:bg-background/70 dark:shadow-black/40'
             : 'bg-background shadow-black/5',
@@ -48,7 +48,7 @@ export function MobileNav() {
             key={to}
             to={to}
             className={cn(
-              'relative flex flex-col items-center justify-center gap-0.5 rounded-full px-3 text-muted-foreground transition-spring hover:text-foreground active:scale-95 active:bg-muted/50 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2',
+              'relative flex flex-col items-center justify-center gap-0.5 rounded-pill px-3 text-muted-foreground transition-spring hover:text-foreground active:scale-95 active:bg-muted/50 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2',
               showNavLabels ? 'h-12 min-w-[3.25rem]' : 'size-10',
             )}
             activeProps={{ className: 'text-primary bg-primary/10 ring-1 ring-primary/20' }}
@@ -70,7 +70,7 @@ export function MobileNav() {
           }}
           aria-label={fab.label}
           className={cn(
-            'flex shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-xl shadow-primary/20 transition-spring hover:brightness-110 active:scale-90 active:rotate-45 motion-reduce:transition-none starting:scale-75 starting:opacity-0',
+            'flex shrink-0 items-center justify-center rounded-pill bg-primary text-primary-foreground shadow-xl shadow-primary/20 transition-spring hover:brightness-110 active:scale-90 active:rotate-45 motion-reduce:transition-none starting:scale-75 starting:opacity-0',
             showNavLabels ? 'size-12' : 'size-10',
             glassEffect && 'bg-primary/90 backdrop-blur-sm',
           )}

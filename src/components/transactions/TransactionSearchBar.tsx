@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
-import { cn } from '@/lib/cn';
 
 interface TransactionSearchBarProps {
   value: string;
@@ -48,7 +47,7 @@ export function TransactionSearchBar({
           type="search"
           aria-label="Search transactions"
           placeholder="Search"
-          className="rounded-full pl-9"
+          className="rounded-pill pl-9"
           value={local}
           onChange={(e) => setLocal(e.target.value)}
         />
@@ -59,13 +58,13 @@ export function TransactionSearchBar({
         size="icon"
         onClick={onOpenFilters}
         aria-label="Open filters"
-        className={cn('relative size-10 shrink-0 rounded-full')}
+        className="relative size-10 shrink-0"
       >
         <ListFilter className="size-4" />
         {isFiltered && (
           <span
             aria-hidden="true"
-            className="absolute right-1 top-1 size-2 rounded-full bg-primary"
+            className="absolute right-1 top-1 size-2 rounded-pill bg-primary"
           />
         )}
       </Button>

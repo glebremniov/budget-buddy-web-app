@@ -66,7 +66,7 @@ export function TransactionList({
                       <Skeleton className="h-4 w-32" />
                       <Skeleton className="h-3 w-20" />
                     </div>
-                    <Skeleton className="h-6 w-24 rounded-full" />
+                    <Skeleton className="h-6 w-24 rounded-pill" />
                   </div>
                 ))}
               </div>

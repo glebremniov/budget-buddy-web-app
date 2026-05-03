@@ -11,8 +11,8 @@ export function TransactionsSkeleton() {
           <Skeleton className="h-4 w-48" />
         </div>
         <div className="flex gap-2">
-          <Skeleton className="h-10 w-10" />
-          <Skeleton className="h-10 w-20 rounded-md" />
+          <Skeleton className="h-10 w-10 rounded-pill" />
+          <Skeleton className="h-10 w-20 rounded-pill" />
         </div>
       </div>
 
@@ -28,7 +28,7 @@ export function TransactionsSkeleton() {
                       <Skeleton className="h-4 w-32" />
                       <Skeleton className="h-3 w-20" />
                     </div>
-                    <Skeleton className="h-6 w-24 rounded-full" />
+                    <Skeleton className="h-6 w-24 rounded-pill" />
                   </div>
                 ))}
               </div>

@@ -115,6 +115,12 @@ shadcn/ui pattern: Radix UI primitives + Tailwind v4. Shared primitives live in 
 - **Custom animations:** Defined as `@theme` tokens (`--animate-fade-in`, `--animate-in-bottom-sheet`, etc.) in `src/index.css`. Custom utilities use the `@utility` directive. Do not add raw `@keyframes` or `.animate-*` classes.
 - **Accessibility:** Segmented controls use `role="tablist"` / `role="tab"` / `aria-selected`. Sheet animations respect `prefers-reduced-motion`.
 - **Dark mode colors:** `getCategoryColor()` in `src/lib/categoryColor.ts` uses CSS `light-dark()` for automatic theme adaptation.
+- **Radius tokens:** Four semantic radii live as `@theme` tokens in `src/index.css` and drive every rounded surface:
+  - `rounded-pill` — primary buttons, FAB, badges, search bar, mobile nav, segmented controls, switch
+  - `rounded-lg` (16px) — cards, dialogs, sheets, toasts
+  - `rounded-md` (12px) — non-pill inputs, selects, dropdown surfaces, generic skeletons
+  - `rounded-sm` (8px) — dropdown items, tiny chips
+  Prefer these over ad-hoc utilities. Use `rounded-full` only for true circles (avatars, drag handle, spinners).
 
 ### Data Conventions
 
