@@ -29,6 +29,9 @@ export interface TransactionFilters {
   end?: string;
   sort?: 'asc' | 'desc';
   type?: TransactionType;
+  query?: string;
+  amountMin?: number;
+  amountMax?: number;
 }
 
 // Client-side "fetch all" limits — the API doesn't support full-text search, so we

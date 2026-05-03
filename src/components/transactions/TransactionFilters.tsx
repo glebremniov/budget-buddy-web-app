@@ -1,9 +1,12 @@
 import { RotateCcw } from 'lucide-react';
+import { useState } from 'react';
+import { AmountInput } from '@/components/ui/amount-input';
 import { Button } from '@/components/ui/button';
 import { DatePicker } from '@/components/ui/date-picker';
 import { Select } from '@/components/ui/select';
 import { TransactionTypeToggle } from '@/components/ui/transaction-type-toggle';
 import type { TransactionPageFilters } from '@/hooks/useTransactionPageState';
+import { toMinorUnits } from '@/lib/formatters';
 
 interface TransactionFiltersProps {
   categories: { id: string; name: string }[];
@@ -13,6 +16,9 @@ interface TransactionFiltersProps {
   onClose: () => void;
 }
 
+const minorToDecimalString = (minor: number | undefined): string =>
+  minor === undefined ? '' : (minor / 100).toFixed(2);
+
 export function TransactionFilters({
   categories,
   filters,
@@ -20,8 +26,37 @@ export function TransactionFilters({
   onReset,
   onClose,
 }: TransactionFiltersProps) {
+  const [minStr, setMinStr] = useState(minorToDecimalString(filters.amountMin));
+  const [maxStr, setMaxStr] = useState(minorToDecimalString(filters.amountMax));
+  const [prevMin, setPrevMin] = useState(filters.amountMin);
+  const [prevMax, setPrevMax] = useState(filters.amountMax);
+  // Sync local input strings when the external filters change (e.g. on Reset).
+  if (prevMin !== filters.amountMin) {
+    setPrevMin(filters.amountMin);
+    setMinStr(minorToDecimalString(filters.amountMin));
+  }
+  if (prevMax !== filters.amountMax) {
+    setPrevMax(filters.amountMax);
+    setMaxStr(minorToDecimalString(filters.amountMax));
+  }
+
+  const minMinor = minStr ? toMinorUnits(Number.parseFloat(minStr)) : undefined;
+  const maxMinor = maxStr ? toMinorUnits(Number.parseFloat(maxStr)) : undefined;
+  const rangeError = minMinor !== undefined && maxMinor !== undefined && minMinor > maxMinor;
+
+  const commitAmounts = (next: { amountMin?: number; amountMax?: number }) => {
+    onFilterChange({ ...filters, ...next });
+  };
+
   const hasActiveFilters =
-    filters.categoryId || filters.start || filters.end || filters.sort !== 'desc' || filters.type;
+    filters.categoryId ||
+    filters.start ||
+    filters.end ||
+    filters.sort !== 'desc' ||
+    filters.type ||
+    filters.query ||
+    filters.amountMin !== undefined ||
+    filters.amountMax !== undefined;
 
   return (
     <div className="space-y-4 pt-2">
@@ -75,6 +110,51 @@ export function TransactionFilters({
         </div>
       </div>
 
+      <fieldset className="space-y-2">
+        <legend className="text-sm font-medium">Amount range</legend>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-1">
+            <label htmlFor="amount-min-filter" className="text-xs text-muted-foreground">
+              Min
+            </label>
+            <AmountInput
+              id="amount-min-filter"
+              value={minStr}
+              error={rangeError}
+              onChange={(v) => {
+                setMinStr(v);
+                if (rangeError) return;
+                const next = v ? toMinorUnits(Number.parseFloat(v)) : undefined;
+                if (maxMinor !== undefined && next !== undefined && next > maxMinor) return;
+                commitAmounts({ amountMin: next, amountMax: filters.amountMax });
+              }}
+            />
+          </div>
+          <div className="space-y-1">
+            <label htmlFor="amount-max-filter" className="text-xs text-muted-foreground">
+              Max
+            </label>
+            <AmountInput
+              id="amount-max-filter"
+              value={maxStr}
+              error={rangeError}
+              onChange={(v) => {
+                setMaxStr(v);
+                if (rangeError) return;
+                const next = v ? toMinorUnits(Number.parseFloat(v)) : undefined;
+                if (minMinor !== undefined && next !== undefined && next < minMinor) return;
+                commitAmounts({ amountMin: filters.amountMin, amountMax: next });
+              }}
+            />
+          </div>
+        </div>
+        {rangeError && (
+          <p role="alert" className="text-xs text-destructive">
+            Min amount cannot be greater than max amount.
+          </p>
+        )}
+      </fieldset>
+
       <div className="space-y-2">
         <label htmlFor="sort-filter" className="text-sm font-medium">
           Sort
@@ -100,7 +180,7 @@ export function TransactionFilters({
           <RotateCcw className="mr-2 size-4" />
           Reset
         </Button>
-        <Button onClick={onClose} className="flex-1">
+        <Button onClick={onClose} className="flex-1" disabled={rangeError}>
           Done
         </Button>
       </div>

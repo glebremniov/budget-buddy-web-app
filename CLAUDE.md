@@ -127,6 +127,12 @@ We use page-based pagination for transactions and categories.
 - API: Consumes `meta.total` for correct item count and page calculation.
 - State: Managed at the page level via `useState` and passed to domain hooks.
 
+### Transaction filters
+
+URL search params are the source of truth for transactions list filters. Validation lives in [src/routes/_app/transactions/index.tsx](src/routes/_app/transactions/index.tsx) (`validateSearch`) — keep it `typeof`-based, no Zod. Supported params: `page`, `categoryId`, `start`, `end`, `sort`, `type`, `query`, `amountMin`, `amountMax`. **Amount params are stored in minor units** (integers ≥1) — convert in/out via `toMinorUnits` / `/100` from [src/lib/formatters.ts](src/lib/formatters.ts). Empty inputs must be omitted (`undefined`) — never send empty strings or `0`.
+
+The free-text search box debounces input via [src/hooks/useDebouncedValue.ts](src/hooks/useDebouncedValue.ts) (default 300 ms) so each keystroke does not refetch. The hook is generic — reuse it whenever you need debounced state.
+
 ### Accessibility Testing
 
 We use `vitest-axe` for automated accessibility checks.
