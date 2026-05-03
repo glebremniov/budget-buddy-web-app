@@ -1,3 +1,9 @@
+## [4.6.1](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v4.6.0...v4.6.1) (2026-05-03)
+
+### Bug Fixes
+
+* address transactions filter bugs ([dcfd794](https://github.com/budget-buddy-org/budget-buddy-web-app/commit/dcfd7946e225e877823fb122a24ec4b3981e0bfc))
+
 ## [4.6.0](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v4.5.0...v4.6.0) (2026-05-03)
 
 ### Features
