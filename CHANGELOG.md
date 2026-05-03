@@ -1,3 +1,9 @@
+## [4.6.2](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v4.6.1...v4.6.2) (2026-05-03)
+
+### Bug Fixes
+
+* align corner radius ([d306106](https://github.com/budget-buddy-org/budget-buddy-web-app/commit/d3061060a6c9902243e004af338bd2126d6d1ca9))
+
 ## [4.6.1](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v4.6.0...v4.6.1) (2026-05-03)
 
 ### Bug Fixes
