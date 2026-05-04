@@ -163,7 +163,7 @@ export function DashboardPage() {
             <AnimatedNumber
               value={balance}
               format={(v) => fmtCurrency(Math.round(v), currency)}
-              className={cn('text-2xl font-bold', balance >= 0 ? 'text-income' : 'text-expense')}
+              className={cn('text-xl font-bold', balance >= 0 ? 'text-income' : 'text-expense')}
             />
           </CardContent>
         </Card>
