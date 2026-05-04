@@ -213,14 +213,14 @@ describe('TransactionForm', () => {
   describe('default currency', () => {
     it('pre-fills currency from locale when no preference is set', () => {
       renderForm();
-      const [currencySelect] = screen.getAllByRole('combobox');
+      const [currencySelect] = screen.getAllByRole('combobox') as HTMLSelectElement[];
       expect(currencySelect.value).toBe(localeCurrency());
     });
 
     it('pre-fills currency from user preference when set', () => {
       useUserPreferencesStore.setState({ currency: 'GBP' });
       renderForm();
-      const [currencySelect] = screen.getAllByRole('combobox');
+      const [currencySelect] = screen.getAllByRole('combobox') as HTMLSelectElement[];
       expect(currencySelect.value).toBe('GBP');
     });
 
@@ -236,7 +236,7 @@ describe('TransactionForm', () => {
         categoryId: 'cat-1',
       };
       renderForm({ transaction });
-      const [currencySelect] = screen.getAllByRole('combobox');
+      const [currencySelect] = screen.getAllByRole('combobox') as HTMLSelectElement[];
       expect(currencySelect.value).toBe('EUR');
     });
   });
