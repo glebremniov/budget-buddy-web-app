@@ -1,3 +1,9 @@
+## [4.8.0](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v4.7.0...v4.8.0) (2026-05-04)
+
+### Features
+
+* implement infinite scroll for transactions page ([#129](https://github.com/budget-buddy-org/budget-buddy-web-app/issues/129)) ([fcb3586](https://github.com/budget-buddy-org/budget-buddy-web-app/commit/fcb3586eb7fb641e6c2bd1ee7930ac50a5297d02))
+
 ## [4.7.0](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v4.6.2...v4.7.0) (2026-05-04)
 
 ### Features
