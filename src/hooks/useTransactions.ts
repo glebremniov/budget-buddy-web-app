@@ -96,14 +96,6 @@ export const infiniteTransactionsQueryOptions = (filters: TransactionFilters = {
 export function useInfiniteTransactions(filters: TransactionFilters = {}) {
   return useInfiniteQuery(infiniteTransactionsQueryOptions(filters));
 }
-
-export function usePrefetchTransactions() {
-  const qc = useQueryClient();
-  return (filters: TransactionFilters = {}) => {
-    qc.prefetchQuery(transactionsQueryOptions(filters));
-  };
-}
-
 export const allTransactionsQueryOptions = (filters: TransactionFilters = {}) =>
   queryOptions({
     queryKey: [...KEYS.list(filters), 'all'],

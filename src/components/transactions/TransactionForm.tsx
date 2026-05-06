@@ -4,6 +4,7 @@ import type {
   TransactionWrite,
 } from '@budget-buddy-org/budget-buddy-contracts';
 import { Plus, RotateCcw } from 'lucide-react';
+import type React from 'react';
 import { useState } from 'react';
 import { ConfirmationDialog } from '@/components/ConfirmationDialog';
 import { AmountInput } from '@/components/ui/amount-input';
@@ -79,7 +80,7 @@ export function TransactionForm({
   const createCategoryError = getApiError(createCategory.error);
   const getFieldError = (field: string) => fieldErrors?.find((e) => e.field === field)?.message;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
 
     let categoryId = form.categoryId;

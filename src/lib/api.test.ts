@@ -31,7 +31,7 @@ vi.mock('@budget-buddy-org/budget-buddy-contracts/client.gen', () => ({
   },
 }));
 
-// Import module to trigger side-effect interceptor registration
+// Import module to trigger side effect interceptor registration
 await import('./api');
 const { getAuthToken } = await import('./api');
 

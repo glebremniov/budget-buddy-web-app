@@ -9,7 +9,7 @@ interface SectionHeaderProps {
 
 /**
  * A reusable section header with an optional icon.
- * Used primarily in Settings and multi-section pages.
+ * Used primarily in Settings and multisection pages.
  */
 export function SectionHeader({ title, icon: Icon, className }: SectionHeaderProps) {
   return (

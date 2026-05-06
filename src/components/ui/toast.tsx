@@ -12,7 +12,7 @@ function ToastViewport({
   ref,
   ...props
 }: React.ComponentPropsWithoutRef<typeof ToastPrimitives.Viewport> & {
-  ref?: React.Ref<React.ElementRef<typeof ToastPrimitives.Viewport>>;
+  ref?: React.Ref<React.ComponentRef<typeof ToastPrimitives.Viewport>>;
 }) {
   return (
     <ToastPrimitives.Viewport
@@ -49,7 +49,7 @@ function Toast({
   ...props
 }: React.ComponentPropsWithoutRef<typeof ToastPrimitives.Root> &
   VariantProps<typeof toastVariants> & {
-    ref?: React.Ref<React.ElementRef<typeof ToastPrimitives.Root>>;
+    ref?: React.Ref<React.ComponentRef<typeof ToastPrimitives.Root>>;
   }) {
   return (
     <ToastPrimitives.Root
@@ -65,7 +65,7 @@ function ToastAction({
   ref,
   ...props
 }: React.ComponentPropsWithoutRef<typeof ToastPrimitives.Action> & {
-  ref?: React.Ref<React.ElementRef<typeof ToastPrimitives.Action>>;
+  ref?: React.Ref<React.ComponentRef<typeof ToastPrimitives.Action>>;
 }) {
   return (
     <ToastPrimitives.Action
@@ -84,7 +84,7 @@ function ToastClose({
   ref,
   ...props
 }: React.ComponentPropsWithoutRef<typeof ToastPrimitives.Close> & {
-  ref?: React.Ref<React.ElementRef<typeof ToastPrimitives.Close>>;
+  ref?: React.Ref<React.ComponentRef<typeof ToastPrimitives.Close>>;
 }) {
   return (
     <ToastPrimitives.Close
@@ -107,7 +107,7 @@ function ToastTitle({
   ref,
   ...props
 }: React.ComponentPropsWithoutRef<typeof ToastPrimitives.Title> & {
-  ref?: React.Ref<React.ElementRef<typeof ToastPrimitives.Title>>;
+  ref?: React.Ref<React.ComponentRef<typeof ToastPrimitives.Title>>;
 }) {
   return (
     <ToastPrimitives.Title
@@ -123,7 +123,7 @@ function ToastDescription({
   ref,
   ...props
 }: React.ComponentPropsWithoutRef<typeof ToastPrimitives.Description> & {
-  ref?: React.Ref<React.ElementRef<typeof ToastPrimitives.Description>>;
+  ref?: React.Ref<React.ComponentRef<typeof ToastPrimitives.Description>>;
 }) {
   return (
     <ToastPrimitives.Description

@@ -1,4 +1,4 @@
-import type { FormEvent } from 'react';
+import type { SubmitEvent } from 'react';
 import { FormActions } from '@/components/ui/form-actions';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 interface CategoryFormProps {
   name: string;
   onNameChange: (name: string) => void;
-  onSubmit: (e: FormEvent) => void;
+  onSubmit: (e: SubmitEvent) => void;
   onCancel: () => void;
   onDelete?: () => void;
   isPending: boolean;
