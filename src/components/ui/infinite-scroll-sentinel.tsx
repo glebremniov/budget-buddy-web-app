@@ -5,7 +5,7 @@ interface InfiniteScrollSentinelProps {
   hasNextPage: boolean;
   isFetchingNextPage: boolean;
   onLoadMore: () => void;
-  total: number;
+  total?: number;
 }
 
 export function InfiniteScrollSentinel({
@@ -35,8 +35,12 @@ export function InfiniteScrollSentinel({
     return (
       <p className="py-6 text-center text-xs text-muted-foreground">
         End of list
-        <br />
-        Total entries: {total}
+        {total && (
+          <>
+            <br />
+            Total entries: {total}
+          </>
+        )}
       </p>
     );
   }
