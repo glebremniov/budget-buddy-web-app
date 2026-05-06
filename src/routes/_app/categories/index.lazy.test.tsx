@@ -214,7 +214,10 @@ describe('CategoriesPage', () => {
     await user.type(screen.getByPlaceholderText(/new category name/i), 'Food');
     await user.click(screen.getByRole('button', { name: /save/i }));
 
-    expect(mockCreateCategory.mutate).toHaveBeenCalledWith({ name: 'Food' }, expect.any(Object));
+    expect(mockCreateCategory.mutate).toHaveBeenCalledWith(
+      { name: 'Food', monthlyBudget: null },
+      expect.any(Object),
+    );
   });
 
   it('does not submit create form when input is empty', async () => {
@@ -266,7 +269,53 @@ describe('CategoriesPage', () => {
     await user.type(editInput, 'Food');
     await user.click(screen.getByRole('button', { name: /save/i }));
 
-    expect(mockUpdateCategory.mutate).toHaveBeenCalledWith({ name: 'Food' }, expect.any(Object));
+    expect(mockUpdateCategory.mutate).toHaveBeenCalledWith(
+      { name: 'Food', monthlyBudget: null },
+      expect.any(Object),
+    );
+  });
+
+  it('sends the typed monthly budget in minor units when creating', async () => {
+    vi.mocked(useCategories).mockReturnValue({
+      data: { items: [], meta: { total: 0, size: 200, page: 0 } },
+      isLoading: false,
+    } as unknown as ReturnType<typeof useCategories>);
+    renderPage();
+    const user = userEvent.setup();
+
+    await user.click(screen.getAllByRole('button', { name: /add/i })[0]);
+    await user.type(screen.getByPlaceholderText(/new category name/i), 'Food');
+    // AmountInput strips non-digits and shifts decimals: typing '5000' -> '50.00'
+    await user.type(screen.getByPlaceholderText('0.00'), '5000');
+    await user.click(screen.getByRole('button', { name: /save/i }));
+
+    expect(mockCreateCategory.mutate).toHaveBeenCalledWith(
+      { name: 'Food', monthlyBudget: 5000 },
+      expect.any(Object),
+    );
+  });
+
+  it('sends null when the budget field is cleared on edit', async () => {
+    vi.mocked(useCategories).mockReturnValue({
+      data: {
+        items: [{ id: 'cat-1', name: 'Groceries', monthlyBudget: 5000 }],
+        meta: { total: 1, size: 200, page: 0 },
+      },
+      isLoading: false,
+    } as unknown as ReturnType<typeof useCategories>);
+    renderPage();
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('button', { name: 'Edit category: Groceries' }));
+    // Budget input should prefill with '50.00'
+    const budgetInput = screen.getByDisplayValue('50.00');
+    await user.clear(budgetInput);
+    await user.click(screen.getByRole('button', { name: /save/i }));
+
+    expect(mockUpdateCategory.mutate).toHaveBeenCalledWith(
+      { name: 'Groceries', monthlyBudget: null },
+      expect.any(Object),
+    );
   });
 
   it('cancels edit mode without mutating when Cancel is clicked', async () => {

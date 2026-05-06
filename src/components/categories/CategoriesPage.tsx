@@ -25,6 +25,20 @@ import {
   useUpdateCategory,
 } from '@/hooks/useCategories';
 import { getApiError } from '@/lib/api-error';
+import { toMinorUnits } from '@/lib/formatters';
+
+function minorUnitsToInput(value: number | null | undefined): string {
+  if (value == null) return '';
+  return (value / 100).toFixed(2);
+}
+
+function inputToMinorUnits(value: string): number | null {
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  const parsed = Number(trimmed);
+  if (!Number.isFinite(parsed) || parsed <= 0) return null;
+  return toMinorUnits(parsed);
+}
 
 export function CategoriesPage() {
   const [page, setPage] = useState(0);
@@ -41,10 +55,17 @@ export function CategoriesPage() {
   }, []);
 
   const [newName, setNewName] = useState('');
+  const [newBudget, setNewBudget] = useState('');
   const [showForm, setShowForm] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<{ id: string; name: string } | null>(null);
+  const [editingCategory, setEditingCategory] = useState<{
+    id: string;
+    name: string;
+    monthlyBudget?: number | null;
+  } | null>(null);
   const [editName, setEditName] = useState('');
+  const [editBudget, setEditBudget] = useState('');
   const [originalEditName, setOriginalEditName] = useState('');
+  const [originalEditBudget, setOriginalEditBudget] = useState('');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const createFieldError = getApiError(createCategory.error)?.errors?.[0]?.message;
@@ -55,10 +76,11 @@ export function CategoriesPage() {
     e.preventDefault();
     if (!newName.trim()) return;
     createCategory.mutate(
-      { name: newName.trim() },
+      { name: newName.trim(), monthlyBudget: inputToMinorUnits(newBudget) },
       {
         onSuccess: () => {
           setNewName('');
+          setNewBudget('');
           setShowForm(false);
           setPage(0);
           toast({
@@ -84,11 +106,15 @@ export function CategoriesPage() {
     e.preventDefault();
     if (!editName.trim() || !editingCategory) return;
     updateCategory.mutate(
-      { name: editName.trim() },
+      {
+        name: editName.trim(),
+        monthlyBudget: inputToMinorUnits(editBudget),
+      },
       {
         onSuccess: () => {
           setEditingCategory(null);
           setEditName('');
+          setEditBudget('');
           toast({
             title: 'Category updated',
             variant: 'success',
@@ -110,12 +136,16 @@ export function CategoriesPage() {
 
   const handleDelete = () => {
     if (!editingCategory) return;
-    const snapshot = { name: editingCategory.name };
+    const snapshot = {
+      name: editingCategory.name,
+      monthlyBudget: editingCategory.monthlyBudget ?? null,
+    };
     deleteCategory.mutate(editingCategory.id, {
       onSuccess: () => {
         setShowDeleteConfirm(false);
         setEditingCategory(null);
         setEditName('');
+        setEditBudget('');
         const { dismiss } = toast({
           title: 'Category deleted',
           variant: 'success',
@@ -168,6 +198,7 @@ export function CategoriesPage() {
           setShowForm(open);
           if (!open) {
             setNewName('');
+            setNewBudget('');
             createCategory.reset();
           }
         }}
@@ -180,10 +211,13 @@ export function CategoriesPage() {
           <CategoryForm
             name={newName}
             onNameChange={setNewName}
+            monthlyBudget={newBudget}
+            onMonthlyBudgetChange={setNewBudget}
             onSubmit={handleCreate}
             onCancel={() => {
               setShowForm(false);
               setNewName('');
+              setNewBudget('');
               createCategory.reset();
             }}
             isPending={createCategory.isPending}
@@ -198,6 +232,7 @@ export function CategoriesPage() {
         onOpenChange={(open) => {
           if (!open) {
             setEditingCategory(null);
+            setEditBudget('');
             updateCategory.reset();
           }
         }}
@@ -205,21 +240,27 @@ export function CategoriesPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Category</DialogTitle>
-            <DialogDescription>Modify the name of your category</DialogDescription>
+            <DialogDescription>Modify the name and budget of your category</DialogDescription>
           </DialogHeader>
           <CategoryForm
             isEditing
             name={editName}
             onNameChange={setEditName}
+            monthlyBudget={editBudget}
+            onMonthlyBudgetChange={setEditBudget}
             onSubmit={handleUpdate}
             onCancel={() => {
               setEditingCategory(null);
+              setEditBudget('');
               updateCategory.reset();
             }}
             onDelete={() => setShowDeleteConfirm(true)}
             isPending={updateCategory.isPending}
             error={updateFieldError}
-            isDisabled={!editName.trim() || editName.trim() === originalEditName}
+            isDisabled={
+              !editName.trim() ||
+              (editName.trim() === originalEditName && editBudget === originalEditBudget)
+            }
           />
         </DialogContent>
       </Dialog>
@@ -240,6 +281,9 @@ export function CategoriesPage() {
                     setEditingCategory(c);
                     setEditName(c.name);
                     setOriginalEditName(c.name);
+                    const budgetInput = minorUnitsToInput(c.monthlyBudget);
+                    setEditBudget(budgetInput);
+                    setOriginalEditBudget(budgetInput);
                   }}
                 />
               ))}

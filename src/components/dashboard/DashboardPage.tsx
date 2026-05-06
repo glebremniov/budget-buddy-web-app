@@ -11,14 +11,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ListItem } from '@/components/ui/list-item';
 import { PageContainer } from '@/components/ui/page-container';
-import { useCategories } from '@/hooks/useCategories';
+import { useCategoriesSummary } from '@/hooks/useCategoriesSummary';
 import { useFormatters } from '@/hooks/useFormatters';
-import { useAllTransactions } from '@/hooks/useTransactions';
+import { useAllTransactions, useTransactions } from '@/hooks/useTransactions';
 import { getCategoryColor } from '@/lib/categoryColor';
 import { cn } from '@/lib/cn';
-import { todayIso, toLocalIsoDate } from '@/lib/formatters';
+import { localeCurrency, todayIso, toLocalIsoDate, toLocalYearMonth } from '@/lib/formatters';
 import { haptic } from '@/lib/haptics';
 import { useThemeStore } from '@/stores/theme.store';
+import { useUserPreferencesStore } from '@/stores/user-preferences.store';
 
 const VISIBLE_COUNT = 5;
 const MONTH_NAMES = [
@@ -50,7 +51,7 @@ export function DashboardPage() {
 
   const [selectedMonth, setSelectedMonth] = useState(currentMonth);
 
-  const { firstDayOfPeriod, lastDayOfPeriod } = useMemo(
+  const { firstDayOfPeriod, lastDayOfPeriod, periodMonth } = useMemo(
     () => ({
       firstDayOfPeriod: toLocalIsoDate(new Date(currentYear, selectedMonth, 1)),
       // For past months use the last day of that month; for the current month use today.
@@ -58,6 +59,7 @@ export function DashboardPage() {
         selectedMonth === currentMonth
           ? todayIso()
           : toLocalIsoDate(new Date(currentYear, selectedMonth + 1, 0)),
+      periodMonth: toLocalYearMonth(new Date(currentYear, selectedMonth, 1)),
     }),
     [currentYear, currentMonth, selectedMonth],
   );
@@ -68,56 +70,57 @@ export function DashboardPage() {
     setShowAll(false);
   };
 
+  const preferredCurrency = useUserPreferencesStore((s) => s.currency) ?? localeCurrency();
+
+  const { data: summaryData, isLoading: summaryLoading } = useCategoriesSummary({
+    month: periodMonth,
+    currency: preferredCurrency,
+  });
+
+  // Income/expense totals: no server-side aggregation endpoint exists yet, so we
+  // still rely on a (capped) client-side sum across the period's transactions.
   const { data: txData, isLoading: txLoading } = useAllTransactions({
     start: firstDayOfPeriod,
     end: lastDayOfPeriod,
     sort: 'desc',
   });
-  const { data: catData, isLoading: catLoading } = useCategories();
 
-  const { totals, balance, categoryRows, recent, currency } = useMemo(() => {
-    const transactions = txData?.items ?? [];
-    const categoryMap = new Map((catData?.items ?? []).map((c) => [c.id, c.name]));
+  const { data: recentData, isLoading: recentLoading } = useTransactions({
+    start: firstDayOfPeriod,
+    end: lastDayOfPeriod,
+    sort: 'desc',
+    size: 5,
+  });
 
+  const { totals, balance } = useMemo(() => {
     let income = 0;
     let expense = 0;
-    // Key by categoryId (empty string = no category) to preserve the id for linking.
-    const expenseByCategory: Record<string, { name: string; amount: number }> = {};
-
-    for (const t of transactions) {
-      if (t.type === 'INCOME') {
-        income += t.amount;
-      } else {
-        expense += t.amount;
-        const catId = t.categoryId ?? '';
-        const name = (t.categoryId && categoryMap.get(t.categoryId)) || 'No Category';
-        const entry = expenseByCategory[catId];
-        if (entry) {
-          entry.amount += t.amount;
-        } else {
-          expenseByCategory[catId] = { name, amount: t.amount };
-        }
-      }
+    for (const t of txData?.items ?? []) {
+      if (t.type === 'INCOME') income += t.amount;
+      else expense += t.amount;
     }
+    return { totals: { income, expense }, balance: income - expense };
+  }, [txData]);
 
-    const sorted = Object.entries(expenseByCategory).sort(([, a], [, b]) => b.amount - a.amount);
-    const maxAmount = sorted[0]?.[1].amount ?? 1; // top bar always fills 100%
+  const { categoryRows, excludedCount } = useMemo(() => {
+    const items = summaryData?.items ?? [];
+    const rows = items
+      .filter((row) => row.spent > 0 || (row.monthlyBudget ?? 0) > 0)
+      .map((row) => ({
+        categoryId: row.categoryId,
+        name: row.categoryName,
+        spent: row.spent,
+        monthlyBudget: row.monthlyBudget ?? null,
+      }))
+      .sort((a, b) => b.spent - a.spent);
+    const excluded = items.reduce((sum, row) => sum + row.excludedTransactionCount, 0);
+    return { categoryRows: rows, excludedCount: excluded };
+  }, [summaryData]);
 
-    return {
-      totals: { income, expense },
-      balance: income - expense,
-      categoryRows: sorted.map(([catId, { name, amount }]) => ({
-        name,
-        amount,
-        categoryId: catId || undefined,
-        pct: Math.round((amount / maxAmount) * 100),
-      })),
-      recent: transactions.slice(0, 8),
-      currency: transactions[0]?.currency ?? 'EUR',
-    };
-  }, [txData, catData]);
+  const currency = summaryData?.currency ?? preferredCurrency;
+  const recent = recentData?.items ?? [];
 
-  if (txLoading || catLoading) return <DashboardSkeleton />;
+  if (summaryLoading || txLoading || recentLoading) return <DashboardSkeleton />;
 
   const visibleRows = showAll ? categoryRows : categoryRows.slice(0, VISIBLE_COUNT);
   const hiddenCount = categoryRows.length - VISIBLE_COUNT;
@@ -206,8 +209,13 @@ export function DashboardPage() {
               <ul className="space-y-3">
                 {visibleRows.map((row) => {
                   const color = getCategoryColor(row.name);
+                  const hasBudget = row.monthlyBudget != null && row.monthlyBudget > 0;
+                  const pct = hasBudget
+                    ? Math.min(100, Math.round((row.spent / (row.monthlyBudget as number)) * 100))
+                    : 0;
+                  const overBudget = hasBudget && row.spent > (row.monthlyBudget as number);
                   return (
-                    <li key={row.name}>
+                    <li key={row.categoryId}>
                       <Link
                         to="/transactions"
                         search={{
@@ -226,21 +234,43 @@ export function DashboardPage() {
                             />
                             <span className="truncate text-sm font-medium">{row.name}</span>
                           </div>
-                          <span className="shrink-0 text-sm text-muted-foreground">
-                            {fmtCurrency(row.amount, currency)}
+                          <span
+                            className={cn(
+                              'shrink-0 text-sm tabular-nums',
+                              overBudget ? 'text-expense font-medium' : 'text-muted-foreground',
+                            )}
+                          >
+                            {hasBudget
+                              ? `${fmtCurrency(row.spent, currency)} / ${fmtCurrency(row.monthlyBudget as number, currency)}`
+                              : fmtCurrency(row.spent, currency)}
                           </span>
                         </div>
-                        <div className="h-1.5 w-full overflow-hidden rounded-pill bg-muted">
-                          <div
-                            className="h-full rounded-pill"
-                            style={{ width: `${row.pct}%`, backgroundColor: color }}
-                          />
-                        </div>
+                        {hasBudget ? (
+                          <div className="h-1.5 w-full overflow-hidden rounded-pill bg-muted">
+                            <div
+                              className="h-full rounded-pill"
+                              style={{
+                                width: `${pct}%`,
+                                backgroundColor: overBudget ? 'var(--color-expense)' : color,
+                              }}
+                            />
+                          </div>
+                        ) : (
+                          <p className="text-xs text-muted-foreground">No budget</p>
+                        )}
                       </Link>
                     </li>
                   );
                 })}
               </ul>
+
+              {excludedCount > 0 && (
+                <p className="text-xs text-muted-foreground">
+                  {excludedCount === 1
+                    ? '1 transaction in another currency not shown'
+                    : `${excludedCount} transactions in other currencies not shown`}
+                </p>
+              )}
 
               {hiddenCount > 0 && (
                 <Button

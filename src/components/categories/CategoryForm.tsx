@@ -1,4 +1,5 @@
 import type { SubmitEvent } from 'react';
+import { AmountInput } from '@/components/ui/amount-input';
 import { FormActions } from '@/components/ui/form-actions';
 import { FormField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
@@ -6,6 +7,8 @@ import { Input } from '@/components/ui/input';
 interface CategoryFormProps {
   name: string;
   onNameChange: (name: string) => void;
+  monthlyBudget: string;
+  onMonthlyBudgetChange: (value: string) => void;
   onSubmit: (e: SubmitEvent) => void;
   onCancel: () => void;
   onDelete?: () => void;
@@ -21,6 +24,8 @@ interface CategoryFormProps {
 export function CategoryForm({
   name,
   onNameChange,
+  monthlyBudget,
+  onMonthlyBudgetChange,
   onSubmit,
   onCancel,
   onDelete,
@@ -41,6 +46,14 @@ export function CategoryForm({
           autoFocus
           autoComplete="off"
           error={!!error}
+        />
+      </FormField>
+
+      <FormField label="Monthly budget (optional)" htmlFor="category-monthly-budget">
+        <AmountInput
+          id="category-monthly-budget"
+          value={monthlyBudget}
+          onChange={onMonthlyBudgetChange}
         />
       </FormField>
 

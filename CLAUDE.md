@@ -65,7 +65,11 @@ The application uses standalone functional API calls (e.g. `listTransactions`, `
 
 TanStack Query v5. All query/mutation logic lives in hooks under `src/hooks/`. Each domain hook file (e.g. `useTransactions.ts`, `useCategories.ts`) exports a `KEYS` object for consistent cache key management, plus hooks for list, detail, create, update, and delete. Delete mutations use optimistic updates with rollback via `onMutate`/`onError`.
 
-- **Dashboard aggregation fetch:** The API has no aggregation endpoint, so `useAllTransactions` fetches up to 2,000 transactions in batches of 200 to calculate monthly totals and chart data client-side. This is intentional and scoped to the Dashboard. The standard `useInfiniteTransactions` (size=20) is used for the transactions list, while `useCategories` (size=200) is used for categories. Text search is server-side via the contracts `query` param — never filter locally.
+- **Dashboard data sources:** The Dashboard composes three fetches:
+  - `useCategoriesSummary({ month, currency })` ([src/hooks/useCategoriesSummary.ts](src/hooks/useCategoriesSummary.ts)) — server-side per-category aggregation (`spent`, `monthlyBudget`, `excludedTransactionCount`). Source of truth for the "Expenses by category" section.
+  - `useTransactions({ size: 5, ... })` — recent transactions list.
+  - `useAllTransactions` — still used **only** to compute income/expense/balance totals client-side, since no income aggregation endpoint exists yet. Capped at 2,000 transactions.
+  Text search is server-side via the contracts `query` param — never filter locally.
 
 Global error logging is wired into `QueryCache` and `MutationCache` in `src/lib/query-client.ts` — don't add duplicate error reporting inside individual hooks.
 
