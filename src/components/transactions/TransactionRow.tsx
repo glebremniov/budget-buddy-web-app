@@ -1,7 +1,6 @@
 import type { Transaction } from '@budget-buddy-org/budget-buddy-contracts';
 import { memo } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { useFormatters } from '@/hooks/useFormatters';
+import { TransactionAmount } from '@/components/transactions/TransactionAmount';
 
 interface TransactionRowProps {
   transaction: Transaction;
@@ -14,7 +13,6 @@ export const TransactionRow = memo(function TransactionRow({
   categoryName,
   onEdit,
 }: TransactionRowProps) {
-  const { fmtCurrency } = useFormatters();
   return (
     <li className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-muted/30 cursor-pointer">
       <button
@@ -26,10 +24,7 @@ export const TransactionRow = memo(function TransactionRow({
         <p className="truncate text-sm font-medium">{t.description ?? '—'}</p>
         <p className="text-xs text-muted-foreground">{categoryName || 'No Category'}</p>
       </button>
-      <Badge variant={t.type === 'INCOME' ? 'income' : 'expense'}>
-        {t.type === 'INCOME' ? '+' : '-'}
-        {fmtCurrency(t.amount, t.currency)}
-      </Badge>
+      <TransactionAmount amount={t.amount} currency={t.currency} type={t.type} />
     </li>
   );
 });

@@ -4,8 +4,8 @@ import { useMemo, useState } from 'react';
 import { DashboardSkeleton } from '@/components/dashboard/DashboardSkeleton';
 import { SummaryCard, SummaryCardDescription } from '@/components/dashboard/SummaryCard';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { TransactionAmount } from '@/components/transactions/TransactionAmount';
 import { AnimatedNumber } from '@/components/ui/animated-number';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useCategories } from '@/hooks/useCategories';
@@ -298,12 +298,7 @@ export function DashboardPage() {
                       <p className="truncate text-sm font-medium">{t.description ?? '—'}</p>
                       <p className="text-xs text-muted-foreground">{fmtDate(t.date)}</p>
                     </div>
-                    <div className="ml-4 flex items-center gap-2">
-                      <Badge variant={t.type === 'INCOME' ? 'income' : 'expense'}>
-                        {t.type === 'INCOME' ? '+' : '-'}
-                        {fmtCurrency(t.amount, t.currency)}
-                      </Badge>
-                    </div>
+                    <TransactionAmount amount={t.amount} currency={t.currency} type={t.type} />
                   </button>
                 </li>
               ))}
