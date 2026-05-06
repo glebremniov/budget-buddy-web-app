@@ -1,3 +1,9 @@
+## [4.9.0](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v4.8.2...v4.9.0) (2026-05-06)
+
+### Features
+
+* **dashboard:** server-side category summary + per-category budgets (closes [#133](https://github.com/budget-buddy-org/budget-buddy-web-app/issues/133)) ([#135](https://github.com/budget-buddy-org/budget-buddy-web-app/issues/135)) ([e591145](https://github.com/budget-buddy-org/budget-buddy-web-app/commit/e591145993b68c859543ec62556da3eb3881607e))
+
 ## [4.8.2](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v4.8.1...v4.8.2) (2026-05-06)
 
 ### Bug Fixes
