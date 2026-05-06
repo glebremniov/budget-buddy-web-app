@@ -13,14 +13,15 @@ vi.mock('@tanstack/react-router', () => ({
 
 vi.mock('@/hooks/useTransactions', () => ({
   useAllTransactions: vi.fn(),
+  useTransactions: vi.fn(),
 }));
 
-vi.mock('@/hooks/useCategories', () => ({
-  useCategories: vi.fn(),
+vi.mock('@/hooks/useCategoriesSummary', () => ({
+  useCategoriesSummary: vi.fn(),
 }));
 
-import { useCategories } from '@/hooks/useCategories';
-import { useAllTransactions } from '@/hooks/useTransactions';
+import { useCategoriesSummary } from '@/hooks/useCategoriesSummary';
+import { useAllTransactions, useTransactions } from '@/hooks/useTransactions';
 
 const mockTransactions = [
   {
@@ -49,15 +50,28 @@ describe('DashboardPage', () => {
     vi.setSystemTime(new Date('2026-04-14'));
     vi.clearAllMocks();
 
-    vi.mocked(useCategories).mockReturnValue({
+    vi.mocked(useCategoriesSummary).mockReturnValue({
       data: {
+        month: '2026-04',
+        currency: 'EUR',
         items: [
-          { id: '1', name: 'Food' },
-          { id: '2', name: 'Transport' },
+          {
+            categoryId: '2',
+            categoryName: 'Transport',
+            monthlyBudget: 10000,
+            spent: 5000,
+            transactionCount: 1,
+            excludedTransactionCount: 0,
+          },
         ],
       },
       isLoading: false,
-    } as ReturnType<typeof useCategories>);
+    } as ReturnType<typeof useCategoriesSummary>);
+
+    vi.mocked(useTransactions).mockReturnValue({
+      data: { items: [], meta: { total: 0, size: 5, page: 0 } },
+      isLoading: false,
+    } as unknown as ReturnType<typeof useTransactions>);
   });
 
   afterEach(() => {
@@ -70,7 +84,7 @@ describe('DashboardPage', () => {
         items: mockTransactions,
       },
       isLoading: false,
-    } as ReturnType<typeof useAllTransactions>);
+    } as unknown as ReturnType<typeof useAllTransactions>);
 
     render(<DashboardPage />);
 
@@ -97,7 +111,11 @@ describe('DashboardPage', () => {
         items: mockTransactions,
       },
       isLoading: false,
-    } as ReturnType<typeof useAllTransactions>);
+    } as unknown as ReturnType<typeof useAllTransactions>);
+    vi.mocked(useTransactions).mockReturnValue({
+      data: { items: mockTransactions, meta: { total: 2, size: 5, page: 0 } },
+      isLoading: false,
+    } as unknown as ReturnType<typeof useTransactions>);
 
     render(<DashboardPage />);
 
@@ -105,5 +123,46 @@ describe('DashboardPage', () => {
     fireEvent.click(transactionItem);
 
     expect(mockNavigate).toHaveBeenCalledWith(expect.objectContaining({ to: '/transactions' }));
+  });
+
+  it('renders summary rows with budget progress and the spent / budget label', async () => {
+    vi.mocked(useAllTransactions).mockReturnValue({
+      data: { items: [] },
+      isLoading: false,
+    } as unknown as ReturnType<typeof useAllTransactions>);
+
+    render(<DashboardPage />);
+
+    expect(screen.getByText('Transport')).toBeInTheDocument();
+    // 5000 / 10000 minor units → "€50.00 / €100.00"
+    expect(screen.getByText(/50\.00.*100\.00/)).toBeInTheDocument();
+  });
+
+  it('shows the excluded-transactions note when excludedTransactionCount > 0', async () => {
+    vi.mocked(useCategoriesSummary).mockReturnValue({
+      data: {
+        month: '2026-04',
+        currency: 'EUR',
+        items: [
+          {
+            categoryId: '2',
+            categoryName: 'Transport',
+            monthlyBudget: null,
+            spent: 5000,
+            transactionCount: 1,
+            excludedTransactionCount: 3,
+          },
+        ],
+      },
+      isLoading: false,
+    } as ReturnType<typeof useCategoriesSummary>);
+    vi.mocked(useAllTransactions).mockReturnValue({
+      data: { items: [] },
+      isLoading: false,
+    } as unknown as ReturnType<typeof useAllTransactions>);
+
+    render(<DashboardPage />);
+
+    expect(screen.getByText(/3 transactions in other currencies not shown/i)).toBeInTheDocument();
   });
 });
