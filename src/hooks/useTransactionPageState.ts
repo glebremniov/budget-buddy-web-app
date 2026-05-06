@@ -1,6 +1,6 @@
 import { useNavigate } from '@tanstack/react-router';
 import { useCallback, useState } from 'react';
-import { Route } from '@/routes/_app/transactions/index';
+import { Route } from '@/routes/_app/transactions';
 
 export interface TransactionPageFilters {
   categoryId: string;
@@ -86,7 +86,7 @@ export function useTransactionPageState() {
   const handleQueryChange = useCallback(
     (next: string | undefined) => {
       navigate({
-        search: (prev) => ({
+        search: (prev: TransactionPageFilters) => ({
           ...prev,
           query: next && next.length > 0 ? next : undefined,
         }),

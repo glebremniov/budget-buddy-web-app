@@ -5,19 +5,13 @@ import type * as React from 'react';
 import { cn } from '@/lib/cn';
 
 const Dialog = DialogPrimitives.Root;
-
-const DialogTrigger = DialogPrimitives.Trigger;
-
 const DialogPortal = DialogPrimitives.Portal;
-
-const DialogClose = DialogPrimitives.Close;
-
 function DialogOverlay({
   className,
   ref,
   ...props
 }: React.ComponentPropsWithoutRef<typeof DialogPrimitives.Overlay> & {
-  ref?: React.Ref<React.ElementRef<typeof DialogPrimitives.Overlay>>;
+  ref?: React.Ref<React.ComponentRef<typeof DialogPrimitives.Overlay>>;
 }) {
   return (
     <DialogPrimitives.Overlay
@@ -39,7 +33,7 @@ function DialogContent({
   ...props
 }: React.ComponentPropsWithoutRef<typeof DialogPrimitives.Content> & {
   hideClose?: boolean;
-  ref?: React.Ref<React.ElementRef<typeof DialogPrimitives.Content>>;
+  ref?: React.Ref<React.ComponentRef<typeof DialogPrimitives.Content>>;
 }) {
   return (
     <DialogPortal>
@@ -94,7 +88,7 @@ function DialogTitle({
   ref,
   ...props
 }: React.ComponentPropsWithoutRef<typeof DialogPrimitives.Title> & {
-  ref?: React.Ref<React.ElementRef<typeof DialogPrimitives.Title>>;
+  ref?: React.Ref<React.ComponentRef<typeof DialogPrimitives.Title>>;
 }) {
   return (
     <DialogPrimitives.Title
@@ -110,7 +104,7 @@ function DialogDescription({
   ref,
   ...props
 }: React.ComponentPropsWithoutRef<typeof DialogPrimitives.Description> & {
-  ref?: React.Ref<React.ElementRef<typeof DialogPrimitives.Description>>;
+  ref?: React.Ref<React.ComponentRef<typeof DialogPrimitives.Description>>;
 }) {
   return (
     <DialogPrimitives.Description
@@ -123,7 +117,6 @@ function DialogDescription({
 
 export {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -131,5 +124,4 @@ export {
   DialogOverlay,
   DialogPortal,
   DialogTitle,
-  DialogTrigger,
 };

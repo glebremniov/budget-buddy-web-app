@@ -37,7 +37,7 @@ function getSnapshot() {
 
 /**
  * Returns whether the app can be installed and a function to trigger the
- * native install prompt.  Uses useSyncExternalStore so every consumer stays
+ * native installation prompt.  Uses useSyncExternalStore so every consumer stays
  * in sync when the event fires or the user installs/dismisses the prompt.
  */
 export function useInstallPrompt() {

@@ -23,5 +23,4 @@ docker-compose.yml
 .dockerignore
 
 # Docs
-docs
 *.md

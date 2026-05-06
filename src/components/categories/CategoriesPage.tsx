@@ -1,3 +1,4 @@
+import type React from 'react';
 import { useCallback, useState } from 'react';
 import { ConfirmationDialog } from '@/components/ConfirmationDialog';
 import { CategoryForm } from '@/components/categories/CategoryForm';
@@ -50,7 +51,7 @@ export function CategoriesPage() {
   const updateCategory = useUpdateCategory(editingCategory?.id ?? '');
   const updateFieldError = getApiError(updateCategory.error)?.errors?.[0]?.message;
 
-  const handleCreate = (e: React.FormEvent) => {
+  const handleCreate = (e: React.SubmitEvent) => {
     e.preventDefault();
     if (!newName.trim()) return;
     createCategory.mutate(
@@ -79,7 +80,7 @@ export function CategoriesPage() {
     );
   };
 
-  const handleUpdate = (e: React.FormEvent) => {
+  const handleUpdate = (e: React.SubmitEvent) => {
     e.preventDefault();
     if (!editName.trim() || !editingCategory) return;
     updateCategory.mutate(

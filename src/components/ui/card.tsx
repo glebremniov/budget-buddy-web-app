@@ -51,15 +51,6 @@ function CardTitle({
     />
   );
 }
-
-function CardDescription({
-  className,
-  ref,
-  ...props
-}: React.HTMLAttributes<HTMLParagraphElement> & { ref?: React.Ref<HTMLParagraphElement> }) {
-  return <p ref={ref} className={cn('text-sm text-muted-foreground', className)} {...props} />;
-}
-
 function CardContent({
   className,
   ref,
@@ -68,12 +59,4 @@ function CardContent({
   return <div ref={ref} className={cn('p-6 pt-0', className)} {...props} />;
 }
 
-function CardFooter({
-  className,
-  ref,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> }) {
-  return <div ref={ref} className={cn('flex items-center p-6 pt-0', className)} {...props} />;
-}
-
-export { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle };
+export { Card, CardContent, CardHeader, CardTitle };

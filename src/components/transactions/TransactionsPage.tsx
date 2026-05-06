@@ -175,7 +175,7 @@ export function TransactionsPage() {
 
       {!isLoading && transactions.length > 0 && (
         <InfiniteScrollSentinel
-          hasNextPage={!!hasNextPage}
+          hasNextPage={hasNextPage}
           isFetchingNextPage={isFetchingNextPage}
           onLoadMore={() => {
             void fetchNextPage();

@@ -50,12 +50,6 @@ function attachSystemThemeListener(getState: () => ThemeState) {
   mediaQuery.addEventListener('change', handleSystemThemeChange);
   systemThemeCleanup = () => mediaQuery.removeEventListener('change', handleSystemThemeChange);
 }
-
-export function detachSystemThemeListener() {
-  systemThemeCleanup?.();
-  systemThemeCleanup = null;
-}
-
 export const useThemeStore = create<ThemeState>()(
   persist(
     (set, get) => ({
