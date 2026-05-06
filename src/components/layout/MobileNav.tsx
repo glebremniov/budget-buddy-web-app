@@ -1,6 +1,6 @@
 import { Link, useRouterState } from '@tanstack/react-router';
 import { ArrowLeftRight, LayoutDashboard, Plus, Tag } from 'lucide-react';
-import { useCallback, useRef } from 'react';
+import { useCallback } from 'react';
 import { useFABContext } from '@/hooks/use-fab';
 import { cn } from '@/lib/cn';
 import { haptic } from '@/lib/haptics';
@@ -17,18 +17,13 @@ export function MobileNav() {
   const showNavLabels = useThemeStore((s) => s.showNavLabels);
   const glassEffect = useThemeStore((s) => s.glassEffect);
   const currentPath = useRouterState({ select: (s) => s.location.pathname });
-  const lastTapRef = useRef<{ [key: string]: number }>({});
-
   const handleTap = useCallback(
-    (to: string, timeStamp: number) => {
-      // Only buzz when the tap actually navigates — re-tapping the active
-      // tab to scroll-to-top should be silent.
-      if (to !== currentPath) haptic('tap');
-      const last = lastTapRef.current[to] || 0;
-      if (timeStamp - last < 300) {
+    (to: string) => {
+      if (to === currentPath) {
         window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        haptic('tap');
       }
-      lastTapRef.current[to] = timeStamp;
     },
     [currentPath],
   );
@@ -53,7 +48,7 @@ export function MobileNav() {
             )}
             activeProps={{ className: 'text-primary bg-primary/10 ring-1 ring-primary/20' }}
             activeOptions={{ exact: to === '/' }}
-            onClick={(e) => handleTap(to, e.timeStamp)}
+            onClick={() => handleTap(to)}
           >
             <Icon className="size-5 shrink-0" />
             {showNavLabels && <span className="text-[10px] leading-none font-medium">{label}</span>}
