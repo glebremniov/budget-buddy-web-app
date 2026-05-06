@@ -1,3 +1,9 @@
+## [4.8.1](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v4.8.0...v4.8.1) (2026-05-06)
+
+### Bug Fixes
+
+* **nav:** scroll to top on click ([8f1db40](https://github.com/budget-buddy-org/budget-buddy-web-app/commit/8f1db4014a362c7d90ff8790ca6b004f72d9b6ea))
+
 ## [4.8.0](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v4.7.0...v4.8.0) (2026-05-04)
 
 ### Features
