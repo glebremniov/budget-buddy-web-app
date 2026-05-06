@@ -1,3 +1,9 @@
+## [4.8.2](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v4.8.1...v4.8.2) (2026-05-06)
+
+### Bug Fixes
+
+* make total not mandatory prob ([106a85e](https://github.com/budget-buddy-org/budget-buddy-web-app/commit/106a85ef24f8abf0822eaa06e51234b98c36d36e))
+
 ## [4.8.1](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v4.8.0...v4.8.1) (2026-05-06)
 
 ### Bug Fixes
