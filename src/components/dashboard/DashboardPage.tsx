@@ -138,7 +138,7 @@ export function DashboardPage() {
               type="button"
               onClick={() => handleMonthSelect(month)}
               className={cn(
-                'shrink-0 rounded-pill px-3 py-1 text-sm font-medium transition outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.98] motion-reduce:transition-none',
+                'shrink-0 rounded-pill px-3 py-1 text-sm font-medium transition outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.98] motion-reduce:transition-none cursor-pointer',
                 isActive
                   ? cn(
                       'bg-primary text-primary-foreground shadow-sm',

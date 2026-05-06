@@ -180,6 +180,7 @@ export function TransactionsPage() {
           onLoadMore={() => {
             void fetchNextPage();
           }}
+          total={transactions.length}
         />
       )}
     </PageContainer>

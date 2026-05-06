@@ -5,12 +5,14 @@ interface InfiniteScrollSentinelProps {
   hasNextPage: boolean;
   isFetchingNextPage: boolean;
   onLoadMore: () => void;
+  total: number;
 }
 
 export function InfiniteScrollSentinel({
   hasNextPage,
   isFetchingNextPage,
   onLoadMore,
+  total,
 }: InfiniteScrollSentinelProps) {
   const ref = React.useRef<HTMLDivElement>(null);
 
@@ -30,7 +32,13 @@ export function InfiniteScrollSentinel({
   }, [hasNextPage, isFetchingNextPage, onLoadMore]);
 
   if (!hasNextPage) {
-    return <p className="py-6 text-center text-xs text-muted-foreground">End of list</p>;
+    return (
+      <p className="py-6 text-center text-xs text-muted-foreground">
+        End of list
+        <br />
+        Total entries: {total}
+      </p>
+    );
   }
 
   return (

@@ -3,9 +3,11 @@ import {
   Download,
   Globe,
   LogOut,
+  Minus,
   Moon,
   Navigation,
   Palette,
+  Plus,
   RefreshCw,
   Sun,
   SunMoon,
@@ -273,8 +275,8 @@ export function SettingsPage() {
         <section className="space-y-3">
           <SectionHeader title="Font Size" icon={Type} />
           <Card className="p-4 space-y-4">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1">
                 <Button
                   variant="outline"
                   size="icon"
@@ -282,7 +284,7 @@ export function SettingsPage() {
                   onClick={() => setFontSize(Math.max(12, fontSize - 1))}
                   disabled={fontSize <= 12}
                 >
-                  -
+                  <Minus className="size-4" />
                 </Button>
                 <span className="text-sm font-medium w-12 text-center">{fontSize}px</span>
                 <Button
@@ -292,7 +294,7 @@ export function SettingsPage() {
                   onClick={() => setFontSize(Math.min(24, fontSize + 1))}
                   disabled={fontSize >= 24}
                 >
-                  +
+                  <Plus className="size-4" />
                 </Button>
               </div>
               <div className="text-sm border rounded-md px-2 py-1 bg-muted">Sample Text</div>
