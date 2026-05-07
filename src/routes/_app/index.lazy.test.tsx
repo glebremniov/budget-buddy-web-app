@@ -12,7 +12,6 @@ vi.mock('@tanstack/react-router', () => ({
 }));
 
 vi.mock('@/hooks/useTransactions', () => ({
-  useAllTransactions: vi.fn(),
   useTransactions: vi.fn(),
 }));
 
@@ -20,8 +19,13 @@ vi.mock('@/hooks/useCategoriesSummary', () => ({
   useCategoriesSummary: vi.fn(),
 }));
 
+vi.mock('@/hooks/useMonthlySummary', () => ({
+  useMonthlySummary: vi.fn(),
+}));
+
 import { useCategoriesSummary } from '@/hooks/useCategoriesSummary';
-import { useAllTransactions, useTransactions } from '@/hooks/useTransactions';
+import { useMonthlySummary } from '@/hooks/useMonthlySummary';
+import { useTransactions } from '@/hooks/useTransactions';
 
 const mockTransactions = [
   {
@@ -43,6 +47,17 @@ const mockTransactions = [
     categoryId: '2',
   },
 ];
+
+const mockMonthlySummary = {
+  month: '2026-04',
+  currency: 'EUR',
+  income: 10000,
+  expense: 5000,
+  balance: 5000,
+  incomeCount: 1,
+  expenseCount: 1,
+  excludedTransactionCount: 0,
+};
 
 describe('DashboardPage', () => {
   beforeEach(() => {
@@ -72,6 +87,11 @@ describe('DashboardPage', () => {
       data: { items: [], meta: { total: 0, size: 5, page: 0 } },
       isLoading: false,
     } as unknown as ReturnType<typeof useTransactions>);
+
+    vi.mocked(useMonthlySummary).mockReturnValue({
+      data: mockMonthlySummary,
+      isLoading: false,
+    } as ReturnType<typeof useMonthlySummary>);
   });
 
   afterEach(() => {
@@ -79,26 +99,16 @@ describe('DashboardPage', () => {
   });
 
   it('shows income, expense and balance totals for the month', async () => {
-    vi.mocked(useAllTransactions).mockReturnValue({
-      data: {
-        items: mockTransactions,
-      },
-      isLoading: false,
-    } as unknown as ReturnType<typeof useAllTransactions>);
-
     render(<DashboardPage />);
 
-    // Items: 10000 income, 5000 expense. Balance = 50.00
+    // mockMonthlySummary: 10000 income, 5000 expense, 5000 balance (all minor units → €100/€50/€50)
 
-    // Income card
     const incomeCard = screen.getByText('Income').closest('.rounded-lg');
     expect(incomeCard).toHaveTextContent(/100/);
 
-    // Expense card
     const expenseCard = screen.getByText('Expenses').closest('.rounded-lg');
     expect(expenseCard).toHaveTextContent(/50/);
 
-    // Balance card
     const balanceCard = screen.getByText('Balance').closest('.rounded-lg');
     expect(balanceCard).toHaveTextContent(/50/);
   });
@@ -106,12 +116,6 @@ describe('DashboardPage', () => {
   it('navigates to transaction list on click', async () => {
     const mockNavigate = vi.fn();
     vi.mocked(useNavigate).mockReturnValue(mockNavigate);
-    vi.mocked(useAllTransactions).mockReturnValue({
-      data: {
-        items: mockTransactions,
-      },
-      isLoading: false,
-    } as unknown as ReturnType<typeof useAllTransactions>);
     vi.mocked(useTransactions).mockReturnValue({
       data: { items: mockTransactions, meta: { total: 2, size: 5, page: 0 } },
       isLoading: false,
@@ -126,11 +130,6 @@ describe('DashboardPage', () => {
   });
 
   it('renders summary rows with budget progress and the spent / budget label', async () => {
-    vi.mocked(useAllTransactions).mockReturnValue({
-      data: { items: [] },
-      isLoading: false,
-    } as unknown as ReturnType<typeof useAllTransactions>);
-
     render(<DashboardPage />);
 
     expect(screen.getByText('Transport')).toBeInTheDocument();
@@ -138,28 +137,11 @@ describe('DashboardPage', () => {
     expect(screen.getByText(/50\.00.*100\.00/)).toBeInTheDocument();
   });
 
-  it('shows the excluded-transactions note when excludedTransactionCount > 0', async () => {
-    vi.mocked(useCategoriesSummary).mockReturnValue({
-      data: {
-        month: '2026-04',
-        currency: 'EUR',
-        items: [
-          {
-            categoryId: '2',
-            categoryName: 'Transport',
-            monthlyBudget: null,
-            spent: 5000,
-            transactionCount: 1,
-            excludedTransactionCount: 3,
-          },
-        ],
-      },
+  it('shows the excluded-transactions note when monthly excludedTransactionCount > 0', async () => {
+    vi.mocked(useMonthlySummary).mockReturnValue({
+      data: { ...mockMonthlySummary, excludedTransactionCount: 3 },
       isLoading: false,
-    } as ReturnType<typeof useCategoriesSummary>);
-    vi.mocked(useAllTransactions).mockReturnValue({
-      data: { items: [] },
-      isLoading: false,
-    } as unknown as ReturnType<typeof useAllTransactions>);
+    } as ReturnType<typeof useMonthlySummary>);
 
     render(<DashboardPage />);
 

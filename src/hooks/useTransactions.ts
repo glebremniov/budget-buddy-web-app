@@ -1,6 +1,5 @@
 import type {
   PaginatedTransactions,
-  Transaction,
   TransactionType,
   TransactionUpdate,
   TransactionWrite,
@@ -34,11 +33,6 @@ export interface TransactionFilters {
   amountMin?: number;
   amountMax?: number;
 }
-
-// Dashboard aggregation pulls every transaction across multiple pages because the API
-// has no aggregation endpoint. MAX_PAGES_ALL caps the fan-out at 2000 rows.
-const PAGE_SIZE_ALL = 200;
-const MAX_PAGES_ALL = 10;
 
 export const TRANSACTIONS_PAGE_SIZE = 20;
 
@@ -95,37 +89,6 @@ export const infiniteTransactionsQueryOptions = (filters: TransactionFilters = {
 
 export function useInfiniteTransactions(filters: TransactionFilters = {}) {
   return useInfiniteQuery(infiniteTransactionsQueryOptions(filters));
-}
-export const allTransactionsQueryOptions = (filters: TransactionFilters = {}) =>
-  queryOptions({
-    queryKey: [...KEYS.list(filters), 'all'],
-    queryFn: async () => {
-      const fetchPage = async (page: number) => {
-        const { data, error } = await listTransactions({
-          query: { ...filters, size: PAGE_SIZE_ALL, page },
-        });
-        if (error) throw error;
-        return data;
-      };
-
-      const first = await fetchPage(0);
-      const total = first.meta.total;
-      const totalPages = Math.min(Math.ceil(total / PAGE_SIZE_ALL), MAX_PAGES_ALL);
-
-      if (totalPages <= 1) return { items: first.items, meta: { total } };
-
-      const rest = await Promise.all(
-        Array.from({ length: totalPages - 1 }, (_, i) => fetchPage(i + 1)),
-      );
-
-      const items: Transaction[] = first.items;
-      for (const page of rest) items.push(...page.items);
-      return { items, meta: { total } };
-    },
-  });
-
-export function useAllTransactions(filters: TransactionFilters = {}) {
-  return useQuery(allTransactionsQueryOptions(filters));
 }
 
 export const transactionDetailQueryOptions = (id: string) =>

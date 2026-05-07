@@ -13,7 +13,8 @@ import { ListItem } from '@/components/ui/list-item';
 import { PageContainer } from '@/components/ui/page-container';
 import { useCategoriesSummary } from '@/hooks/useCategoriesSummary';
 import { useFormatters } from '@/hooks/useFormatters';
-import { useAllTransactions, useTransactions } from '@/hooks/useTransactions';
+import { useMonthlySummary } from '@/hooks/useMonthlySummary';
+import { useTransactions } from '@/hooks/useTransactions';
 import { getCategoryColor } from '@/lib/categoryColor';
 import { cn } from '@/lib/cn';
 import { localeCurrency, todayIso, toLocalIsoDate, toLocalYearMonth } from '@/lib/formatters';
@@ -77,12 +78,9 @@ export function DashboardPage() {
     currency: preferredCurrency,
   });
 
-  // Income/expense totals: no server-side aggregation endpoint exists yet, so we
-  // still rely on a (capped) client-side sum across the period's transactions.
-  const { data: txData, isLoading: txLoading } = useAllTransactions({
-    start: firstDayOfPeriod,
-    end: lastDayOfPeriod,
-    sort: 'desc',
+  const { data: monthlySummary, isLoading: monthlyLoading } = useMonthlySummary({
+    month: periodMonth,
+    currency: preferredCurrency,
   });
 
   const { data: recentData, isLoading: recentLoading } = useTransactions({
@@ -92,15 +90,10 @@ export function DashboardPage() {
     size: 5,
   });
 
-  const { totals, balance } = useMemo(() => {
-    let income = 0;
-    let expense = 0;
-    for (const t of txData?.items ?? []) {
-      if (t.type === 'INCOME') income += t.amount;
-      else expense += t.amount;
-    }
-    return { totals: { income, expense }, balance: income - expense };
-  }, [txData]);
+  const income = monthlySummary?.income ?? 0;
+  const expense = monthlySummary?.expense ?? 0;
+  const balance = monthlySummary?.balance ?? 0;
+  const monthlyExcludedCount = monthlySummary?.excludedTransactionCount ?? 0;
 
   const { categoryRows, excludedCount } = useMemo(() => {
     const items = summaryData?.items ?? [];
@@ -117,10 +110,10 @@ export function DashboardPage() {
     return { categoryRows: rows, excludedCount: excluded };
   }, [summaryData]);
 
-  const currency = summaryData?.currency ?? preferredCurrency;
+  const currency = monthlySummary?.currency ?? summaryData?.currency ?? preferredCurrency;
   const recent = recentData?.items ?? [];
 
-  if (summaryLoading || txLoading || recentLoading) return <DashboardSkeleton />;
+  if (summaryLoading || monthlyLoading || recentLoading) return <DashboardSkeleton />;
 
   const visibleRows = showAll ? categoryRows : categoryRows.slice(0, VISIBLE_COUNT);
   const hiddenCount = categoryRows.length - VISIBLE_COUNT;
@@ -176,7 +169,7 @@ export function DashboardPage() {
 
         <SummaryCard
           label="Income"
-          amount={totals.income}
+          amount={income}
           currency={currency}
           icon={<ArrowUpRight className="size-4 text-income" />}
           className="text-income"
@@ -184,13 +177,21 @@ export function DashboardPage() {
         />
         <SummaryCard
           label="Expenses"
-          amount={totals.expense}
+          amount={expense}
           currency={currency}
           icon={<ArrowDownRight className="size-4 text-expense" />}
           className="text-expense"
           linkSearch={{ type: 'EXPENSE', start: firstDayOfPeriod, end: lastDayOfPeriod }}
         />
       </div>
+
+      {monthlyExcludedCount > 0 && (
+        <p className="text-xs text-muted-foreground">
+          {monthlyExcludedCount === 1
+            ? '1 transaction in another currency not shown'
+            : `${monthlyExcludedCount} transactions in other currencies not shown`}
+        </p>
+      )}
 
       {/* Expenses by category */}
       <Card>

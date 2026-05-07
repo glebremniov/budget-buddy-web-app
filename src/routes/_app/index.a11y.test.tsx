@@ -23,8 +23,8 @@ vi.mock('@/hooks/useCategories', () => ({
   }),
 }));
 
-vi.mock('@/hooks/useTransactions', () => {
-  const mockData = {
+vi.mock('@/hooks/useTransactions', () => ({
+  useTransactions: () => ({
     data: {
       items: [
         {
@@ -48,12 +48,24 @@ vi.mock('@/hooks/useTransactions', () => {
       ],
     },
     isLoading: false,
-  };
-  return {
-    useTransactions: () => mockData,
-    useAllTransactions: () => mockData,
-  };
-});
+  }),
+}));
+
+vi.mock('@/hooks/useMonthlySummary', () => ({
+  useMonthlySummary: () => ({
+    data: {
+      month: '2024-03',
+      currency: 'EUR',
+      income: 10000,
+      expense: 5000,
+      balance: 5000,
+      incomeCount: 1,
+      expenseCount: 1,
+      excludedTransactionCount: 0,
+    },
+    isLoading: false,
+  }),
+}));
 
 describe('DashboardPage a11y', () => {
   it('should have no accessibility violations', async () => {
