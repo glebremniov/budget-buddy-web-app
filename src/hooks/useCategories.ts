@@ -11,6 +11,7 @@ import {
   updateCategory,
 } from '@budget-buddy-org/budget-buddy-contracts';
 import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { CATEGORIES_SUMMARY_KEYS } from '@/hooks/useCategoriesSummary';
 
 export const CATEGORIES_PAGE_SIZE = 200;
 
@@ -63,7 +64,10 @@ export function useCreateCategory() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: KEYS.all }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: KEYS.all });
+      qc.invalidateQueries({ queryKey: CATEGORIES_SUMMARY_KEYS.all });
+    },
   });
 }
 
@@ -81,6 +85,7 @@ export function useUpdateCategory(id: string) {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: KEYS.all });
       qc.invalidateQueries({ queryKey: KEYS.detail(id) });
+      qc.invalidateQueries({ queryKey: CATEGORIES_SUMMARY_KEYS.all });
     },
   });
 }
@@ -117,6 +122,9 @@ export function useDeleteCategory() {
       // Also remove the specific detail query if it exists
       qc.removeQueries({ queryKey: KEYS.detail(id) });
     },
-    onSettled: () => qc.invalidateQueries({ queryKey: KEYS.all }),
+    onSettled: () => {
+      qc.invalidateQueries({ queryKey: KEYS.all });
+      qc.invalidateQueries({ queryKey: CATEGORIES_SUMMARY_KEYS.all });
+    },
   });
 }

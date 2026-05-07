@@ -8,9 +8,19 @@ export interface AmountInputProps
   onChange: (value: string) => void;
   ref?: React.Ref<HTMLInputElement>;
   error?: boolean;
+  /** When true, "0" is a valid amount (kept as "0.00"). Default false — zero clears the field. */
+  allowZero?: boolean;
 }
 
-function AmountInput({ className, value, onChange, ref, error, ...props }: AmountInputProps) {
+function AmountInput({
+  className,
+  value,
+  onChange,
+  ref,
+  error,
+  allowZero = false,
+  ...props
+}: AmountInputProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Extract digits only
     const digits = e.target.value.replaceAll(/\D/g, '');
@@ -22,7 +32,7 @@ function AmountInput({ className, value, onChange, ref, error, ...props }: Amoun
 
     // Convert to a number (e.g. 1299) then back to decimal string (e.g. 12.99)
     const numericValue = Number.parseInt(digits, 10);
-    if (numericValue === 0) {
+    if (numericValue === 0 && !allowZero) {
       onChange('');
       return;
     }

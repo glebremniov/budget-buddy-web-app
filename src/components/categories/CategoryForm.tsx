@@ -54,6 +54,7 @@ export function CategoryForm({
           id="category-monthly-budget"
           value={monthlyBudget}
           onChange={onMonthlyBudgetChange}
+          allowZero
         />
       </FormField>
 

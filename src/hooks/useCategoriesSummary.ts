@@ -8,14 +8,14 @@ export interface CategoriesSummaryFilters {
   currency?: string;
 }
 
-const KEYS = {
+export const CATEGORIES_SUMMARY_KEYS = {
   all: ['categories-summary'] as const,
   summary: (month: string, currency: string) => ['categories-summary', month, currency] as const,
 };
 
 export const categoriesSummaryQueryOptions = (month: string, currency: string) =>
   queryOptions({
-    queryKey: KEYS.summary(month, currency),
+    queryKey: CATEGORIES_SUMMARY_KEYS.summary(month, currency),
     queryFn: async () => {
       const { data, error } = await getCategoriesSummary({
         query: { month, currency },

@@ -210,11 +210,15 @@ export function DashboardPage() {
               <ul className="space-y-3">
                 {visibleRows.map((row) => {
                   const color = getCategoryColor(row.name);
-                  const hasBudget = row.monthlyBudget != null && row.monthlyBudget > 0;
-                  const pct = hasBudget
-                    ? Math.min(100, Math.round((row.spent / (row.monthlyBudget as number)) * 100))
-                    : 0;
-                  const overBudget = hasBudget && row.spent > (row.monthlyBudget as number);
+                  const hasBudget = row.monthlyBudget != null;
+                  const budget = row.monthlyBudget ?? 0;
+                  const pct =
+                    budget > 0
+                      ? Math.min(100, Math.round((row.spent / budget) * 100))
+                      : row.spent > 0
+                        ? 100
+                        : 0;
+                  const overBudget = hasBudget && row.spent > budget;
                   return (
                     <li key={row.categoryId}>
                       <Link
