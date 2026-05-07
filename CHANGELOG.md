@@ -1,3 +1,9 @@
+## [4.10.0](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v4.9.0...v4.10.0) (2026-05-07)
+
+### Features
+
+* **dashboard:** use GET /v1/transactions/summary; remove useAllTransactions ([#137](https://github.com/budget-buddy-org/budget-buddy-web-app/issues/137)) ([934c516](https://github.com/budget-buddy-org/budget-buddy-web-app/commit/934c51626f5649471a5b19647746b81a97bb6a18))
+
 ## [4.9.0](https://github.com/budget-buddy-org/budget-buddy-web-app/compare/v4.8.2...v4.9.0) (2026-05-06)
 
 ### Features
