@@ -1,25 +1,19 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { DashboardSkeleton } from '@/components/dashboard/DashboardSkeleton';
 import { categoriesQueryOptions } from '@/hooks/useCategories';
-import { allTransactionsQueryOptions } from '@/hooks/useTransactions';
-import { todayIso, toLocalIsoDate } from '@/lib/formatters';
+import { monthlySummaryQueryOptions } from '@/hooks/useMonthlySummary';
+import { localeCurrency, toLocalYearMonth } from '@/lib/formatters';
 import { queryClient } from '@/lib/query-client';
+import { useUserPreferencesStore } from '@/stores/user-preferences.store';
 
 export const Route = createFileRoute('/_app/')({
   pendingComponent: DashboardSkeleton,
   loader: () => {
-    const now = new Date();
-    const firstDayOfMonth = toLocalIsoDate(new Date(now.getFullYear(), now.getMonth(), 1));
-    const today = todayIso();
+    const month = toLocalYearMonth(new Date());
+    const currency = useUserPreferencesStore.getState().currency ?? localeCurrency();
 
     return Promise.all([
-      queryClient.ensureQueryData(
-        allTransactionsQueryOptions({
-          start: firstDayOfMonth,
-          end: today,
-          sort: 'desc',
-        }),
-      ),
+      queryClient.ensureQueryData(monthlySummaryQueryOptions(month, currency)),
       queryClient.ensureQueryData(categoriesQueryOptions()),
     ]);
   },
