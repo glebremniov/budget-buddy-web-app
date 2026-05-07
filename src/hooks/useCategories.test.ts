@@ -160,6 +160,25 @@ describe('useUpdateCategory', () => {
       body: { name: 'Food' },
     });
   });
+
+  it('invalidates the categories-summary cache after a successful update', async () => {
+    vi.mocked(updateCategory).mockResolvedValue({
+      data: { ...mockCategory, monthlyBudget: 50000 },
+      error: undefined,
+    } as unknown as UpdateCategoryResult);
+
+    const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const wrapper = ({ children }: { children: React.ReactNode }) =>
+      React.createElement(QueryClientProvider, { client: qc }, children);
+    const invalidateSpy = vi.spyOn(qc, 'invalidateQueries');
+
+    const { result } = renderHook(() => useUpdateCategory('cat-1'), { wrapper });
+
+    result.current.mutate({ monthlyBudget: 50000 });
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+    expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ['categories-summary'] });
+  });
 });
 
 describe('useDeleteCategory', () => {

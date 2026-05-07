@@ -53,4 +53,22 @@ describe('AmountInput', () => {
     await userEvent.type(input, '{backspace}');
     expect(onChange).toHaveBeenLastCalledWith('');
   });
+
+  it('clears the field when the only digit is "0" and zero is not allowed', async () => {
+    const onChange = vi.fn();
+    render(<AmountInput value="" onChange={onChange} />);
+    const input = screen.getByRole('textbox');
+
+    await userEvent.type(input, '0');
+    expect(onChange).toHaveBeenLastCalledWith('');
+  });
+
+  it('keeps zero as "0.00" when allowZero is set', async () => {
+    const onChange = vi.fn();
+    render(<AmountInput value="" onChange={onChange} allowZero />);
+    const input = screen.getByRole('textbox');
+
+    await userEvent.type(input, '0');
+    expect(onChange).toHaveBeenLastCalledWith('0.00');
+  });
 });
